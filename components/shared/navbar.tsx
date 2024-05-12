@@ -29,10 +29,10 @@ export const Navbar = () => {
                         ))}
                     </ul>
                     <div className='flex gap-2'>
-                        <Button variant='default' size='lg'>
+                        <Button variant='default' size='sm'>
                             Sign up
                         </Button>
-                        <Button variant='primary' size='lg'>
+                        <Button variant='primary' size='sm'>
                             Log in
                         </Button>
                     </div>
