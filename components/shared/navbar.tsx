@@ -29,11 +29,11 @@ export const Navbar = () => {
                         ))}
                     </ul>
                     <div className='flex gap-2'>
-                        <Button variant='default' size='sm'>
-                            Sign up
+                        <Button variant='default' size='sm' asChild>
+                            <Link href='/signup'>Sign up</Link>
                         </Button>
-                        <Button variant='primary' size='sm'>
-                            Log in
+                        <Button variant='primary' size='sm' asChild>
+                            <Link href='/login'>Log in</Link>
                         </Button>
                     </div>
                 </div>
