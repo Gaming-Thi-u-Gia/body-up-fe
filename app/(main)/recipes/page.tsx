@@ -1,5 +1,5 @@
 const RecipesPage = () => {
-    return <div>RecipesPage</div>;
+  return <div>Vietanhancut</div>;
 };
 
 export default RecipesPage;
