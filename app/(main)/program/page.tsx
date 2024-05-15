@@ -1,7 +1,7 @@
 import React from "react";
 
 const ProgramPage = () => {
-    return <div>ProgramPage</div>;
+    return <div>Viet Anh dep trai</div>;
 };
 
 export default ProgramPage;
