@@ -22,6 +22,7 @@ export default function RootLayout({
             <body className={cn("flex flex-col min-h-screen", font.className)}>
                 <Navbar />
                 <main className='mt-[56px] flex-1'>{children}</main>
+                
                 <Footer />
             </body>
         </html>
