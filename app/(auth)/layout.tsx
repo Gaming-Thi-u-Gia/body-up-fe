@@ -5,7 +5,7 @@ type Props = {
 };
 const AuthLayout = ({ children }: Props) => {
     return (
-        <div className='w-full h-[804px] flex'>
+        <div className='w-full flex h-[calc(100vh-120px)]'>
             <div className='w-[50%]'>{children}</div>
             <FeatureSticker />
         </div>
