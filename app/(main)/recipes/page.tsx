@@ -1,10 +1,17 @@
-import Header_navbar from './Header_Filter'
-import Latest_Recipes from './Latest_Recipes';
-const RecipesPage = () => {
-    return <div>
-        <Header_navbar />
-        <Latest_Recipes />       
-  </div>;
+import HeaderNavRecipes from './HeaderNavRecipes';
+import BodyLatestRecipes from './BodyLatestRecipes';
+import PopularCategories from './PopularCategories';
+import CategoryRecipes from './CategoryRecipes';
+const page = () => {
+    return (
+        <>
+        <div className=' max-w-7xl h-full mx-auto'>
+            <HeaderNavRecipes />
+            <BodyLatestRecipes />     
+            <PopularCategories />
+            <CategoryRecipes />  
+        </div>
+        </>
+    );
   };
-  
-  export default RecipesPage;
+  export default page;
