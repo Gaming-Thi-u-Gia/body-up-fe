@@ -10,7 +10,7 @@ const layout = ({ children }: Props) => {
         <div className="hidden w-[20%] bg-transparent border-r border-gray-200/50 lg:flex ">
           <Sidebar />
         </div>
-        <div className="w-[65%]">{children}</div>
+        <div className="w-[80%]">{children}</div>
       </div>
     </div>
   );

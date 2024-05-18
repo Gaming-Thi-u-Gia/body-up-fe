@@ -12,7 +12,7 @@ const Sidebar = () => {
         <ul className="hidden w-full flex-col items-start gap-2 md:flex">
           <li
             className={cn(
-              `flex w-full justify-center items-center font-bold text-[16px] leading-[140%]  whitespace-nowrap bg-cover transition-all group`,
+              `flex w-full justify-center items-center font-bold text-[16px] leading-[140%] whitespace-nowrap bg-cover transition-all group`,
               pathname === "/settings/preferences" &&
                 "bg-[#e6e4e4]/50 text-black border-r border-gray-300"
             )}

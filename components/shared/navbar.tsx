@@ -4,40 +4,130 @@ import { Button } from "../ui/button";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { category } from "@/constants";
+import { useState } from "react";
+import message from "/public/message.svg";
+import notifications from "/public/notifications.svg";
+import Image from "next/image";
+// import { Button } from "@/components/ui/button"
+import { LogOut, Settings, User } from "lucide-react";
+import defaultProfile from "/public/default-iProfile.png";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+// import Notification from "/Notification.svg";
 export const Navbar = () => {
-    const pathname = usePathname();
-    return (
-        <nav className='bg-[#F7F7F7] border-b border-[#C4C4C4] fixed w-full'>
-            <div className='max-w-7xl px-2 sm:px-6 lg:px-8 mx-auto '>
-                <div className='h-[56px] flex justify-between items-center font-medium'>
-                    <h3 className='font-bold text-[20px]'>BODY UP!!!</h3>
-                    <ul className='flex justify-between items-center sm:items-stretch text-sm gap-6 h-full'>
-                        {category.map((item) => (
-                            <li
-                                key={item.category}
-                                className='flex flex-col items-center justify-center leading-[54px] relative'
-                            >
-                                <Link href={item.url}>{item.category}</Link>
-                                <hr
-                                    className={cn(
-                                        `bg-[#303033] h-[2px] rounded-[10px] w-full absolute bottom-0`,
-                                        pathname !== item.url && "hidden"
-                                    )}
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                    <div className='flex gap-2'>
-                        <Button variant='default' size='sm' asChild>
-                            <Link href='/signup'>Sign up</Link>
-                        </Button>
-                        <Button variant='primary' size='sm' asChild>
-                            <Link href='/login'>Log in</Link>
-                        </Button>
-                    </div>
-                </div>
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const pathname = usePathname();
+  const [position, setPosition] = useState("bottom");
+  return (
+    <nav className="bg-[#F7F7F7] border-b border-[#C4C4C4] fixed w-full">
+      <div className="max-w-7xl px-2 sm:px-6 lg:px-8 mx-auto ">
+        <div className="h-[56px] flex justify-between items-center font-medium">
+          <h3 className="font-bold text-[20px]">BODY UP!!!</h3>
+          <ul className="flex justify-between items-center sm:items-stretch text-sm gap-6 h-full">
+            {category.map((item) => (
+              <li
+                key={item.category}
+                className="flex flex-col items-center justify-center leading-[54px] relative"
+              >
+                <Link href={item.url}>{item.category}</Link>
+                <hr
+                  className={cn(
+                    `bg-[#303033] h-[2px] rounded-[10px] w-full absolute bottom-0`,
+                    pathname !== item.url && "hidden"
+                  )}
+                />
+              </li>
+            ))}
+          </ul>
+          {!isLoggedIn ? (
+            <div className="flex gap-2">
+              <Button variant="default" size="sm" asChild>
+                <Link href="/signup">Sign up</Link>
+              </Button>
+              <Button variant="primary" size="sm" asChild>
+                <Link href="/login">Log in</Link>
+              </Button>
             </div>
-        </nav>
-    );
+          ) : (
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 gap-4">
+              <div className="relative">
+                <button
+                  type="button"
+                  className="relative rounded-full p-1 text-gray-400 hover:text-white"
+                >
+                  <Image src={message} alt="message"></Image>
+                </button>
+                <span className="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                  3
+                </span>
+              </div>
+              <div className="relative">
+                <button
+                  type="button"
+                  className="relative rounded-full p-1 text-gray-400 hover:text-white"
+                >
+                  <Image src={notifications} alt="message" />
+                </button>
+                <span className="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                  3
+                </span>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Image
+                    src={defaultProfile}
+                    alt="Profile"
+                    width={40}
+                    height={40}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>
+                        <Link href="/profile">Profile</Link>
+                      </span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>
+                        <Link href="/settings/preferences">Settings</Link>
+                      </span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuSub>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent></DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  </DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
 };
