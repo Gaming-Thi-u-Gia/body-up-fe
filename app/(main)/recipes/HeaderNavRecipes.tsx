@@ -26,16 +26,16 @@ const HeaderNavRecipes = () => {
   return (
     <div className="border-b border-[#E3E4EB]">
       <div className="  h-full mx-auto flex py-[20px] justify-between items-center">
-        <div className="py-[5px] relative">
-          <Button id="current__cate" onClick={handleOnOrOfCategories} variant="secondary" className="px-5" size="default">
+        <div className="h-full relative">
+          <Button id="current__cate" onClick={handleOnOrOfCategories} variant="secondary" className="px-[14px]" size="default">
             Browse By Collection
             <Image width={15} height={14} src="/more.svg" alt="More" />
           </Button>
-          <div id="list__cate" className="hidden mt-2 absolute bg-white z-10 rounded-[15px] w-[220px]">
+          <div id="list__cate" className="hidden mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px]">
             <ul >
               {titleRecipes.map((title, index) => {
                 return (
-                  <li className="pl-3 py-[5px] hover:text-[gray] hover:bg-slate-400" key={index}>
+                  <li className=" py-[5px] px-5 hover:text-[#000000d9] hover:bg-[#F7F7F7] cursor-pointer whitespace-nowrap text-[14px]" key={index}>
                     {title}
                   </li>
                 );
@@ -44,8 +44,8 @@ const HeaderNavRecipes = () => {
           </div>
         </div>
         <div className="flex h-8">
-          <div className="group  inline-flex">
-            <span className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out">
+          <div className="group inline-flex h-full">
+            <span className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out h-full">
               <Button
                 variant="defaultOutline"
                 size="default"
@@ -53,8 +53,8 @@ const HeaderNavRecipes = () => {
                 Search
               </Button>
             </span>
-            <span className="inline-flex group-hover:w-[240px] items-center group-hover:opacity-100 transition-all ease-in-out duration-1000 relative w-0 opacity-0 rounded-[15px]">
-              <Image className="absolute left-0 cursor-pointer  " width={20} height={20} src="/search.svg" alt="More" />
+            <span className="relative inline-flex group-hover:w-[240px] items-center group-hover:opacity-100 transition-all ease-in-out duration-1000 h-full rounded-[15px] w-0 opacity-0">
+              <Image className="absolute left-[2px] cursor-pointer" width={20} height={20} src="/search.svg" alt="More" />
               <input
                 className="pl-5 w-full rounded-[15px]"
                 placeholder="Search"
