@@ -5,6 +5,7 @@ import Image from "next/image";
 import { category } from "@/constants";
 import { FaStar } from "react-icons/fa";
 import React, { useState } from "react";
+import Link from "next/link";
 
 const CategoryRecipes = () => {
   const listCategoryItems = [
@@ -108,7 +109,8 @@ const CategoryRecipes = () => {
                       style={{
                         width: "100%",
                         borderRadius: "15px",
-                        height: "390px",
+                        height: "100%",
+                        overflow: ""
                       }}
                       src={recipe.img}
                       alt="Recipe image"
