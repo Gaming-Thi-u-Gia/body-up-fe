@@ -1,10 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { title } from "process";
 import Image from "next/image";
 import { category } from "@/constants";
 import { FaStar } from "react-icons/fa";
 import React, { useState } from "react";
+import { Link } from "lucide-react";
 
 const CategoryRecipes = () => {
   const listCategoryItems = [
@@ -108,7 +108,7 @@ const CategoryRecipes = () => {
                       style={{
                         width: "100%",
                         borderRadius: "15px",
-                        height: "390px",
+                        height: "100%",
                       }}
                       src={recipe.img}
                       alt="Recipe image"
