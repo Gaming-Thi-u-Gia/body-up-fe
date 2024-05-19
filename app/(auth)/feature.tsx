@@ -7,6 +7,7 @@ type Props = {
   text: any;
   img: any;
 };
+//@ts-ignore
 const Feature = ({ backGround, strong, text, img }: Props) => {
   return (
     <div
