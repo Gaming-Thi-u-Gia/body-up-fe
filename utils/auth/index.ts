@@ -1,4 +1,4 @@
-import { SignUpSchema } from "@/schemas";
+import { LoginSchema, SignUpSchema } from "@/schemas";
 import { z } from "zod";
 
 export const handleRegister = async (data: z.infer<typeof SignUpSchema>) => {
@@ -41,6 +41,49 @@ export const handleRegister = async (data: z.infer<typeof SignUpSchema>) => {
             }
             return datas;
         });
+        return result;
+    } catch (error) {
+        throw new Error("Error while creating account");
+    }
+};
+
+export const handleLogin = async (data: z.infer<typeof LoginSchema>) => {
+    try {
+        const result = await fetch("http://localhost:8080/api/v1/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        }).then(async (res) => {
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return data;
+        });
+        const resultFromSv = await fetch("/api/auth/", {
+            method: "POST",
+            body: JSON.stringify(result.payload),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(async (res) => {
+            const payload = await res.json();
+            const datas = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return datas;
+        });
+        return result;
     } catch (error) {
         throw new Error("Error while creating account");
     }

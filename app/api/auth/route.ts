@@ -1,5 +1,3 @@
-import { cookies } from "next/headers";
-
 export async function POST(request: Request) {
     const res = await request.json();
     const token = res.token;
@@ -16,4 +14,14 @@ export async function POST(request: Request) {
             headers: { "Set-Cookie": `sessionToken=${token}; Path=/;HttpOnly` },
         }
     );
+}
+
+export async function DELETE(request: Request) {
+    return new Response(JSON.stringify({ message: "Session deleted" }), {
+        status: 200,
+        headers: {
+            "Content-Type": "application/json",
+            "Set-Cookie": `sessionToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly`,
+        },
+    });
 }

@@ -1,4 +1,5 @@
 "use client";
+import { useAuthStore } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -9,13 +10,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { LoginSchema } from "@/schemas";
+import { handleLogin } from "@/utils/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 export const LoginForm = () => {
+    const { login } = useAuthStore((store) => store);
+    const router = useRouter();
     const form = useForm({
         resolver: zodResolver(LoginSchema),
         defaultValues: {
@@ -24,7 +29,11 @@ export const LoginForm = () => {
             isRemember: false,
         },
     });
-    const onSubmit = (data: z.infer<typeof LoginSchema>) => {};
+    const onSubmit = async (data: z.infer<typeof LoginSchema>) => {
+        const token = await handleLogin(data);
+        login(token?.payload.token);
+        router.push("/my-fitness-journey");
+    };
     return (
         <>
             <Form {...form}>
