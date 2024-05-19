@@ -88,3 +88,26 @@ export const handleLogin = async (data: z.infer<typeof LoginSchema>) => {
         throw new Error("Error while creating account");
     }
 };
+
+export const handleLogout = async () => {
+    try {
+        const result = await fetch("/api/auth/", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(async (res) => {
+            const payload = await res.json();
+            const datas = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return datas;
+        });
+    } catch (error) {
+        throw new Error("Error while creating account");
+    }
+};

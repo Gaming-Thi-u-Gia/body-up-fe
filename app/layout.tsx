@@ -23,16 +23,14 @@ export default function RootLayout({
     return (
         <html lang='en'>
             <body className={cn("flex flex-col min-h-screen", font.className)}>
-                <Navbar />
-                <main className='mt-[56px] flex-1'>
-                    <AuthStoreProvider
-                        initialToken={userCookie?.value}
-                        initialLoggedIn={!!userCookie?.value}
-                    >
-                        {children}
-                    </AuthStoreProvider>
-                </main>
-                <Footer />
+                <AuthStoreProvider
+                    initialToken={userCookie?.value}
+                    initialLoggedIn={!!userCookie?.value}
+                >
+                    <Navbar />
+                    <main className='mt-[56px] flex-1'>{children}</main>
+                    <Footer />
+                </AuthStoreProvider>
             </body>
         </html>
     );
