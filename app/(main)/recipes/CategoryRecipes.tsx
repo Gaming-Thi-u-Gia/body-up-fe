@@ -8,6 +8,8 @@ import React, { useState } from "react";
 import { Link } from "lucide-react";
 
 const CategoryRecipes = () => {
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
   const initialName = (name = '') => {
     const words = name.trim().split(' ');
     const initials = words.map(word => word.charAt(0));
@@ -63,21 +65,21 @@ const CategoryRecipes = () => {
           title: "Baked Avocado Eggs",
           star: 4,
           dietary: ["Vg", "DF", "LF"],
-          img: "https://dominofilm.vn/uploads/albums/2019/01/photo_5c495cf04fcea.jpg",
+          img: "https://chloeting.com/_next/image?url=https%3A%2F%2Fstatic.chloeting.com%2Frecipes%2F6458633750181861834e8f59%2Fimages%2Fone-pot-rice-cooker-fried-rice-1683514169461-cover.jpeg&w=1920&q=90",
         },
         {
           id: 3,
           title: "Baked Avocado Eggs",
           star: 4,
           dietary: ["Vg", "DF", "LF"],
-          img: "https://dominofilm.vn/uploads/albums/2019/01/photo_5c495cf04fcea.jpg",
+          img: "https://chloeting.com/_next/image?url=https%3A%2F%2Fstatic.chloeting.com%2Frecipes%2F6458633750181861834e8f59%2Fimages%2Fone-pot-rice-cooker-fried-rice-1683514169461-cover.jpeg&w=1920&q=90",
         },
         {
           id: 4,
           title: "Baked Avocado Eggs",
           star: 4,
           dietary: ["Vg", "DF", "LF"],
-          img: "https://dominofilm.vn/uploads/albums/2019/01/photo_5c495cf04fcea.jpg",
+          img: "https://chloeting.com/_next/image?url=https%3A%2F%2Fstatic.chloeting.com%2Frecipes%2F6458633750181861834e8f59%2Fimages%2Fone-pot-rice-cooker-fried-rice-1683514169461-cover.jpeg&w=1920&q=90",
         },
       ],
     },
@@ -111,11 +113,11 @@ const CategoryRecipes = () => {
                 >
                   <div className="relative h-full">
                     <img
-                      className="h-[87%] rounded-[15px]"
+                      className="h-[87%] w-full rounded-[15px]"
                       src={recipe.img}
                       alt="Recipe image"
                     />
-                    <div className="absolute bottom-[calc(13%+12px)] left-3 flex-wrap-reverse ">
+                    <div className="absolute bottom-[calc(13%+12px)] left-3 flex-wrap-reverse w-[32px]">
                       {recipe.dietary.map((dietary, index) => (
                         <Button
                           className="my-1"
@@ -128,10 +130,30 @@ const CategoryRecipes = () => {
                       ))}
                     </div>
                     <div className="flex w-full justify-between absolute top-3 px-5">
-                      <div>
-                        <Button variant="secondary" size="icon">
-                          <a href="#">&#x2605;</a>
-                        </Button>
+                      <div className='group inline-flex cursor-pointer text-[#D5D5D5]' >
+                        <span className={`group-hover:opacity-100 group-hover:w-auto w-0 transition-all opacity-0 flex bg-[#EEF1F2] rounded-[15px] `} >
+                          {
+                            [...Array(5)].map((star, index) => {
+                              const currentRating = index + 1;
+                              return (
+                                <span key={currentRating} className='star-label'>
+                                  <span
+                                    className={`text-[25px] px-1 ${currentRating <= (hover || rating) ? 'text-[#ffc107]' : ''}`}
+                                    onMouseEnter={() => setHover(currentRating)}
+                                    onMouseLeave={() => setHover(0)}
+                                    onClick={() => setRating(currentRating)}
+                                  >
+                                    &#9733;
+                                  </span>
+                                </span>
+                              );
+                            })
+                          }
+                        </span>
+                        <span className='group-hover:opacity-0 group-hover:w-0 bg-[#EEF1F2] rounded-[15px] px-2 text-[25px]'>
+                          &#9733;
+                        </span>
+
                       </div>
                       <div className="flex">
                         <Button className="mr-4" variant="secondary" size="icon">

@@ -21,17 +21,20 @@ const HeaderNavRecipes = () => {
   function handleOnOrOfCategories() {
     const currentCate = document.getElementById('current__cate');
     const listCate = document.getElementById('list__cate');
-    if (listCate) listCate.classList.toggle('hidden');
+    if (listCate) {
+      listCate.classList.toggle('hidden')
+    }
+    currentCate?.classList.toggle('bg-black');
   }
   return (
     <div className="border-b border-[#E3E4EB]">
       <div className="  h-full mx-auto flex py-[20px] justify-between items-center">
         <div className="h-full relative">
-          <Button id="current__cate" onClick={handleOnOrOfCategories} variant="secondary" className="px-[14px]" size="default">
+          <Button color="bg-black" id="current__cate" onClick={handleOnOrOfCategories} variant="secondary" className="px-[14px]" size="default">
             Browse By Collection
             <Image width={15} height={14} src="/more.svg" alt="More" />
           </Button>
-          <div id="list__cate" className="hidden mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px]">
+          <div id="list__cate" className=" hidden mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px]">
             <ul >
               {titleRecipes.map((title, index) => {
                 return (

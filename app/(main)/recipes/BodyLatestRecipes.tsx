@@ -55,7 +55,7 @@ const BodyLatestRecipes = () => {
                       return (
                         <span key={currentRating} className='star-label'>
                           <span
-                            className={`text-[25px] px-1 ${currentRating <= (hover || rating) ? 'text-[#ffc107]' : ''}`}
+                            className={`text-[22px] px-1 ${currentRating <= (hover || rating) ? 'text-[#ffc107]' : ''}`}
                             onMouseEnter={() => setHover(currentRating)}
                             onMouseLeave={() => setHover(0)}
                             onClick={() => setRating(currentRating)}
@@ -67,7 +67,7 @@ const BodyLatestRecipes = () => {
                     })
                   }
                 </span>
-                <span className='group-hover:opacity-0 group-hover:w-0  px-2 text-[25px]'>
+                <span className='group-hover:opacity-0 group-hover:w-0  px-2 text-[22px]'>
                   &#9733;
                 </span>
               </div>
@@ -98,7 +98,7 @@ const BodyLatestRecipes = () => {
                       return (
                         <span key={currentRating} className='star-label'>
                           <span
-                            className={`text-[25px] px-1 ${currentRating <= (hover || rating) ? 'text-[#ffc107]' : ''}`}
+                            className={`text-[22px] px-1 ${currentRating <= (hover || rating) ? 'text-[#ffc107]' : ''}`}
                             onMouseEnter={() => setHover(currentRating)}
                             onMouseLeave={() => setHover(0)}
                             onClick={() => setRating(currentRating)}
@@ -110,7 +110,7 @@ const BodyLatestRecipes = () => {
                     })
                   }
                 </span>
-                <span className='group-hover:opacity-0 group-hover:w-0 bg-[#EEF1F2] rounded-[15px] px-2 text-[25px]'>
+                <span className='group-hover:opacity-0 group-hover:w-0 bg-[#EEF1F2] rounded-[15px] px-2 text-[22px]'>
                   &#9733;
                 </span>
               </div>
