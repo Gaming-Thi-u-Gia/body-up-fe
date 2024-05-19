@@ -15,10 +15,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 export const LoginForm = () => {
+    const [isPending, startTransition] = useTransition();
     const { login } = useAuthStore((store) => store);
     const router = useRouter();
     const form = useForm({
@@ -29,10 +31,13 @@ export const LoginForm = () => {
             isRemember: false,
         },
     });
-    const onSubmit = async (data: z.infer<typeof LoginSchema>) => {
-        const token = await handleLogin(data);
-        login(token?.payload.token);
-        router.push("/my-fitness-journey");
+    const onSubmit = (data: z.infer<typeof LoginSchema>) => {
+        startTransition(async () => {
+            await handleLogin(data).then((res) => {
+                login(res?.payload.token);
+                router.push("/my-fitness-journey");
+            });
+        });
     };
     return (
         <>
@@ -111,7 +116,12 @@ export const LoginForm = () => {
                             </Link>
                         </div>
                     </div>
-                    <Button type='submit' variant='primary' size='full'>
+                    <Button
+                        type='submit'
+                        variant='primary'
+                        size='full'
+                        disabled={isPending}
+                    >
                         Log in
                     </Button>
                     <div className=''>
@@ -125,6 +135,7 @@ export const LoginForm = () => {
                         variant='primaryOutline'
                         size='full'
                         className='text-sm font-medium'
+                        disabled={isPending}
                     >
                         <Image
                             src='/google-c.svg'

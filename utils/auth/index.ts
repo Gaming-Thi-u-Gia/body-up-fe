@@ -41,7 +41,7 @@ export const handleRegister = async (data: z.infer<typeof SignUpSchema>) => {
             }
             return datas;
         });
-        return result;
+        return resultFromSv;
     } catch (error) {
         throw new Error("Error while creating account");
     }
@@ -83,7 +83,7 @@ export const handleLogin = async (data: z.infer<typeof LoginSchema>) => {
             }
             return datas;
         });
-        return result;
+        return resultFromSv;
     } catch (error) {
         throw new Error("Error while creating account");
     }

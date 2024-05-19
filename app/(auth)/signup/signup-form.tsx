@@ -16,8 +16,12 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { useAuthStore } from "@/components/providers/auth-provider";
 
 export const SignupForm = () => {
+    const [isPending, startTransition] = useTransition();
+    const { login } = useAuthStore((store) => store);
     const router = useRouter();
     const form = useForm({
         resolver: zodResolver(SignUpSchema),
@@ -30,9 +34,16 @@ export const SignupForm = () => {
             isSendMail: false,
         },
     });
-    const onSubmit = async (data: z.infer<typeof SignUpSchema>) => {
-        await handleRegister(data);
-        router.push("/my-fitness-journey");
+    const onSubmit = (data: z.infer<typeof SignUpSchema>) => {
+        startTransition(async () => {
+            await handleRegister(data)
+                .then((res) => {
+                    console.log("res:", res);
+                    login(res.payload.token);
+                    router.push("/my-fitness-journey");
+                })
+                .catch((err) => console.log(err.message));
+        });
     };
     return (
         <>
