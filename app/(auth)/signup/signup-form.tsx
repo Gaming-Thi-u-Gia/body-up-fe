@@ -13,11 +13,12 @@ import { SignUpSchema } from "@/schemas";
 import { handleRegister } from "@/utils/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 export const SignupForm = () => {
+    const router = useRouter();
     const form = useForm({
         resolver: zodResolver(SignUpSchema),
         defaultValues: {
@@ -31,6 +32,7 @@ export const SignupForm = () => {
     });
     const onSubmit = async (data: z.infer<typeof SignUpSchema>) => {
         await handleRegister(data);
+        router.push("/my-fitness-journey");
     };
     return (
         <>

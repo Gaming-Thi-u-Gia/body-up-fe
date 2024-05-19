@@ -22,7 +22,7 @@ export const AuthStoreProvider = ({
     if (!storeRef.current) {
         storeRef.current = createAuthStore({
             isLoggedIn: initialLoggedIn || false,
-            sessionToken: initialToken || "",
+            sessionToken: initialToken || null,
         });
     }
 

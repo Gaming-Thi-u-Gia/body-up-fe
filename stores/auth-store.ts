@@ -2,7 +2,7 @@ import { createStore } from "zustand/vanilla";
 
 export type AuthState = {
     isLoggedIn: boolean;
-    sessionToken: string;
+    sessionToken: string | null;
 };
 
 export type AuthActions = {
@@ -14,7 +14,7 @@ export type AuthStore = AuthState & AuthActions;
 
 export const defaultInitState: AuthState = {
     isLoggedIn: false,
-    sessionToken: "",
+    sessionToken: null,
 };
 
 export const createAuthStore = (initState: AuthState = defaultInitState) => {
@@ -22,6 +22,6 @@ export const createAuthStore = (initState: AuthState = defaultInitState) => {
         ...initState,
         login: (token) =>
             set(() => ({ isLoggedIn: true, sessionToken: token })),
-        logout: () => set(() => ({ isLoggedIn: false, sessionToken: "" })),
+        logout: () => set(() => ({ isLoggedIn: false, sessionToken: null })),
     }));
 };

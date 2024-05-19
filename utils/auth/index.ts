@@ -41,7 +41,6 @@ export const handleRegister = async (data: z.infer<typeof SignUpSchema>) => {
             }
             return datas;
         });
-        console.log(resultFromSv);
     } catch (error) {
         throw new Error("Error while creating account");
     }
