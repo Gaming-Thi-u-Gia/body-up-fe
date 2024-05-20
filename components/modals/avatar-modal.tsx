@@ -13,7 +13,9 @@ import {
 import Avatar from "react-avatar-edit";
 import { Button } from "@/components/ui/button";
 import { useAvatarModal } from "@/stores/use-avatar-model";
+import { useAuthStore } from "../providers/auth-provider";
 export const AvatarModal = () => {
+    const { sessionToken } = useAuthStore((store) => store);
     const [isClient, setIsClient] = useState(false);
     const { isOpen, close } = useAvatarModal();
     const [src, setSrc] = useState();
@@ -25,7 +27,56 @@ export const AvatarModal = () => {
         setPreview(view);
     };
     useEffect(() => setIsClient(true), []);
+    if (!isClient) {
+        return null;
+    }
 
+    const handleClick = async () => {
+        const resultFromSv = await fetch("/api/update-avatar/", {
+            method: "POST",
+            body: JSON.stringify({ base64Img: preview }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(async (res) => {
+            const payload = await res.json();
+            const datas = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return datas;
+        });
+        try {
+            const res = await fetch("http://localhost:8080/api/v1/avatar", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+                body: JSON.stringify({
+                    avatar: resultFromSv.payload.results.secure_url,
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            return data;
+        } catch (error) {
+            console.error(error);
+        }
+        close();
+        return resultFromSv;
+    };
     if (!isClient) {
         return null;
     }
@@ -41,6 +92,10 @@ export const AvatarModal = () => {
                         <Avatar
                             width={390}
                             height={295}
+                            imageHeight={295}
+                            imageWidth={390}
+                            exportAsSquare={true}
+                            exportSize={100}
                             onCrop={onCrop}
                             onClose={onClose}
                             src={src}
@@ -53,7 +108,7 @@ export const AvatarModal = () => {
                             variant='primary'
                             className='w-full'
                             size='lg'
-                            onClick={close}
+                            onClick={handleClick}
                         >
                             Save Image
                         </Button>

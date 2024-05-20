@@ -111,3 +111,28 @@ export const handleLogout = async () => {
         throw new Error("Error while creating account");
     }
 };
+
+export const getAuth = async (sessionToken: string) => {
+    try {
+        const result = await fetch("http://localhost:8080/api/v1/demo", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+        }).then(async (res) => {
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return data;
+        });
+        return result;
+    } catch (err) {
+        console.log(err);
+    }
+};

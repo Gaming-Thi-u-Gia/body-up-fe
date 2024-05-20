@@ -26,6 +26,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import { useAvatarModal } from "@/stores/use-avatar-model";
+import { getAuth } from "@/utils/auth";
+import { useAuthStore } from "@/components/providers/auth-provider";
 
 const PreferencesPage = () => {
     const { open } = useAvatarModal();
