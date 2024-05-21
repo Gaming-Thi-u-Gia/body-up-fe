@@ -26,10 +26,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import { useAvatarModal } from "@/stores/use-avatar-model";
-import { useUserStore } from "@/stores/use-user";
+import { useAuthStore } from "@/components/providers/auth-provider";
 
 const PreferencesPage = () => {
-    const { avatar } = useUserStore((store) => store);
+    const { user } = useAuthStore((store) => store);
     const { open } = useAvatarModal();
     const [profileTitle, setProfileTitle] = useState([]);
     const formSchema = z.object({
@@ -187,7 +187,7 @@ const PreferencesPage = () => {
                     <div className='flex flex-col m-[40px] justify-between h-[470px]'>
                         <div className='flex flex-col gap-3 m-[26px]'>
                             <Image
-                                src={avatar || defaultProfile}
+                                src={user?.avatar || defaultProfile}
                                 alt='profile'
                                 width={100}
                                 height={100}

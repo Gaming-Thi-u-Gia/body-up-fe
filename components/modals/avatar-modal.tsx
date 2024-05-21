@@ -12,14 +12,14 @@ import Avatar from "react-avatar-edit";
 import { Button } from "@/components/ui/button";
 import { useAvatarModal } from "@/stores/use-avatar-model";
 import { useAuthStore } from "../providers/auth-provider";
-import { useUserStore } from "@/stores/use-user";
 import { handleUpdateAvatar } from "@/utils/user";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 export const AvatarModal = () => {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
-    const { updateProfile, firstName } = useUserStore((store) => store);
-    const { sessionToken } = useAuthStore((store) => store);
+    const { sessionToken, updateProfile, user } = useAuthStore(
+        (store) => store
+    );
     const [isClient, setIsClient] = useState(false);
     const { isOpen, close } = useAvatarModal();
     const [src, setSrc] = useState();
@@ -36,9 +36,9 @@ export const AvatarModal = () => {
     const handleClick = () => {
         startTransition(async () => {
             const result = await handleUpdateAvatar(sessionToken!, preview!);
-            updateProfile(result.payload.results.secure_url);
+            updateProfile({ avatar: result.payload.results.secure_url });
             close();
-            redirect("/settings/preferences");
+            router.refresh();
         });
     };
     if (!isClient) {

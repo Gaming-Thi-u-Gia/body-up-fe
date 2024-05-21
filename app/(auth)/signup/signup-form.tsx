@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SignUpSchema } from "@/schemas";
-import { handleRegister } from "@/utils/auth";
+import { getAuth, handleRegister } from "@/utils/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
@@ -21,7 +21,7 @@ import { useAuthStore } from "@/components/providers/auth-provider";
 
 export const SignupForm = () => {
     const [isPending, startTransition] = useTransition();
-    const { login } = useAuthStore((store) => store);
+    const { login, updateProfile, user } = useAuthStore((store) => store);
     const router = useRouter();
     const form = useForm({
         resolver: zodResolver(SignUpSchema),
@@ -36,13 +36,11 @@ export const SignupForm = () => {
     });
     const onSubmit = (data: z.infer<typeof SignUpSchema>) => {
         startTransition(async () => {
-            await handleRegister(data)
-                .then((res) => {
-                    console.log("res:", res);
-                    login(res.payload.res.token);
-                    router.push("/my-fitness-journey");
-                })
-                .catch((err) => console.log(err.message));
+            const response = await handleRegister(data);
+            const authResponse = await getAuth(response.payload.res.token);
+            login(response.payload.res.token);
+            updateProfile(authResponse?.payload);
+            router.push("/program");
         });
     };
     return (
