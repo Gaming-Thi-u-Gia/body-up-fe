@@ -23,16 +23,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { startTransition, useState } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import { useAvatarModal } from "@/stores/use-avatar-model";
-import { useUserStore } from "@/stores/use-user";
-import { handleUpdateProfileUser } from "@/utils/user";
-import { Router } from "next/router";
-import { redirect } from "next/navigation";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import { handleUpdateProfileUser } from "@/utils/user";
+import { redirect } from "next/navigation";
 
 const PreferencesPage = () => {
-  const { sessionToken } = useAuthStore((store) => store);
-  const { updateProfile } = useUserStore((store) => store);
-  const { avatar } = useUserStore((store) => store);
+  const { sessionToken,updateProfile,user } = useAuthStore((store) => store);
   const { open } = useAvatarModal();
   const [profileTitle, setProfileTitle] = useState([]);
 
@@ -49,7 +45,6 @@ const PreferencesPage = () => {
     startTransition(async () => {
       const result = await handleUpdateProfileUser(values, sessionToken!);
       console.log(result);
-
       updateProfile(result?.payload.results);
       redirect("/settings/preferences");
     });
@@ -152,38 +147,43 @@ const PreferencesPage = () => {
                 >
                   Profile Title
                 </label>
-
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a title to display" />
-                  </SelectTrigger>
-                  {profileTitle.length > 0 ? (
-                    <SelectContent>
-                      <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="system">System</SelectItem>
-                    </SelectContent>
-                  ) : (
-                    <SelectContent>
-                      <SelectItem value="null" disabled>
-                        No Title To select
-                      </SelectItem>
-                    </SelectContent>
-                  )}
-                </Select>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col m-[40px] justify-between h-[470px]">
-            <div className="flex flex-col gap-3 m-[26px]">
-              <Image
-                src={avatar || defaultProfile}
-                alt="profile"
-                width={100}
-                height={100}
-                className="rounded-full ml-6"
-              />
-              {/* <label
+                                <Select>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder='Select a title to display' />
+                                    </SelectTrigger>
+                                    {profileTitle.length > 0 ? (
+                                        <SelectContent>
+                                            <SelectItem value='light'>
+                                                Light
+                                            </SelectItem>
+                                            <SelectItem value='dark'>
+                                                Dark
+                                            </SelectItem>
+                                            <SelectItem value='system'>
+                                                System
+                                            </SelectItem>
+                                        </SelectContent>
+                                    ) : (
+                                        <SelectContent>
+                                            <SelectItem value='null' disabled>
+                                                No Title To select
+                                            </SelectItem>
+                                        </SelectContent>
+                                    )}
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='flex flex-col m-[40px] justify-between h-[470px]'>
+                        <div className='flex flex-col gap-3 m-[26px]'>
+                            <Image
+                                src={user?.avatar || defaultProfile}
+                                alt='profile'
+                                width={100}
+                                height={100}
+                                className='rounded-full ml-6'
+                            />
+                            {/* <label
                               htmlFor=""
                               className="text-[#303033] h-[22.4px] font-medium flex-shrink-0 cursor-pointer"
                             >
