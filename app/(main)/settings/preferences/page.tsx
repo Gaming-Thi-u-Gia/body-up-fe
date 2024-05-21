@@ -187,7 +187,7 @@ const PreferencesPage = () => {
                     <div className='flex flex-col m-[40px] justify-between h-[470px]'>
                         <div className='flex flex-col gap-3 m-[26px]'>
                             <Image
-                                src={avatar}
+                                src={avatar || defaultProfile}
                                 alt='profile'
                                 width={100}
                                 height={100}

@@ -38,11 +38,10 @@ export const Navbar = () => {
             updateProfile(data?.payload);
         };
         fetchData();
-    }, [sessionToken, updateProfile]);
+    }, [sessionToken]);
     const router = useRouter();
     const { isLoggedIn, logout } = useAuthStore((store) => store);
     const pathname = usePathname();
-    const [position, setPosition] = useState("bottom");
     const onClick = async (event: React.MouseEvent) => {
         event.preventDefault();
         await handleLogout().then(() => {

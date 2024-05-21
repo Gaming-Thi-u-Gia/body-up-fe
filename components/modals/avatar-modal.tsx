@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import {
     Dialog,
     DialogContent,
@@ -13,9 +13,12 @@ import { Button } from "@/components/ui/button";
 import { useAvatarModal } from "@/stores/use-avatar-model";
 import { useAuthStore } from "../providers/auth-provider";
 import { useUserStore } from "@/stores/use-user";
-import { useRouter } from "next/navigation";
+import { handleUpdateAvatar } from "@/utils/user";
+import { redirect, useRouter } from "next/navigation";
 export const AvatarModal = () => {
-    const { updateProfile } = useUserStore((store) => store);
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+    const { updateProfile, firstName } = useUserStore((store) => store);
     const { sessionToken } = useAuthStore((store) => store);
     const [isClient, setIsClient] = useState(false);
     const { isOpen, close } = useAvatarModal();
@@ -30,52 +33,13 @@ export const AvatarModal = () => {
         setPreview(view);
     };
 
-    const handleClick = async () => {
-        const resultFromSv = await fetch("/api/update-avatar/", {
-            method: "POST",
-            body: JSON.stringify({ base64Img: preview }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then(async (res) => {
-            const payload = await res.json();
-            const datas = {
-                status: res.status,
-                payload,
-            };
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            return datas;
+    const handleClick = () => {
+        startTransition(async () => {
+            const result = await handleUpdateAvatar(sessionToken!, preview!);
+            updateProfile(result.payload.results.secure_url);
+            close();
+            redirect("/settings/preferences");
         });
-        try {
-            const res = await fetch("http://localhost:8080/api/v1/avatar", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${sessionToken}`,
-                },
-                body: JSON.stringify({
-                    avatar: resultFromSv.payload.results.secure_url,
-                }),
-            });
-
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-
-            const payload = await res.json();
-            const data = {
-                status: res.status,
-                payload,
-            };
-            return data;
-        } catch (error) {
-            console.error(error);
-        }
-        updateProfile(resultFromSv.payload.results.secure_url);
-        close();
-        return resultFromSv;
     };
     if (!isClient) {
         return null;
@@ -109,6 +73,7 @@ export const AvatarModal = () => {
                             className='w-full'
                             size='lg'
                             onClick={handleClick}
+                            disabled={isPending}
                         >
                             Save Image
                         </Button>
@@ -117,6 +82,7 @@ export const AvatarModal = () => {
                             className='w-full'
                             size='lg'
                             onClick={close}
+                            disabled={isPending}
                         >
                             Cancel
                         </Button>
