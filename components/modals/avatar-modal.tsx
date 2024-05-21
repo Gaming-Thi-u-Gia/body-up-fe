@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -14,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useAvatarModal } from "@/stores/use-avatar-model";
 import { useAuthStore } from "../providers/auth-provider";
 import { useUserStore } from "@/stores/use-user";
+import { useRouter } from "next/navigation";
 export const AvatarModal = () => {
     const { updateProfile } = useUserStore((store) => store);
     const { sessionToken } = useAuthStore((store) => store);
@@ -88,20 +88,20 @@ export const AvatarModal = () => {
                     <div className='flex items-center w-full justify-center mb-5'>
                         Update profile picture
                     </div>
-                    <DialogDescription className='text-center text-base '>
-                        <Avatar
-                            width={390}
-                            height={295}
-                            imageHeight={295}
-                            imageWidth={390}
-                            exportAsSquare={true}
-                            exportSize={100}
-                            onCrop={onCrop}
-                            onClose={onClose}
-                            src={src}
-                        />
-                    </DialogDescription>
+                    <DialogTitle>Your avatar :</DialogTitle>
                 </DialogHeader>
+                <Avatar
+                    width={390}
+                    height={295}
+                    imageHeight={295}
+                    imageWidth={390}
+                    exportAsSquare={true}
+                    exportSize={100}
+                    onCrop={onCrop}
+                    onClose={onClose}
+                    src={src}
+                />
+
                 <DialogFooter className='mb-4'>
                     <div className='flex flex-col gap-y-4 w-full'>
                         <Button

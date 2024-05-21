@@ -11,7 +11,13 @@ export async function POST(request: Request, response: Response) {
     const results = await new Promise((resolve, reject) => {
         cloudinary.uploader.upload(
             base64Img,
-            { overwrite: true, invalidate: true, width: 100, height: 100 },
+            {
+                folder: "user_avatar",
+                overwrite: true,
+                invalidate: true,
+                width: 100,
+                height: 100,
+            },
             function (error: any, result: any) {
                 if (error) {
                     reject(error);
