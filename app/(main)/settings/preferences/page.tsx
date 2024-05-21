@@ -25,18 +25,15 @@ import defaultProfile from "/public/default-iProfile.png";
 import { useAvatarModal } from "@/stores/use-avatar-model";
 import { useUserStore } from "@/stores/use-user";
 import { deleteAvatar, handleUpdateProfileUser } from "@/utils/user";
-import { Router } from "next/router";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useAuthStore } from "@/components/providers/auth-provider";
-import userStore from "@/stores/user-store";
-
 const PreferencesPage = () => {
   const { sessionToken } = useAuthStore((store) => store);
   const { updateProfile } = useUserStore((store) => store);
   const { avatar } = useUserStore((store) => store);
   const { open } = useAvatarModal();
   const [profileTitle, setProfileTitle] = useState([]);
-
+  const router = useRouter();
   const form = useForm({
     defaultValues: {
       firstName: "",
@@ -52,19 +49,14 @@ const PreferencesPage = () => {
       throw new Error("No session token available");
     }
     startTransition(async () => {
-      const result = await deleteAvatar(sessionToken!, avatar);
-      console.log(sessionToken);
-
-      console.log(result);
-      updateProfile(result?.payload.results);
-      redirect("/settings/preferences");
+      const result = await deleteAvatar(sessionToken);
+      updateProfile({ avatar: "" });
     });
   };
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
       const result = await handleUpdateProfileUser(values, sessionToken!);
       console.log(result);
-
       updateProfile(result?.payload.results);
       redirect("/settings/preferences");
     });
@@ -190,33 +182,28 @@ const PreferencesPage = () => {
             </div>
           </div>
           <div className="flex flex-col m-[40px] justify-between h-[470px]">
-            <div className="flex flex-col gap-3 m-[26px]">
+            <div className="flex flex-col gap-3 m-[26px] items-center justify-center">
               <Image
                 src={avatar || defaultProfile}
                 alt="profile"
                 width={100}
                 height={100}
-                className="rounded-full ml-6"
+                className="rounded-full "
               />
-              {/* <label
-                              htmlFor=""
-                              className="text-[#303033] h-[22.4px] font-medium flex-shrink-0 cursor-pointer"
-                            >
-                              Upload Profile Photo
-                            </label> */}
               <Button
                 type="button"
                 variant="primary"
                 size="full"
-                className="bg-transparent text-[#303033] font-medium ring-0 hover:ring-1"
+                className="bg-transparent text-[#303033] font-medium ring-0 hover:ring-1 text-center"
                 onClick={open}
               >
                 Upload Profile Photo
               </Button>
               <Button
                 type="button"
-                onClick={handleDeleteAva}
-                className="text-[#FF5858] h-[22.4px] flex-shrink-0 cursor-pointer"
+                size="default"
+                onClick={() => handleDeleteAva()}
+                className="text-[#FF5858] bg-transparent flex-shrink-0 cursor-pointer text-center"
               >
                 Remove Profile Photo
               </Button>

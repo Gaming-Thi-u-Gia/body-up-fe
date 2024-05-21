@@ -77,3 +77,21 @@ export const handleUpdateProfileUser = async (
   };
   return result;
 };
+export const deleteAvatar = async (sessionToken: string) => {
+  const res = await fetch("http://localhost:8080/api/v1/avatar", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`HTTP error! status: ${res.status}`);
+  }
+  const payload = await res.json();
+  const result = {
+    status: res.status,
+    payload,
+  };
+  return result;
+};
