@@ -34,7 +34,7 @@ export const LoginForm = () => {
     const onSubmit = (data: z.infer<typeof LoginSchema>) => {
         startTransition(async () => {
             await handleLogin(data).then((res) => {
-                login(res?.payload.token);
+                login(res.payload.res.token);
                 router.push("/my-fitness-journey");
             });
         });

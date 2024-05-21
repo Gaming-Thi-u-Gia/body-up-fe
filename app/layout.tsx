@@ -6,6 +6,7 @@ import { Footer } from "@/components/shared/footer";
 import { cn } from "@/lib/utils";
 import { AuthStoreProvider } from "@/components/providers/auth-provider";
 import { cookies } from "next/headers";
+import { AvatarModal } from "@/components/modals/avatar-modal";
 
 const font = Manrope({ subsets: ["latin"] });
 
@@ -28,7 +29,10 @@ export default function RootLayout({
                     initialLoggedIn={!!userCookie?.value}
                 >
                     <Navbar />
-                    <main className='mt-[56px] flex-1'>{children}</main>
+                    <main className='mt-[56px] flex-1'>
+                        <AvatarModal />
+                        {children}
+                    </main>
                     <Footer />
                 </AuthStoreProvider>
             </body>
