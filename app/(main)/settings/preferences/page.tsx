@@ -24,8 +24,8 @@ import { startTransition, useState } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import { useAvatarModal } from "@/stores/use-avatar-model";
 import { useAuthStore } from "@/components/providers/auth-provider";
-import { handleUpdateProfileUser } from "@/utils/user";
-import { redirect } from "next/navigation";
+import { deleteAvatar, handleUpdateProfileUser } from "@/utils/user";
+import { redirect, useRouter } from "next/navigation";
 
 const PreferencesPage = () => {
   const { sessionToken, updateProfile, user } = useAuthStore((store) => store);
