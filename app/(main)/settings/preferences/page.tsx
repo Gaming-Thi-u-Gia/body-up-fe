@@ -200,7 +200,7 @@ const PreferencesPage = () => {
                               Upload Profile Photo
                             </label> */}
                             <Button
-                                type='submit'
+                                type='button'
                                 variant='primary'
                                 size='full'
                                 className='bg-transparent text-[#303033] font-medium ring-0 hover:ring-1'
@@ -217,7 +217,7 @@ const PreferencesPage = () => {
                         </div>
                         <div className='flex flex-row gap-2'>
                             <Button
-                                type='submit'
+                                type='button'
                                 variant='primary'
                                 size='full'
                                 className='bg-transparent text-gray-500 ring-0 hover:ring-1'
