@@ -49,6 +49,7 @@ const PreferencesPage = () => {
     startTransition(async () => {
       const result = await deleteAvatar(sessionToken);
       updateProfile({ avatar: "" });
+      router.refresh();
     });
   };
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -141,7 +142,7 @@ const PreferencesPage = () => {
                 </label>
                 <FormField
                   control={form.control}
-                  name="username"
+                  name="bio"
                   render={({ field }) => (
                     <Textarea
                       placeholder="Add your bio..."
@@ -179,13 +180,13 @@ const PreferencesPage = () => {
             </div>
           </div>
           <div className="flex flex-col m-[40px] justify-between h-[470px]">
-            <div className="flex flex-col gap-3 m-[26px]">
+            <div className="flex flex-col gap-3 m-[26px] items-center justify-center">
               <Image
                 src={user?.avatar || defaultProfile}
                 alt="profile"
                 width={100}
                 height={100}
-                className="rounded-full ml-6"
+                className="rounded-full"
               />
               {/* <label
                               htmlFor=""
