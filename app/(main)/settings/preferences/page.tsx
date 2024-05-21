@@ -24,10 +24,11 @@ import { startTransition, useState } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import { useAvatarModal } from "@/stores/use-avatar-model";
 import { useUserStore } from "@/stores/use-user";
-import { handleUpdateProfileUser } from "@/utils/user";
+import { deleteAvatar, handleUpdateProfileUser } from "@/utils/user";
 import { Router } from "next/router";
 import { redirect } from "next/navigation";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import userStore from "@/stores/user-store";
 
 const PreferencesPage = () => {
   const { sessionToken } = useAuthStore((store) => store);
@@ -45,6 +46,20 @@ const PreferencesPage = () => {
       profileTitle: "",
     },
   });
+
+  const handleDeleteAva = async () => {
+    if (!sessionToken) {
+      throw new Error("No session token available");
+    }
+    startTransition(async () => {
+      const result = await deleteAvatar(sessionToken!, avatar);
+      console.log(sessionToken);
+
+      console.log(result);
+      updateProfile(result?.payload.results);
+      redirect("/settings/preferences");
+    });
+  };
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
       const result = await handleUpdateProfileUser(values, sessionToken!);
@@ -198,12 +213,13 @@ const PreferencesPage = () => {
               >
                 Upload Profile Photo
               </Button>
-              <label
-                htmlFor=""
+              <Button
+                type="button"
+                onClick={handleDeleteAva}
                 className="text-[#FF5858] h-[22.4px] flex-shrink-0 cursor-pointer"
               >
                 Remove Profile Photo
-              </label>
+              </Button>
             </div>
             <div className="flex flex-row gap-2">
               <Button
