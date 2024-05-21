@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { AuthStoreProvider } from "@/components/providers/auth-provider";
 import { cookies } from "next/headers";
 import { AvatarModal } from "@/components/modals/avatar-modal";
+import { getAuth } from "@/utils/auth";
 
 const font = Manrope({ subsets: ["latin"] });
 
@@ -16,26 +17,31 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-  children,
+    children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const userCookie = cookies().get("sessionToken");
-  return (
-    <html lang="en">
-      <body className={cn("flex flex-col min-h-screen", font.className)}>
-        <AuthStoreProvider
-          initialToken={userCookie?.value}
-          initialLoggedIn={!!userCookie?.value}
-        >
-          <Navbar />
-          <main className="mt-[56px] flex-1">
-            <AvatarModal />
-            {children}
-          </main>
-          <Footer />
-        </AuthStoreProvider>
-      </body>
-    </html>
-  );
+    const userCookie = cookies().get("sessionToken");
+    let res;
+    if (userCookie) {
+        res = await getAuth(userCookie.value);
+    }
+    return (
+        <html lang='en'>
+            <body className={cn("flex flex-col min-h-screen", font.className)}>
+                <AuthStoreProvider
+                    initialToken={userCookie?.value}
+                    initialLoggedIn={!!userCookie?.value}
+                    initialUser={res?.payload}
+                >
+                    <Navbar />
+                    <main className='mt-[56px] flex-1'>
+                        <AvatarModal />
+                        {children}
+                    </main>
+                    <Footer />
+                </AuthStoreProvider>
+            </body>
+        </html>
+    );
 }

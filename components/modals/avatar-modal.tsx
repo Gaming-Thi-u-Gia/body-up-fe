@@ -12,18 +12,18 @@ import Avatar from "react-avatar-edit";
 import { Button } from "@/components/ui/button";
 import { useAvatarModal } from "@/stores/use-avatar-model";
 import { useAuthStore } from "../providers/auth-provider";
-import { useUserStore } from "@/stores/use-user";
 import { handleUpdateAvatar } from "@/utils/user";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 export const AvatarModal = () => {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const { updateProfile, firstName } = useUserStore((store) => store);
-  const { sessionToken } = useAuthStore((store) => store);
-  const [isClient, setIsClient] = useState(false);
-  const { isOpen, close } = useAvatarModal();
-  const [src, setSrc] = useState();
-  const [preview, setPreview] = useState(null);
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+    const { sessionToken, updateProfile, user } = useAuthStore(
+        (store) => store
+    );
+    const [isClient, setIsClient] = useState(false);
+    const { isOpen, close } = useAvatarModal();
+    const [src, setSrc] = useState();
+    const [preview, setPreview] = useState(null);
 
   useEffect(() => setIsClient(true), []);
   const onClose = () => {
@@ -32,19 +32,17 @@ export const AvatarModal = () => {
   const onCrop = (view: any) => {
     setPreview(view);
   };
-
-  const handleClick = () => {
-    startTransition(async () => {
-      const result = await handleUpdateAvatar(sessionToken!, preview!);
-      updateProfile(result.payload.results.secure_url);
-      close();
-      redirect("/settings/preferences");
-    });
-  };
-  if (!isClient) {
-    return null;
-  }
-
+    const handleClick = () => {
+        startTransition(async () => {
+            const result = await handleUpdateAvatar(sessionToken!, preview!);
+            updateProfile({ avatar: result.payload.results.secure_url });
+            close();
+            router.refresh();
+        });
+    };
+    if (!isClient) {
+        return null;
+    }
   return (
     <Dialog open={isOpen} onOpenChange={close}>
       <DialogContent className="max-w-md">

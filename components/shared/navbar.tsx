@@ -4,11 +4,9 @@ import { Button } from "../ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { category } from "@/constants";
-import { useEffect, useState } from "react";
 import message from "/public/message.svg";
 import notifications from "/public/notifications.svg";
 import Image from "next/image";
-// import { Button } from "@/components/ui/button"
 import { LogOut, Settings, User } from "lucide-react";
 import defaultProfile from "/public/default-iProfile.png";
 
@@ -25,20 +23,11 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "../providers/auth-provider";
-import { getAuth, handleLogout } from "@/utils/auth";
-import { useUserStore } from "@/stores/use-user";
+import { handleLogout } from "@/utils/auth";
 
 // import Notification from "/Notification.svg";
 export const Navbar = () => {
-    const { sessionToken } = useAuthStore((store) => store);
-    const { avatar, updateProfile } = useUserStore((store) => store);
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await getAuth(sessionToken!);
-            updateProfile(data?.payload);
-        };
-        fetchData();
-    }, [sessionToken]);
+    const { sessionToken, user } = useAuthStore((store) => store);
     const router = useRouter();
     const { isLoggedIn, logout } = useAuthStore((store) => store);
     const pathname = usePathname();
@@ -106,7 +95,7 @@ export const Navbar = () => {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Image
-                                        src={avatar || defaultProfile}
+                                        src={user?.avatar || defaultProfile}
                                         alt='Profile'
                                         width={40}
                                         height={40}

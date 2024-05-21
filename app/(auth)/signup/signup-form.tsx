@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SignUpSchema } from "@/schemas";
-import { handleRegister } from "@/utils/auth";
+import { getAuth, handleRegister } from "@/utils/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
@@ -19,120 +19,120 @@ import { useTransition } from "react";
 import { useAuthStore } from "@/components/providers/auth-provider";
 
 export const SignupForm = () => {
-  const [isPending, startTransition] = useTransition();
-  const { login } = useAuthStore((store) => store);
-  const router = useRouter();
-  const form = useForm({
-    resolver: zodResolver(SignUpSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      isSendMail: false,
-    },
-  });
-  const onSubmit = (data: z.infer<typeof SignUpSchema>) => {
-    startTransition(async () => {
-      await handleRegister(data)
-        .then((res) => {
-          console.log("res:", res);
-          login(res.payload.res.token);
-          router.push("/my-fitness-journey");
-        })
-        .catch((err) => console.log(err.message));
+    const [isPending, startTransition] = useTransition();
+    const { login, updateProfile, user } = useAuthStore((store) => store);
+    const router = useRouter();
+    const form = useForm({
+        resolver: zodResolver(SignUpSchema),
+        defaultValues: {
+            firstName: "",
+            lastName: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            isSendMail: false,
+        },
     });
-  };
-  return (
-    <>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 mt-2">
-          <div className="space-y-3">
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="First Name"
-                      className="bg-transparent hover:ring-1 hover:ring-black"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            ></FormField>
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Last Name"
-                      className="bg-transparent hover:ring-1 hover:ring-black"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            ></FormField>
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="email"
-                      placeholder="Email"
-                      className="bg-transparent hover:ring-1 hover:ring-black"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            ></FormField>
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      placeholder="Password"
-                      className="bg-transparent hover:ring-1 hover:ring-black"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            ></FormField>
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Re-enter Password"
-                      type="password"
-                      className="bg-transparent hover:ring-1 hover:ring-black"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            ></FormField>
-
+    const onSubmit = (data: z.infer<typeof SignUpSchema>) => {
+        startTransition(async () => {
+            const response = await handleRegister(data);
+            const authResponse = await getAuth(response.payload.res.token);
+            login(response.payload.res.token);
+            updateProfile(authResponse?.payload);
+            router.push("/program");
+        });
+    };
+    return (
+        <>
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className='space-y-5 mt-2'
+                >
+                    <div className='space-y-3'>
+                        <FormField
+                            control={form.control}
+                            name='firstName'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            placeholder='First Name'
+                                            className='bg-transparent hover:ring-1 hover:ring-black'
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        ></FormField>
+                        <FormField
+                            control={form.control}
+                            name='lastName'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            placeholder='Last Name'
+                                            className='bg-transparent hover:ring-1 hover:ring-black'
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        ></FormField>
+                        <FormField
+                            control={form.control}
+                            name='email'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            type='email'
+                                            placeholder='Email'
+                                            className='bg-transparent hover:ring-1 hover:ring-black'
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        ></FormField>
+                        <FormField
+                            control={form.control}
+                            name='password'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            type='password'
+                                            placeholder='Password'
+                                            className='bg-transparent hover:ring-1 hover:ring-black'
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        ></FormField>
+                        <FormField
+                            control={form.control}
+                            name='confirmPassword'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            placeholder='Re-enter Password'
+                                            type='password'
+                                            className='bg-transparent hover:ring-1 hover:ring-black'
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        ></FormField>
             <div className="flex gap-1">
               <FormField
                 control={form.control}
