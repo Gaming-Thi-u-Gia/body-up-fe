@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
     Dialog,
     DialogContent,
@@ -14,22 +13,22 @@ import Avatar from "react-avatar-edit";
 import { Button } from "@/components/ui/button";
 import { useAvatarModal } from "@/stores/use-avatar-model";
 import { useAuthStore } from "../providers/auth-provider";
+import { useUserStore } from "@/stores/use-user";
 export const AvatarModal = () => {
+    const { updateProfile } = useUserStore((store) => store);
     const { sessionToken } = useAuthStore((store) => store);
     const [isClient, setIsClient] = useState(false);
     const { isOpen, close } = useAvatarModal();
     const [src, setSrc] = useState();
     const [preview, setPreview] = useState(null);
+
+    useEffect(() => setIsClient(true), []);
     const onClose = () => {
         setPreview(null);
     };
     const onCrop = (view: any) => {
         setPreview(view);
     };
-    useEffect(() => setIsClient(true), []);
-    if (!isClient) {
-        return null;
-    }
 
     const handleClick = async () => {
         const resultFromSv = await fetch("/api/update-avatar/", {
@@ -74,6 +73,7 @@ export const AvatarModal = () => {
         } catch (error) {
             console.error(error);
         }
+        updateProfile(resultFromSv.payload.results.secure_url);
         close();
         return resultFromSv;
     };

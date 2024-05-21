@@ -9,13 +9,17 @@ cloudinary.config({
 export async function POST(request: Request, response: Response) {
     const { base64Img } = await request.json();
     const results = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload(base64Img, {}, function (error, result) {
-            if (error) {
-                reject(error);
-                return;
+        cloudinary.uploader.upload(
+            base64Img,
+            { overwrite: true, invalidate: true, width: 100, height: 100 },
+            function (error: any, result: any) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
             }
-            resolve(result);
-        });
+        );
     });
     return Response.json({ results });
 }

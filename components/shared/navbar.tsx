@@ -111,6 +111,7 @@ export const Navbar = () => {
                                         alt='Profile'
                                         width={40}
                                         height={40}
+                                        className='rounded-full cursor-pointer'
                                     />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className='w-56'>
