@@ -2,7 +2,6 @@ import beforeAfter from "/public/before-after.png";
 import foods from "/public/foods.png";
 import todayWorkout from "/public/today-workout.png";
 import todayWorkoutRun from "/public/today-workout-run.png";
-
 import Image from "next/image";
 import Feature from "./feature";
 export const FeatureSticker = () => {

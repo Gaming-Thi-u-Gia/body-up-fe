@@ -1,6 +1,5 @@
 import Image from "next/image";
 import React from "react";
-
 type Props = {
   backGround: any;
   strong: any;

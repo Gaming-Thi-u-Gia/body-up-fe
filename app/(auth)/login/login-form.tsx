@@ -2,11 +2,11 @@
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { LoginSchema } from "@/schemas";
@@ -18,7 +18,6 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 export const LoginForm = () => {
     const [isPending, startTransition] = useTransition();
     const { login, sessionToken, updateProfile } = useAuthStore(
@@ -147,10 +146,55 @@ export const LoginForm = () => {
                             height={24}
                             className='mr-2'
                         />
-                        Log in with Google
-                    </Button>
-                </form>
-            </Form>
-        </>
-    );
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                ></FormField>
+                <label
+                  htmlFor="isRemember"
+                  className="text-sm ml-1 cursor-pointer"
+                >
+                  Keep me signed in
+                </label>
+              </div>
+              <Link href="/forgot-password" className="text-sm underline">
+                Forgot your password?
+              </Link>
+            </div>
+          </div>
+          <Button
+            type="submit"
+            variant="primary"
+            size="full"
+            disabled={isPending}
+          >
+            Log in
+          </Button>
+          <div className="">
+            <div className="flex items-center justify-center space-x-1">
+              <div className="h-[1px] w-full bg-[#e0e0e0]"></div>
+              <span className="text-sm">or</span>
+              <div className="h-[1px] w-full bg-[#e0e0e0]"></div>
+            </div>
+          </div>
+          <Button
+            variant="primaryOutline"
+            size="full"
+            className="text-sm font-medium"
+            disabled={isPending}
+          >
+            <Image
+              src="/google-c.svg"
+              alt="Google"
+              width={24}
+              height={24}
+              className="mr-2"
+            />
+            Log in with Google
+          </Button>
+        </form>
+      </Form>
+    </>
+  );
 };

@@ -1,8 +1,5 @@
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
 import { LoginForm } from "./login-form";
-
 const LoginPage = () => {
   return (
     <div className="w-[492px] py-2 px-3 mr-5">
