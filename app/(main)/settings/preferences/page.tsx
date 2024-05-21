@@ -56,7 +56,7 @@ const PreferencesPage = () => {
       const result = await handleUpdateProfileUser(values, sessionToken!);
       console.log(result);
       updateProfile(result?.payload.results);
-      redirect("/settings/preferences");
+      router.refresh();
     });
   }
 
