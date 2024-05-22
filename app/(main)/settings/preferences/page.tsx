@@ -24,11 +24,15 @@ import { startTransition, useState } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import { useAvatarModal } from "@/stores/use-avatar-model";
 import { useAuthStore } from "@/components/providers/auth-provider";
-import { deleteAvatar, handleUpdateProfileUser } from "@/utils/user";
-import { redirect, useRouter } from "next/navigation";
+import { handleUpdateProfileUser } from "@/utils/user";
+import { useRouter } from "next/navigation";
+import { useDeleteAvatarModal } from "@/stores/use-delete-avatar-model";
 
 const PreferencesPage = () => {
     const { sessionToken, updateProfile, user } = useAuthStore(
+        (store) => store
+    );
+    const { open: openDeleteAvatarModal } = useDeleteAvatarModal(
         (store) => store
     );
     const { open } = useAvatarModal();
@@ -43,17 +47,6 @@ const PreferencesPage = () => {
             profileTitle: "",
         },
     });
-
-    const handleDeleteAva = async () => {
-        if (!sessionToken) {
-            throw new Error("No session token available");
-        }
-        startTransition(async () => {
-            const result = await deleteAvatar(sessionToken);
-            updateProfile(result.payload);
-            router.refresh();
-        });
-    };
     function onSubmit(values: z.infer<typeof formSchema>) {
         startTransition(async () => {
             const result = await handleUpdateProfileUser(values, sessionToken!);
@@ -221,7 +214,7 @@ const PreferencesPage = () => {
                             <Button
                                 type='button'
                                 size='default'
-                                onClick={() => handleDeleteAva()}
+                                onClick={openDeleteAvatarModal}
                                 className='text-[#FF5858] bg-transparent flex-shrink-0 cursor-pointer text-center'
                             >
                                 Remove Profile Photo
