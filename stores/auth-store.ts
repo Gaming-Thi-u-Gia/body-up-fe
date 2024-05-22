@@ -34,6 +34,6 @@ export const createAuthStore = (initState: AuthState = defaultInitState) => {
         logout: () =>
             set(() => ({ isLoggedIn: false, sessionToken: null, user: null })),
         updateProfile: (profile: Partial<UserState>) =>
-            set((state) => ({ ...state, user: { ...state.user, ...profile } })),
+            set((state) => ({ user: { ...state.user, ...profile } })),
     }));
 };
