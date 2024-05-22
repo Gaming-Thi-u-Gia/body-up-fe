@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 export const LoginForm = () => {
     const [isPending, startTransition] = useTransition();
@@ -34,11 +35,28 @@ export const LoginForm = () => {
     });
     const onSubmit = (data: z.infer<typeof LoginSchema>) => {
         startTransition(async () => {
-            const response = await handleLogin(data);
-            const authResponse = await getAuth(response.payload.res.token);
-            login(response.payload.res.token);
-            updateProfile(authResponse?.payload);
-            router.push("/program");
+            try {
+                const response = await handleLogin(data);
+                const authResponse = await getAuth(response.payload.res.token);
+                login(response.payload.res.token);
+                updateProfile(authResponse?.payload);
+                router.push("/program");
+                toast.success("Login Successfuly!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Undo",
+                        onClick: () => console.log("Undo"),
+                    },
+                });
+            } catch (error) {
+                toast.error("Login Failed!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Undo",
+                        onClick: () => console.log("Undo"),
+                    },
+                });
+            }
         });
     };
     return (
@@ -46,20 +64,20 @@ export const LoginForm = () => {
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className='space-y-5 mt-2'
+                    className="space-y-5 mt-2"
                 >
-                    <div className='space-y-3'>
+                    <div className="space-y-3">
                         <FormField
                             control={form.control}
-                            name='email'
+                            name="email"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
                                         <Input
                                             {...field}
-                                            type='email'
-                                            placeholder='E-mail'
-                                            className='bg-transparent hover:ring-1 hover:ring-black'
+                                            type="email"
+                                            placeholder="E-mail"
+                                            className="bg-transparent hover:ring-1 hover:ring-black"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -68,35 +86,35 @@ export const LoginForm = () => {
                         ></FormField>
                         <FormField
                             control={form.control}
-                            name='password'
+                            name="password"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
                                         <Input
                                             {...field}
-                                            type='password'
-                                            placeholder='Password'
-                                            className='bg-transparent hover:ring-1 hover:ring-black'
+                                            type="password"
+                                            placeholder="Password"
+                                            className="bg-transparent hover:ring-1 hover:ring-black"
                                         />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         ></FormField>
-                        <div className='flex justify-between items-center'>
-                            <div className='flex items-center'>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
                                 <FormField
                                     control={form.control}
-                                    name='isRemember'
+                                    name="isRemember"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
                                                 {/* @ts-ignore */}
                                                 <Input
                                                     {...field}
-                                                    type='checkbox'
-                                                    className='bg-transparent'
-                                                    id='isRemember'
+                                                    type="checkbox"
+                                                    className="bg-transparent"
+                                                    id="isRemember"
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -104,47 +122,47 @@ export const LoginForm = () => {
                                     )}
                                 ></FormField>
                                 <label
-                                    htmlFor='isRemember'
-                                    className='text-sm ml-1 cursor-pointer'
+                                    htmlFor="isRemember"
+                                    className="text-sm ml-1 cursor-pointer"
                                 >
                                     Keep me signed in
                                 </label>
                             </div>
                             <Link
-                                href='/forgot-password'
-                                className='text-sm underline'
+                                href="/forgot-password"
+                                className="text-sm underline"
                             >
                                 Forgot your password?
                             </Link>
                         </div>
                     </div>
                     <Button
-                        type='submit'
-                        variant='primary'
-                        size='full'
+                        type="submit"
+                        variant="primary"
+                        size="full"
                         disabled={isPending}
                     >
                         Log in
                     </Button>
-                    <div className=''>
-                        <div className='flex items-center justify-center space-x-1'>
-                            <div className='h-[1px] w-full bg-[#e0e0e0]'></div>
-                            <span className='text-sm'>or</span>
-                            <div className='h-[1px] w-full bg-[#e0e0e0]'></div>
+                    <div className="">
+                        <div className="flex items-center justify-center space-x-1">
+                            <div className="h-[1px] w-full bg-[#e0e0e0]"></div>
+                            <span className="text-sm">or</span>
+                            <div className="h-[1px] w-full bg-[#e0e0e0]"></div>
                         </div>
                     </div>
                     <Button
-                        variant='primaryOutline'
-                        size='full'
-                        className='text-sm font-medium'
+                        variant="primaryOutline"
+                        size="full"
+                        className="text-sm font-medium"
                         disabled={isPending}
                     >
                         <Image
-                            src='/google-c.svg'
-                            alt='Google'
+                            src="/google-c.svg"
+                            alt="Google"
                             width={24}
                             height={24}
-                            className='mr-2'
+                            className="mr-2"
                         />
                         Log in with Google
                     </Button>

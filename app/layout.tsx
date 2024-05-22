@@ -9,7 +9,7 @@ import { cookies } from "next/headers";
 import { AvatarModal } from "@/components/modals/avatar-modal";
 import { getAuth } from "@/utils/auth";
 import { DeleteAvatarModal } from "@/components/modals/delete-avatar-modal";
-
+import { Toaster } from "@/components/ui/sonner";
 const font = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export default async function RootLayout({
         res = await getAuth(userCookie.value);
     }
     return (
-        <html lang='en'>
+        <html lang="en">
             <body className={cn("flex flex-col min-h-screen", font.className)}>
                 <AuthStoreProvider
                     initialToken={userCookie?.value}
@@ -36,11 +36,12 @@ export default async function RootLayout({
                     initialUser={res?.payload}
                 >
                     <Navbar />
-                    <main className='mt-[56px] flex-1'>
+                    <main className="mt-[56px] flex-1">
                         <AvatarModal />
                         <DeleteAvatarModal />
                         {children}
                     </main>
+                    <Toaster position="top-right" />
                     <Footer />
                 </AuthStoreProvider>
             </body>
