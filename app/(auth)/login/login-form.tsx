@@ -118,7 +118,12 @@ export const LoginForm = () => {
                             </Link>
                         </div>
                     </div>
-                    <Button type='submit' variant='primary' size='full'>
+                    <Button
+                        type='submit'
+                        variant='primary'
+                        size='full'
+                        disabled={isPending}
+                    >
                         Log in
                     </Button>
                     <div className=''>
@@ -132,6 +137,7 @@ export const LoginForm = () => {
                         variant='primaryOutline'
                         size='full'
                         className='text-sm font-medium'
+                        disabled={isPending}
                     >
                         <Image
                             src='/google-c.svg'
