@@ -30,7 +30,6 @@ export function DeleteAvatarModal() {
         startTransition(async () => {
             const result = await deleteAvatar(sessionToken);
             updateProfile(result.payload);
-            router.refresh();
         });
     };
     return (
@@ -41,8 +40,8 @@ export function DeleteAvatarModal() {
                         Are you absolutely sure?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete your account and remove your data from our
+                        This avatar cannot be undone. This will permanently
+                        delete your avatar and remove your avatar from our
                         servers.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
