@@ -40,14 +40,21 @@ export const AvatarModal = () => {
                     sessionToken!,
                     preview!
                 );
+                toast.success("Save Avatar Success!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
                 updateProfile({ avatar: result.payload.results.secure_url });
                 close();
             } catch (error) {
-                toast.error("Save Avatar Success!", {
+                toast.error("Save Avatar Failed!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
-                        label: "Undo",
-                        onClick: () => console.log("Undo"),
+                        label: "Close",
+                        onClick: () => console.log("Close"),
                     },
                 });
                 console.log(error);

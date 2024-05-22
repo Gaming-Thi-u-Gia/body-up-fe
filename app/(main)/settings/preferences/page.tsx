@@ -54,15 +54,23 @@ const PreferencesPage = () => {
                     values,
                     sessionToken!
                 );
+                toast.success("Save Profile Success!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+                // console.log(error);
                 console.log(result);
                 updateProfile(result?.payload.results);
                 router.refresh();
             } catch (error) {
-                toast.success("Save Profile Success!", {
+                toast.error("Save Profile Failed", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
-                        label: "Undo",
-                        onClick: () => console.log("Undo"),
+                        label: "Close",
+                        onClick: () => console.log("Close"),
                     },
                 });
                 console.log(error);
@@ -95,7 +103,9 @@ const PreferencesPage = () => {
                                             <FormControl>
                                                 <Input
                                                     {...field}
-                                                    placeholder="First Name"
+                                                    placeholder={
+                                                        user?.firstName
+                                                    }
                                                     className="bg-white hover:ring-1 hover:ring-black "
                                                 />
                                             </FormControl>

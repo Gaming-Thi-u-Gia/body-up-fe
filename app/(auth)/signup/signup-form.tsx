@@ -18,10 +18,9 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
-
 export const SignupForm = () => {
     const [isPending, startTransition] = useTransition();
-    const { login, updateProfile, user } = useAuthStore((store) => store);
+    const { login, updateProfile } = useAuthStore((store) => store);
     const router = useRouter();
     const form = useForm({
         resolver: zodResolver(SignUpSchema),
@@ -34,6 +33,7 @@ export const SignupForm = () => {
             isSendMail: false,
         },
     });
+
     const onSubmit = (data: z.infer<typeof SignUpSchema>) => {
         startTransition(async () => {
             try {
@@ -45,16 +45,16 @@ export const SignupForm = () => {
                 toast.success("Register Successfuly!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
-                        label: "Undo",
-                        onClick: () => console.log("Undo"),
+                        label: "Close",
+                        onClick: () => console.log("Close"),
                     },
                 });
             } catch (error) {
                 toast.error("This Email is already registered!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
-                        label: "Undo",
-                        onClick: () => console.log("Undo"),
+                        label: "Close",
+                        onClick: () => console.log("Close"),
                     },
                 });
                 console.log(error);

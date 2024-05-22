@@ -44,18 +44,19 @@ export const LoginForm = () => {
                 toast.success("Login Successfuly!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
-                        label: "Undo",
-                        onClick: () => console.log("Undo"),
+                        label: "Close",
+                        onClick: () => console.log("Close"),
                     },
                 });
             } catch (error) {
                 toast.error("Login Failed!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
-                        label: "Undo",
-                        onClick: () => console.log("Undo"),
+                        label: "Close",
+                        onClick: () => console.log("Close"),
                     },
                 });
+                console.log(error);
             }
         });
     };

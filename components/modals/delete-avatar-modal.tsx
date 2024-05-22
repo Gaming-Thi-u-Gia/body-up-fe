@@ -15,6 +15,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useAuthStore } from "../providers/auth-provider";
 import { deleteAvatar } from "@/utils/user";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function DeleteAvatarModal() {
     const router = useRouter();
@@ -28,8 +29,25 @@ export function DeleteAvatarModal() {
             throw new Error("No session token available");
         }
         startTransition(async () => {
-            const result = await deleteAvatar(sessionToken);
-            updateProfile(result.payload);
+            try {
+                const result = await deleteAvatar(sessionToken);
+                updateProfile(result.payload);
+                toast.success("Delete Avatar Success!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            } catch (error) {
+                toast.error("Delete Avatar Failed!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            }
         });
     };
     return (
