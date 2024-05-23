@@ -15,10 +15,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { signIn, signOut, useSession, getProviders } from "next-auth/react";
+
 export const LoginForm = () => {
     const [isPending, startTransition] = useTransition();
     const { login, sessionToken, updateProfile } = useAuthStore(
@@ -153,10 +155,12 @@ export const LoginForm = () => {
                         </div>
                     </div>
                     <Button
+                        type="button"
                         variant="primaryOutline"
                         size="full"
                         className="text-sm font-medium"
                         disabled={isPending}
+                        onClick={() => signIn("google")}
                     >
                         <Image
                             src="/google-c.svg"
@@ -167,6 +171,7 @@ export const LoginForm = () => {
                         />
                         Log in with Google
                     </Button>
+                    ;
                 </form>
             </Form>
         </>
