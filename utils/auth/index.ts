@@ -11,9 +11,7 @@ export const handleVerifyCode = async (data: z.infer<typeof OtpSchema>) => {
             `http://localhost:8080/api/v1/auth/verify?code=${pin}`,
             {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                credentials: "include",
             }
         ).then(async (res) => {
             const payload = await res.json();
@@ -60,6 +58,7 @@ export const handleRegister = async (data: z.infer<typeof SignUpSchema>) => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ ...registerData, role: "USER" }),
+                credentials: "include",
             }
         ).then(async (res) => {
             const payload = await res.json();

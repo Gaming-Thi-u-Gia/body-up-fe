@@ -31,11 +31,16 @@ import {
 } from "@/components/ui/form";
 import { useVerifyCode } from "@/stores/use-verify-models";
 import { OtpSchema } from "@/schemas";
-import { handleVerifyCode } from "@/utils/auth";
+import { getAuth, handleVerifyCode } from "@/utils/auth";
+import { useAuthStore } from "../providers/auth-provider";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 // import { toast } from "sonner"
 export const VerifyCodeModel = () => {
+    const { login, updateProfile } = useAuthStore((store) => store);
     const { isOpen, close } = useVerifyCode((store) => store);
-
+    const [isPending, startTransition] = useTransition();
+    const router = useRouter();
     const form = useForm<z.infer<typeof OtpSchema>>({
         resolver: zodResolver(OtpSchema),
         defaultValues: {
@@ -43,16 +48,33 @@ export const VerifyCodeModel = () => {
         },
     });
     async function onSubmit(data: z.infer<typeof OtpSchema>) {
-        try {
-            const res = await handleVerifyCode(data);
-            if (res) {
+        startTransition(async () => {
+            try {
+                const result = await handleVerifyCode(data);
+                const user = await getAuth(result.payload.res.token);
+                login(result.payload.res.token);
+                console.log(user);
+
+                updateProfile(user?.payload);
+                toast.success("Verify code successfuly!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+                router.push("/program");
                 close();
+            } catch (error) {
+                toast.error("Invalid verify code!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
             }
-            console.log(res);
-            console.log(data);
-        } catch (error) {
-            console.error("Error in onSubmit:", error);
-        }
+        });
     }
 
     const [client, setClient] = useState(false);
@@ -65,9 +87,9 @@ export const VerifyCodeModel = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={close}>
-            <DialogContent className="max-w-md">
+            <DialogContent className='max-w-md'>
                 <DialogHeader>
-                    <div className="flex items-center w-full justify-center mb-5">
+                    <div className='flex items-center w-full justify-center mb-5'>
                         Comfirm your verify code
                     </div>
                     <DialogTitle>Your code:</DialogTitle>
@@ -76,11 +98,11 @@ export const VerifyCodeModel = () => {
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
-                        className="w-2/3 space-y-6"
+                        className='w-2/3 space-y-6'
                     >
                         <FormField
                             control={form.control}
-                            name="pin"
+                            name='pin'
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>One-Time Code</FormLabel>
@@ -109,7 +131,9 @@ export const VerifyCodeModel = () => {
                             )}
                         />
 
-                        <Button variant="primary">Submit</Button>
+                        <Button variant='primary' disabled={isPending}>
+                            Submit
+                        </Button>
                     </form>
                 </Form>
             </DialogContent>
