@@ -10,6 +10,7 @@ import { AvatarModal } from "@/components/modals/avatar-modal";
 import { getAuth } from "@/utils/auth";
 import { DeleteAvatarModal } from "@/components/modals/delete-avatar-modal";
 import { Toaster } from "@/components/ui/sonner";
+import { VerifyCodeModel } from "@/components/modals/verify-code-modal";
 const font = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -37,10 +38,12 @@ export default async function RootLayout({
                 >
                     <Navbar />
                     <main className="mt-[56px] flex-1">
+                        <VerifyCodeModel />
                         <AvatarModal />
                         <DeleteAvatarModal />
                         {children}
                     </main>
+
                     <Toaster position="top-right" />
                     <Footer />
                 </AuthStoreProvider>

@@ -18,10 +18,12 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
+import { useVerifyCode } from "@/stores/use-verify-models";
 export const SignupForm = () => {
     const [isPending, startTransition] = useTransition();
     const { login, updateProfile } = useAuthStore((store) => store);
     const router = useRouter();
+    const { open } = useVerifyCode((store) => store);
     const form = useForm({
         resolver: zodResolver(SignUpSchema),
         defaultValues: {
@@ -38,11 +40,7 @@ export const SignupForm = () => {
         startTransition(async () => {
             try {
                 const response = await handleRegister(data);
-                const authResponse = await getAuth(response.payload.res.token);
-                login(response.payload.res.token);
-                updateProfile(authResponse?.payload);
-                router.push("/program");
-                toast.success("Register Successfuly!", {
+                toast.success(response.payload.token, {
                     description: `${new Date().toLocaleString()}`,
                     action: {
                         label: "Close",
@@ -60,6 +58,8 @@ export const SignupForm = () => {
                 console.log(error);
             }
         });
+
+        open();
     };
     return (
         <>
