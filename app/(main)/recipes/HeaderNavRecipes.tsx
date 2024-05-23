@@ -21,10 +21,9 @@ const HeaderNavRecipes = () => {
   function handleOnOrOfCategories() {
     const currentCate = document.getElementById('current__cate');
     const listCate = document.getElementById('list__cate');
-    if (listCate) {
-      listCate.classList.toggle('hidden')
+    if (listCate && currentCate) {
+      listCate.classList.toggle('hidden');
     }
-    currentCate?.classList.toggle('bg-black');
   }
   return (
     <div className="border-b border-[#E3E4EB]">
