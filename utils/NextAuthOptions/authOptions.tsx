@@ -1,3 +1,4 @@
+import { JWT } from "next-auth/jwt";
 import GoogleProvider from "next-auth/providers/google";
 const CliendID = "";
 const ClientSecret = "";
@@ -16,13 +17,22 @@ export const authOptions = {
             },
         }),
     ],
+    jwt: {
+        async encode({ token }: { token: JWT }) {
+            return token.accessToken;
+        },
+        async decode({ token }: { token: JWT }) {
+            return token.accessToken;
+        },
+    },
     callbacks: {
         async signIn({
-            account,
             profile,
+            user,
         }: {
             account: any;
             profile: any;
+            user: any;
         }): Promise<boolean> {
             const res = await fetch(
                 "http://localhost:8080/api/v1/auth/logingoogle",
@@ -39,29 +49,35 @@ export const authOptions = {
                     }),
                 }
             );
+            console.log(profile);
             const data = await res.json();
-            const resultFromSv = await fetch(
-                "http://localhost:3000/api/auth/",
-                {
-                    method: "POST",
-                    body: JSON.stringify(data.token),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            ).then(async (res) => {
-                const payload = await res.json();
-                const datas = {
-                    status: res.status,
-                    payload,
-                };
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                console.log(datas);
-                return datas;
-            });
+            user.accessToken = data.token;
             return true;
+        },
+        async jwt({
+            token,
+            user,
+            account,
+        }: {
+            token: any;
+            user: any;
+            account: any;
+        }) {
+            if (account) {
+                token.accessToken = user.accessToken;
+            }
+            return token;
+        },
+    },
+    cookies: {
+        sessionToken: {
+            name: `sessionToken`,
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: true,
+            },
         },
     },
 };

@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { useVerifyCode } from "@/stores/use-verify-models";
+import { signIn } from "next-auth/react";
 export const SignupForm = () => {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
@@ -63,19 +64,19 @@ export const SignupForm = () => {
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-5 mt-2"
+                    className='space-y-5 mt-2'
                 >
-                    <div className="space-y-3">
+                    <div className='space-y-3'>
                         <FormField
                             control={form.control}
-                            name="firstName"
+                            name='firstName'
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
                                         <Input
                                             {...field}
-                                            placeholder="First Name"
-                                            className="bg-transparent hover:ring-1 hover:ring-black"
+                                            placeholder='First Name'
+                                            className='bg-transparent hover:ring-1 hover:ring-black'
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -84,14 +85,14 @@ export const SignupForm = () => {
                         ></FormField>
                         <FormField
                             control={form.control}
-                            name="lastName"
+                            name='lastName'
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
                                         <Input
                                             {...field}
-                                            placeholder="Last Name"
-                                            className="bg-transparent hover:ring-1 hover:ring-black"
+                                            placeholder='Last Name'
+                                            className='bg-transparent hover:ring-1 hover:ring-black'
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -100,15 +101,15 @@ export const SignupForm = () => {
                         ></FormField>
                         <FormField
                             control={form.control}
-                            name="email"
+                            name='email'
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
                                         <Input
                                             {...field}
-                                            type="email"
-                                            placeholder="Email"
-                                            className="bg-transparent hover:ring-1 hover:ring-black"
+                                            type='email'
+                                            placeholder='Email'
+                                            className='bg-transparent hover:ring-1 hover:ring-black'
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -117,15 +118,15 @@ export const SignupForm = () => {
                         ></FormField>
                         <FormField
                             control={form.control}
-                            name="password"
+                            name='password'
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
                                         <Input
                                             {...field}
-                                            type="password"
-                                            placeholder="Password"
-                                            className="bg-transparent hover:ring-1 hover:ring-black"
+                                            type='password'
+                                            placeholder='Password'
+                                            className='bg-transparent hover:ring-1 hover:ring-black'
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -134,34 +135,34 @@ export const SignupForm = () => {
                         ></FormField>
                         <FormField
                             control={form.control}
-                            name="confirmPassword"
+                            name='confirmPassword'
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
                                         <Input
                                             {...field}
-                                            placeholder="Re-enter Password"
-                                            type="password"
-                                            className="bg-transparent hover:ring-1 hover:ring-black"
+                                            placeholder='Re-enter Password'
+                                            type='password'
+                                            className='bg-transparent hover:ring-1 hover:ring-black'
                                         />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         ></FormField>
-                        <div className="flex gap-1">
+                        <div className='flex gap-1'>
                             <FormField
                                 control={form.control}
-                                name="isSendMail"
+                                name='isSendMail'
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
                                             {/* @ts-ignore */}
                                             <Input
                                                 {...field}
-                                                type="checkbox"
-                                                className="bg-transparent h-fit mt-[5.5px]"
-                                                id="isRemember"
+                                                type='checkbox'
+                                                className='bg-transparent h-fit mt-[5.5px]'
+                                                id='isRemember'
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -169,8 +170,8 @@ export const SignupForm = () => {
                                 )}
                             ></FormField>
                             <label
-                                htmlFor="isRemember"
-                                className="text-sm ml-1 cursor-pointer"
+                                htmlFor='isRemember'
+                                className='text-sm ml-1 cursor-pointer'
                             >
                                 Send me email notifications for new program
                                 launches, website or store updates (optional)
@@ -178,32 +179,34 @@ export const SignupForm = () => {
                         </div>
                     </div>
                     <Button
-                        type="submit"
-                        variant="primary"
-                        size="full"
+                        type='submit'
+                        variant='primary'
+                        size='full'
                         disabled={isPending}
                     >
                         Create Account
                     </Button>
-                    <div className="">
-                        <div className="flex items-center justify-center space-x-1">
-                            <div className="h-[1px] w-full bg-[#e0e0e0]"></div>
-                            <span className="text-sm">or</span>
-                            <div className="h-[1px] w-full bg-[#e0e0e0]"></div>
+                    <div className=''>
+                        <div className='flex items-center justify-center space-x-1'>
+                            <div className='h-[1px] w-full bg-[#e0e0e0]'></div>
+                            <span className='text-sm'>or</span>
+                            <div className='h-[1px] w-full bg-[#e0e0e0]'></div>
                         </div>
                     </div>
                     <Button
-                        variant="primaryOutline"
-                        size="full"
-                        className="text-sm font-medium"
+                        variant='primaryOutline'
+                        size='full'
+                        className='text-sm font-medium'
                         disabled={isPending}
+                        type='button'
+                        onClick={() => signIn("google")}
                     >
                         <Image
-                            src="/google-c.svg"
-                            alt="Google"
+                            src='/google-c.svg'
+                            alt='Google'
                             width={24}
                             height={24}
-                            className="mr-2"
+                            className='mr-2'
                         />
                         Sign up with Google
                     </Button>

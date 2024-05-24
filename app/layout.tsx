@@ -24,12 +24,14 @@ export default async function RootLayout({
     children: React.ReactNode;
 }>) {
     const userCookie = cookies().get("sessionToken");
+    const googleCookie = cookies().get("googleToken");
     let res;
     if (userCookie) {
         res = await getAuth(userCookie.value);
     }
+
     return (
-        <html lang="en">
+        <html lang='en'>
             <body className={cn("flex flex-col min-h-screen", font.className)}>
                 <AuthStoreProvider
                     initialToken={userCookie?.value}
@@ -37,14 +39,14 @@ export default async function RootLayout({
                     initialUser={res?.payload}
                 >
                     <Navbar />
-                    <main className="mt-[56px] flex-1">
+                    <main className='mt-[56px] flex-1'>
                         <VerifyCodeModel />
                         <AvatarModal />
                         <DeleteAvatarModal />
                         {children}
                     </main>
 
-                    <Toaster position="top-right" />
+                    <Toaster position='top-right' />
                     <Footer />
                 </AuthStoreProvider>
             </body>
