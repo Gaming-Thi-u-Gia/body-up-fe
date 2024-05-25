@@ -13,7 +13,7 @@ export const handleSetNewPassword = async (
     const { password } = data;
     try {
         const res = await fetch(
-            `http://localhost:8080/api/v1/auth/reset-password`,
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_AUTH}/reset-password`,
             {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -42,7 +42,7 @@ export const handleResetPassCode = async (data: z.infer<typeof OtpSchema>) => {
     console.log(pin);
     try {
         const res = await fetch(
-            `http://localhost:8080/api/v1/auth/resetPasscode?code=${pin}`,
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_AUTH}/resetPasscode?code=${pin}`,
             {
                 method: "POST",
                 credentials: "include",
@@ -68,7 +68,7 @@ export const handleSendResetCode = async (
     const { email } = data;
     try {
         const result = await fetch(
-            `http://localhost:8080/api/v1/auth/forgot-password?email=${email}`,
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_AUTH}/forgot-password?email=${email}`,
             {
                 method: "POST",
                 headers: {
@@ -101,7 +101,7 @@ export const handleVerifyCode = async (data: z.infer<typeof OtpSchema>) => {
 
     try {
         const result = await fetch(
-            `http://localhost:8080/api/v1/auth/verify?code=${pin}`,
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_AUTH}/verify?code=${pin}`,
             {
                 method: "POST",
                 credentials: "include",
@@ -144,7 +144,7 @@ export const handleRegister = async (data: z.infer<typeof SignUpSchema>) => {
     const { confirmPassword, ...registerData } = data;
     try {
         const result = await fetch(
-            "http://localhost:8080/api/v1/auth/register",
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_AUTH}/register`,
             {
                 method: "POST",
                 headers: {
@@ -172,13 +172,16 @@ export const handleRegister = async (data: z.infer<typeof SignUpSchema>) => {
 
 export const handleLogin = async (data: z.infer<typeof LoginSchema>) => {
     try {
-        const result = await fetch("http://localhost:8080/api/v1/auth/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        }).then(async (res) => {
+        const result = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_AUTH}/login`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            }
+        ).then(async (res) => {
             const payload = await res.json();
             const data = {
                 status: res.status,
@@ -214,7 +217,7 @@ export const handleLogin = async (data: z.infer<typeof LoginSchema>) => {
 
 export const handleLogout = async () => {
     try {
-        const result = await fetch("/api/auth/", {
+        const result = await fetch(`${process.env.NEXT_PUBLIC_API}/auth/`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -237,13 +240,16 @@ export const handleLogout = async () => {
 
 export const getAuth = async (sessionToken: string) => {
     try {
-        const result = await fetch("http://localhost:8080/api/v1/demo", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${sessionToken}`,
-            },
-        }).then(async (res) => {
+        const result = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/demo`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+            }
+        ).then(async (res) => {
             const payload = await res.json();
             const data = {
                 status: res.status,

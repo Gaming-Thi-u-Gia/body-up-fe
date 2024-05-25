@@ -5,13 +5,16 @@ export const handleUpdateAvatar = async (
     sessionToken: string,
     image: string
 ) => {
-    const resultFromSv = await fetch("/api/update-avatar/", {
-        method: "POST",
-        body: JSON.stringify({ base64Img: image }),
-        headers: {
-            "Content-Type": "application/json",
-        },
-    }).then(async (res) => {
+    const resultFromSv = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/update-avatar/`,
+        {
+            method: "POST",
+            body: JSON.stringify({ base64Img: image }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+    ).then(async (res) => {
         const payload = await res.json();
         const datas = {
             status: res.status,
@@ -23,16 +26,19 @@ export const handleUpdateAvatar = async (
         return datas;
     });
     try {
-        const res = await fetch(`http://localhost:8080/api/v1/avatar`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${sessionToken}`,
-            },
-            body: JSON.stringify({
-                avatar: resultFromSv.payload.results.secure_url,
-            }),
-        });
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/avatar`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+                body: JSON.stringify({
+                    avatar: resultFromSv.payload.results.secure_url,
+                }),
+            }
+        );
 
         if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
@@ -56,17 +62,20 @@ export const handleUpdateProfileUser = async (
 ) => {
     const { firstName, lastName } = data;
 
-    const res = await fetch("http://localhost:8080/api/v1/profile", {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${sessionToken}`,
-        },
-        body: JSON.stringify({
-            firstName,
-            lastName,
-        }),
-    });
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/profile`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+            body: JSON.stringify({
+                firstName,
+                lastName,
+            }),
+        }
+    );
     if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
     }
@@ -78,13 +87,16 @@ export const handleUpdateProfileUser = async (
     return result;
 };
 export const deleteAvatar = async (sessionToken: string) => {
-    const res = await fetch("http://localhost:8080/api/v1/avatar", {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${sessionToken}`,
-        },
-    });
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/avatar`,
+        {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+        }
+    );
     if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
     }

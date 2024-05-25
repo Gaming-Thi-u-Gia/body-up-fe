@@ -1,7 +1,8 @@
 import { JWT } from "next-auth/jwt";
 import GoogleProvider from "next-auth/providers/google";
-const CliendID = "";
-const ClientSecret = "";
+
+const CliendID = process.env.GOOGLE_CLIENT_ID as string;
+const ClientSecret = process.env.GOOGLE_CLIENT_SECRET as string;
 
 export const authOptions = {
     providers: [
@@ -35,7 +36,7 @@ export const authOptions = {
             user: any;
         }): Promise<boolean> {
             const res = await fetch(
-                "http://localhost:8080/api/v1/auth/logingoogle",
+                `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_AUTH}/logingoogle`,
                 {
                     method: "POST",
                     headers: {
