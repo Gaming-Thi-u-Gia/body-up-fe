@@ -11,6 +11,7 @@ import { getAuth } from "@/utils/auth";
 import { DeleteAvatarModal } from "@/components/modals/delete-avatar-modal";
 import { Toaster } from "@/components/ui/sonner";
 import { VerifyCodeModel } from "@/components/modals/verify-code-modal";
+import { VerifyResetCodeModel } from "@/components/modals/verify-reset-code-modal";
 const font = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -31,7 +32,7 @@ export default async function RootLayout({
     }
 
     return (
-        <html lang='en'>
+        <html lang="en">
             <body className={cn("flex flex-col min-h-screen", font.className)}>
                 <AuthStoreProvider
                     initialToken={userCookie?.value}
@@ -39,14 +40,15 @@ export default async function RootLayout({
                     initialUser={res?.payload}
                 >
                     <Navbar />
-                    <main className='mt-[56px] flex-1'>
+                    <main className="mt-[56px] flex-1">
                         <VerifyCodeModel />
+                        <VerifyResetCodeModel />
                         <AvatarModal />
                         <DeleteAvatarModal />
                         {children}
                     </main>
 
-                    <Toaster position='top-right' />
+                    <Toaster position="top-right" />
                     <Footer />
                 </AuthStoreProvider>
             </body>

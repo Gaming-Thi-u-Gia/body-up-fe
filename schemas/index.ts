@@ -40,11 +40,28 @@ export const OtpSchema = z.object({
         message: "Your one-time password must be 6 characters.",
     }),
 });
+export const ForgotPasswordSchema = z.object({
+    email: z.string().email({ message: "Please enter valid email address!" }),
+});
+
+export const ChangePasswordSchema = z
+    .object({
+        password: z.string().min(6, {
+            message: "Password must be at least 6 characters long!",
+        }),
+        confirmPassword: z.string().min(6),
+    })
+    .superRefine(({ confirmPassword, password }, ctx) => {
+        if (confirmPassword !== password) {
+            ctx.addIssue({
+                code: "custom",
+                message: "The passwords did not match",
+                path: ["confirmPassword"],
+            });
+        }
+    });
 
 export const formSchema = z.object({
-    // username: z.string().min(2, {
-    //     message: "Username must be at least 2 characters.",
-    // }),
     firstName: z.string(),
     lastName: z.string(),
     bio: z.string(),

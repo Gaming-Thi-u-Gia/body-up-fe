@@ -1,5 +1,98 @@
-import { LoginSchema, OtpSchema, SignUpSchema } from "@/schemas";
+import {
+    ChangePasswordSchema,
+    ForgotPasswordSchema,
+    LoginSchema,
+    OtpSchema,
+    SignUpSchema,
+} from "@/schemas";
 import { z } from "zod";
+
+export const handleSetNewPassword = async (
+    data: z.infer<typeof ChangePasswordSchema>
+) => {
+    const { password } = data;
+    try {
+        const res = await fetch(
+            `http://localhost:8080/api/v1/auth/reset-password`,
+            {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password }),
+                credentials: "include",
+            }
+        ).then(async (res) => {
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return data;
+        });
+        return res;
+    } catch (error) {
+        throw new Error("Something went wrong");
+    }
+};
+
+export const handleResetPassCode = async (data: z.infer<typeof OtpSchema>) => {
+    const { pin } = data;
+    console.log(pin);
+    try {
+        const res = await fetch(
+            `http://localhost:8080/api/v1/auth/resetPasscode?code=${pin}`,
+            {
+                method: "POST",
+                credentials: "include",
+            }
+        ).then(async (res) => {
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return data;
+        });
+    } catch (error) {
+        throw new Error("Error while creating account");
+    }
+};
+export const handleSendResetCode = async (
+    data: z.infer<typeof ForgotPasswordSchema>
+) => {
+    const { email } = data;
+    try {
+        const result = await fetch(
+            `http://localhost:8080/api/v1/auth/forgot-password?email=${email}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+                credentials: "include",
+            }
+        ).then(async (res) => {
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return data;
+        });
+        return result;
+    } catch (error) {
+        throw new Error("Something went wrong");
+    }
+};
 
 export const handleVerifyCode = async (data: z.infer<typeof OtpSchema>) => {
     // const { confirmPassword, ...registerData } = data;
