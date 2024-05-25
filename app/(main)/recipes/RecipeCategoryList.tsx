@@ -1,11 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useState } from "react";
-import CategoryItemHeader from "./CategoryItemHeader";
-import CategoryRecipesItemsDisplay from "./CategoryRecipesItemsDisplay";
+import CategoryItemHeader from "./HeaderInfoSearch";
+import CategoryRecipesItemsDisplay from "./CardRecipe";
 
-const CategoryRecipes = () => {
-
+const RecipeCategoryList = () => {
   const listCategoryItems = [
     {
       id: 1,
@@ -85,7 +84,14 @@ const CategoryRecipes = () => {
           />
           <div className="grid grid-cols-4 gap-5">
             {listCategoryItem.recipes.map((recipe, index) => (
-              <CategoryRecipesItemsDisplay key={recipe.id} index={index} img={recipe.img} dietary={recipe.dietary as []} title={recipe.title} avgStar={recipe.avgStar} />
+              <CategoryRecipesItemsDisplay
+                key={recipe.id}
+                index={index}
+                img={recipe.img}
+                dietary={recipe.dietary as []}
+                title={recipe.title}
+                avgStar={recipe.avgStar}
+              />
             ))}
           </div>
         </div>
@@ -94,4 +100,4 @@ const CategoryRecipes = () => {
   );
 };
 
-export default CategoryRecipes;
+export default RecipeCategoryList;

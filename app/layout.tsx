@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/shared/navbar";
 import { Footer } from "@/components/shared/footer";
 import { cn } from "@/lib/utils";
+import 'photoswipe/dist/photoswipe.css'
 
 const font = Manrope({ subsets: ["latin"] });
 
@@ -22,7 +23,7 @@ export default function RootLayout({
             <body className={cn("flex flex-col min-h-screen", font.className)}>
                 <Navbar />
                 <main className='mt-[56px] flex-1'>{children}</main>
-                
+
                 <Footer />
             </body>
         </html>

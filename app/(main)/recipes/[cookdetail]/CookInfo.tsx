@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 
-const HowToCook = () => {
+const CookInfo = () => {
     const howToCook = {
         steps: [
             "In a small bowl, mix together 1 tbsp yogurt, instant coffee powder, cocoa powder, stevia extract and vanilla extract until combined.",
@@ -49,4 +49,4 @@ const HowToCook = () => {
     )
 }
 
-export default HowToCook
+export default CookInfo

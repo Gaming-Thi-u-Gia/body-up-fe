@@ -1,15 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import Star from "./Star";
+import Star from "./StarRating";
 import { useState } from "react";
 
-const CategoryRecipesItemsDisplay = ({ index, img, dietary, title, avgStar }: { index: number, img: string, dietary: [], title: string, avgStar: number }) => {
-  const initialName = (name = '') => {
-    const words = name.trim().split(' ');
-    const initials = words.map(word => word.charAt(0));
-    return initials.join('').substring(0, 2);
-  }
+const CardRecipe = ({
+  index,
+  img,
+  dietary,
+  title,
+  avgStar,
+}: {
+  index: number;
+  img: string;
+  dietary: [];
+  title: string;
+  avgStar: number;
+}) => {
+  const initialName = (name = "") => {
+    const words = name.trim().split(" ");
+    const initials = words.map((word) => word.charAt(0));
+    return initials.join("").substring(0, 2);
+  };
   return (
     <>
       <div
@@ -38,20 +50,10 @@ const CategoryRecipesItemsDisplay = ({ index, img, dietary, title, avgStar }: { 
             <Star avgStar={avgStar} />
             <div className="flex">
               <Button className="mr-4" variant="secondary" size="icon">
-                <Image
-                  width={20}
-                  height={20}
-                  src="/add.svg"
-                  alt="add"
-                />
+                <Image width={20} height={20} src="/add.svg" alt="add" />
               </Button>
               <Button variant="secondary" size="icon">
-                <Image
-                  width={24}
-                  height={25}
-                  src="/heart.svg"
-                  alt="heart"
-                />
+                <Image width={24} height={25} src="/heart.svg" alt="heart" />
               </Button>
             </div>
           </div>
@@ -61,7 +63,7 @@ const CategoryRecipesItemsDisplay = ({ index, img, dietary, title, avgStar }: { 
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default CategoryRecipesItemsDisplay
+export default CardRecipe;
