@@ -24,6 +24,7 @@ const buttonVariants = cva(
                 lg: "h-10 px-7",
                 icon: "h-8 w-8",
                 full: "w-full h-9",
+                smP4: "h-8 px-4 text-xs font-bold",
             },
         },
         defaultVariants: {
