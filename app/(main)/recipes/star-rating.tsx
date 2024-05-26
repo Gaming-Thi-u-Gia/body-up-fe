@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-const Star = ({ avgStar }: { avgStar: Number }) => {
+const StarRating = ({ avgStar }: { avgStar: Number }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   return (
@@ -37,4 +37,4 @@ const Star = ({ avgStar }: { avgStar: Number }) => {
   );
 };
 
-export default Star;
+export default StarRating;

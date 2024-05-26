@@ -1,6 +1,6 @@
-import React from "react";
+import { Button } from "@/components/ui/button";
 
-const HeaderInfoSort = ({
+const HeaderInfoViewAll = ({
   title,
   detail,
 }: {
@@ -19,19 +19,13 @@ const HeaderInfoSort = ({
           </p>
         </div>
         <div>
-          <div>
-            <span>Most Current</span>
-            <ul className="z-[1]">
-              <li></li>
-              <li></li>
-              <li></li>
-              <li></li>
-            </ul>
-          </div>
+          <Button variant="primaryOutline" size="default">
+            <a href="#">View All</a>
+          </Button>
         </div>
       </div>
     </>
   );
 };
 
-export default HeaderInfoSort;
+export default HeaderInfoViewAll;

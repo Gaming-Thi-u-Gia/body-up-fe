@@ -1,8 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import Star from "./StarRating";
-import { useState } from "react";
+import Star from "./star-rating";
 
 const CardRecipe = ({
   index,

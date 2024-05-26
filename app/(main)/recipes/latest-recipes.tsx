@@ -2,11 +2,9 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { title } from "process";
 import Image from "next/image";
-import { category } from "@/constants";
-import HeaderInfoSearch from "./HeaderInfoSearch";
-import Star from "./StarRating";
+import HeaderInfoSearch from "./header-info-viewall";
+import Star from "./star-rating";
 const LatestRecipes = () => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
@@ -31,7 +29,7 @@ const LatestRecipes = () => {
     },
   ];
   return (
-    <div className=" h-full mx-auto mt-10">
+    <div className=" h-full mx-auto">
       <HeaderInfoSearch title="Latest Recipes" detail={""} />
       <div className="flex gap-5 ">
         {/* Recipe1 */}

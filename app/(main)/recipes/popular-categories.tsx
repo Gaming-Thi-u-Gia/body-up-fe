@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import React from "react";
-import HeaderInfoSearch from "./HeaderInfoSearch";
+import HeaderInfoSearch from "./header-info-viewall";
 
 const PopularCategories = () => {
   const popularCategories = [
