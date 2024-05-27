@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 
 const CommunityFilter = () => {
     return (
-        <nav className="flex ml-[333px] gap-3 w-[828px] mt-[70px] justify-between h-10">
+        <nav className="flex ml-[22%] gap-3 w-[828px] mt-[70px] justify-between h-10">
             <div className="flex items-center justify-center gap-2">
                 <Button type="button" variant="primary" size="sm">
                     Latest

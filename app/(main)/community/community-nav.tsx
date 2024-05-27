@@ -13,7 +13,7 @@ const CommunityNavbar = () => {
                     Community
                 </h1>
             </div>
-            <div className="flex items-center flex-row justify-between w-[828px] h-[34px] ml-[213px]">
+            <div className="flex items-center flex-row justify-between w-[828px] h-[34px] ml-[12.5%]">
                 <h1 className="font-bold text-sm text-black">#{title}</h1>
                 <div className="flex gap-5">
                     <div className="flex items-center text-black cursor-pointer gap-2">
