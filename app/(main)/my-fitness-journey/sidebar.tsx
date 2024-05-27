@@ -9,6 +9,7 @@ import { myFitness } from "@/constants";
 import { Button } from "@/components/ui/button";
 
 import { SidebarItem } from "./sidebar-item";
+import defaultProfile from "/public/default-iProfile.png";
 
 export const Sidebar = () => {
     const { user } = useAuthStore((state) => state);
@@ -17,17 +18,17 @@ export const Sidebar = () => {
             <div className='flex pb-0 p-[30px] gap-4'>
                 <div>
                     <Image
-                        src={user?.avatar!}
+                        src={user?.avatar! || defaultProfile}
                         alt='User avatar'
                         width={50}
                         height={50}
                         className='rounded-full'
                     />
-                    <Badge variant='secondary' className='mt-2'>
+                    <Badge variant='secondary' className='mt-2 w-[50px]'>
                         70 AP
                     </Badge>
                 </div>
-                <h4 className='font-bold mt-3'>
+                <h4 className='font-bold mt-3 truncate'>
                     {user?.firstName} {user?.lastName}
                 </h4>
             </div>
