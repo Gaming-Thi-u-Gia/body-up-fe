@@ -5,7 +5,8 @@ import React from "react";
 
 const CommunityNavbar = () => {
     const pathname = usePathname();
-    const title = pathname.split("/").pop();
+    const pathParts = pathname.split("/");
+    const title = pathParts[2];
     return (
         <div className="w-full fixed top-15 left-0 z-20 bg-[#F9F9FA] h-[57px] flex items-center border-b border-gray-200/100 ">
             <div className="w-[333px] flex items-center pr-[200px] pl-[15px] border-r border-gray-200/100 h-[57px]">
@@ -13,7 +14,7 @@ const CommunityNavbar = () => {
                     Community
                 </h1>
             </div>
-            <div className="flex items-center flex-row justify-between w-[828px] h-[34px] ml-[12.5%]">
+            <div className="flex items-center flex-row justify-between w-[828px] h-[34px] ml-[12.7%]">
                 <h1 className="font-bold text-sm text-black">#{title}</h1>
                 <div className="flex gap-5">
                     <div className="flex items-center text-black cursor-pointer gap-2">

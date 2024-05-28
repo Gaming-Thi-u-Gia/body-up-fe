@@ -1,14 +1,4 @@
 import React from "react";
-import defaultProfile from "/public/default-iProfile.png";
-import Image from "next/image";
-import fitness_icon from "/public/fitness-icon.svg";
-import message_icon from "/public/message-icon.svg";
-import saved_icon from "/public/saved-posts-icon.svg";
-import share_icon from "/public/share-icon.svg";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import before_after from "/public/before-after-icon.svg";
-import challenges_icon from "/public/challenges-icon.svg";
 import {
     Sheet,
     SheetContent,
@@ -16,11 +6,17 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
-const PostUser = () => {
+import Image from "next/image";
+import defaultProfile from "/public/default-iProfile.png";
+import before_after from "/public/before-after-icon.svg";
+import { Button } from "@/components/ui/button";
+import challenges_icon from "/public/challenges-icon.svg";
+import Link from "next/link";
+const BeforAfterPost = () => {
     return (
-        <div className="w-full mb-10 flex flex-col p-2 gap-2 bor hover:bg-[#f5f5f5] rounded-lg">
-            <div className="w-full flex justify-between items-center ">
-                <div className="flex gap-2 items-center ">
+        <div className=" bg-white rounded-md px-2 py-3">
+            <div className="flex items-center justify-between ">
+                <div className="flex gap-2 items-center">
                     <Sheet>
                         <SheetTrigger>
                             <Image
@@ -114,85 +110,38 @@ const PostUser = () => {
                             </div>
                         </SheetContent>
                     </Sheet>
-                    <label
-                        className="text-[#303033] text-sm font-bold cursor-pointer"
-                        htmlFor=""
-                    >
-                        stellaria
-                    </label>
-                    <span className="text-sm">5 days ago</span>
+                    <div className="flex flex-col text-sm items-start">
+                        <label className="font-bold text-black">
+                            cncagnes9237
+                        </label>
+                        <span className="font-light text-black ">
+                            13 hours ago
+                        </span>
+                    </div>
                 </div>
                 <div className="flex gap-2 items-center">
-                    <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] h-7 justify-center items-center">
-                        <Image
-                            src={fitness_icon}
-                            alt="logo"
-                            width={13}
-                            height={12}
-                        />
-                        <span className="text-[12px]">Workout</span>
-                    </div>
-                    <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] h-7 justify-center items-center">
-                        <Image
-                            src={fitness_icon}
-                            alt="logo"
-                            width={13}
-                            height={12}
-                        />
-                        <span className="text-[12px]">Workout</span>
+                    <div className="flex rounded-full bg-[#E1E6FA] p-3 h-7 justify-center items-center">
+                        <span className="text-[12px] font-medium">NEW</span>
                     </div>
                 </div>
             </div>
-            <Link
-                href="/community/fitness"
-                className="text-black text-lg font-medium mt-3"
-            >
-                How Was Your Workout Today? | Weekly Thread
-            </Link>
-            <Link
-                href="/community/fitness/viewpost"
-                className="text-[#303033] text-[16px] h-[48px] mt-2 line-clamp-2 "
-            >
-                Want to share your daily fitness journey with the community and
-                cheer each other on? This is the place to do it! Tell us how
-                your workout went, what program or activity you did, new habits
-                you're working on, and see how others are doing too. Refreshing
-                the workout thread for a new week ahead!
-            </Link>
-            <div className="flex gap-2 items-center mt-3">
-                <Button
-                    variant="secondary"
-                    className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
-                >
-                    <Image
-                        src={message_icon}
-                        alt="logo"
-                        width={20}
-                        height={20}
-                    />
-                    <span className="text-[12px]">
-                        <span>33</span> Replies
-                    </span>
-                </Button>
-                <Button
-                    variant="secondary"
-                    className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
-                >
-                    <Image src={saved_icon} alt="logo" width={20} height={20} />
-                    <span className="text-[12px]">Saved</span>
-                </Button>
-                <Button
-                    variant="secondary"
-                    className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
-                >
-                    <Image src={share_icon} alt="logo" width={20} height={20} />
-                    <span className="text-[12px]">Share</span>
-                </Button>
+            <h1 className="text-[14px] font-bold p-2">
+                Happy with the results
+            </h1>
+            <div className="flex gap-2 rounded-md items-center justify-center px-1">
+                {/* <Link href="/"></Link> */}
+                <img
+                    src="https://static.chloeting.com/users/66181662ed0fcedc0969bc7e/photos/66412e739810b23039b25727/fa318370-10a2-11ef-95aa-b9f652f19ec5.jpeg"
+                    alt=""
+                    className="w-[50%] h-[378px] object-cover rounded-xl "
+                />
+                <img
+                    src="https://static.chloeting.com/users/66181662ed0fcedc0969bc7e/photos/6654dcb6b624db48640b02d3/03b54690-1c5e-11ef-a2e9-f78e7e898479.jpeg"
+                    className="w-[50%] h-[378px] object-cover rounded-xl"
+                />
             </div>
-
-            <hr className="mt-3" />
         </div>
     );
 };
 
-export default PostUser;
+export default BeforAfterPost;

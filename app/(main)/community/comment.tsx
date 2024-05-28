@@ -1,12 +1,5 @@
-import React from "react";
-import defaultProfile from "/public/default-iProfile.png";
-import Image from "next/image";
-import fitness_icon from "/public/fitness-icon.svg";
-import message_icon from "/public/message-icon.svg";
-import saved_icon from "/public/saved-posts-icon.svg";
-import share_icon from "/public/share-icon.svg";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+"use client";
+import React, { useState } from "react";
 import before_after from "/public/before-after-icon.svg";
 import challenges_icon from "/public/challenges-icon.svg";
 import {
@@ -16,10 +9,19 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
-const PostUser = () => {
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import defaultProfile from "/public/default-iProfile.png";
+import upvote_icon from "/public/upvote-icon.svg";
+import updown_icon from "/public/updown-icon.svg";
+import reply_icon from "/public/reply-icon.svg";
+const Comment = () => {
+    const [isOpennedReply, setIsOpennedReply] = useState(false);
+    const [countUpvoted, setCountUpvoted] = useState<number>(0);
     return (
-        <div className="w-full mb-10 flex flex-col p-2 gap-2 bor hover:bg-[#f5f5f5] rounded-lg">
-            <div className="w-full flex justify-between items-center ">
+        <div className="w-full flex flex-col gap-3 items-center mt-7 justify-between p-3">
+            <div className="w-full flex justify-between items-center  ">
                 <div className="flex gap-2 items-center ">
                     <Sheet>
                         <SheetTrigger>
@@ -123,76 +125,90 @@ const PostUser = () => {
                     <span className="text-sm">5 days ago</span>
                 </div>
                 <div className="flex gap-2 items-center">
-                    <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] h-7 justify-center items-center">
+                    <Button
+                        variant="secondary"
+                        className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] p-2 justify-center items-center"
+                        onClick={() =>
+                            setIsOpennedReply(
+                                (isOpennedReply) => !isOpennedReply
+                            )
+                        }
+                    >
                         <Image
-                            src={fitness_icon}
+                            src={reply_icon}
                             alt="logo"
                             width={13}
                             height={12}
                         />
-                        <span className="text-[12px]">Workout</span>
-                    </div>
-                    <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] h-7 justify-center items-center">
+                        <span className="text-[12px]">Reply</span>
+                    </Button>
+                    <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] px-2 py-2  justify-between items-center">
                         <Image
-                            src={fitness_icon}
+                            src={upvote_icon}
                             alt="logo"
-                            width={13}
-                            height={12}
+                            width={18}
+                            height={18}
+                            className="cursor-pointer"
+                            onClick={() =>
+                                setCountUpvoted(
+                                    (countUpvoted) => countUpvoted + 1
+                                )
+                            }
                         />
-                        <span className="text-[12px]">Workout</span>
+
+                        <span className="text-[14px]">{countUpvoted}</span>
+
+                        <Image
+                            src={updown_icon}
+                            alt="logo"
+                            width={18}
+                            height={18}
+                            className="cursor-pointer"
+                            onClick={() =>
+                                setCountUpvoted(
+                                    (countUpvoted) => countUpvoted - 1
+                                )
+                            }
+                        />
                     </div>
                 </div>
             </div>
-            <Link
-                href="/community/fitness"
-                className="text-black text-lg font-medium mt-3"
-            >
-                How Was Your Workout Today? | Weekly Thread
-            </Link>
-            <Link
-                href="/community/fitness/viewpost"
-                className="text-[#303033] text-[16px] h-[48px] mt-2 line-clamp-2 "
-            >
-                Want to share your daily fitness journey with the community and
-                cheer each other on? This is the place to do it! Tell us how
-                your workout went, what program or activity you did, new habits
-                you're working on, and see how others are doing too. Refreshing
-                the workout thread for a new week ahead!
-            </Link>
-            <div className="flex gap-2 items-center mt-3">
-                <Button
-                    variant="secondary"
-                    className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
-                >
-                    <Image
-                        src={message_icon}
-                        alt="logo"
-                        width={20}
-                        height={20}
-                    />
-                    <span className="text-[12px]">
-                        <span>33</span> Replies
-                    </span>
-                </Button>
-                <Button
-                    variant="secondary"
-                    className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
-                >
-                    <Image src={saved_icon} alt="logo" width={20} height={20} />
-                    <span className="text-[12px]">Saved</span>
-                </Button>
-                <Button
-                    variant="secondary"
-                    className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
-                >
-                    <Image src={share_icon} alt="logo" width={20} height={20} />
-                    <span className="text-[12px]">Share</span>
-                </Button>
-            </div>
 
-            <hr className="mt-3" />
+            <p>
+                Back to working out after 20-25 days break, on day 2 of slim
+                thigh challenge. I thought it would be easy, but god, it's
+                killing me!!
+            </p>
+            {isOpennedReply && (
+                <div className="w-full flex flex-col gap-1">
+                    <h1 className="flex items-center p-1 font-semibold">
+                        Reply To Comment
+                    </h1>
+                    <Textarea
+                        placeholder="Write a reply"
+                        className="rounded-lg bg-transparent p-3 text-[16px]"
+                    />
+                    <div className=" flex items-center justify-end gap-2 mt-3">
+                        <Button
+                            variant="default"
+                            onClick={() => setIsOpennedReply(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="primary"
+                            className="w-[188px] h-9 flex"
+                        >
+                            Reply
+                        </Button>
+                    </div>
+                    <hr className="mt-3" />
+                </div>
+            )}
+
+            <hr className="mt-3 w-full" />
         </div>
     );
 };
 
-export default PostUser;
+export default Comment;
