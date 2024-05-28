@@ -1,7 +1,9 @@
-import React from "react";
-
-const FitnessJourneyPage = () => {
-    return <div>FitnessJourneyPage</div>;
+const MySchedulePage = () => {
+    return (
+        <div>
+            <h2 className='text-3xl font-bold'>My Schedule</h2>
+        </div>
+    );
 };
 
-export default FitnessJourneyPage;
+export default MySchedulePage;

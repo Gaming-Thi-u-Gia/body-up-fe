@@ -41,7 +41,7 @@ export const Sidebar = () => {
             <Separator />
             <div className='flex flex-col p-5'>
                 <SidebarItem
-                    href='/my-fitness-journey/my-schedule'
+                    href='/my-fitness-journey'
                     icon='/schedule-icon.svg'
                     title='My Schedule'
                 />
