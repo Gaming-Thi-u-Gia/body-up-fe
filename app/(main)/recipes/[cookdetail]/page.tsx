@@ -4,24 +4,28 @@ import Info from "./Info";
 import CookInfo from "./CookInfo";
 import ImageSwipe from "./ImageSwipe";
 /* eslint-disable @next/next/no-img-element */
-const page = ({ params }) => {
-    const { foodName } = params;
+type Props = {
+  params: {
+    foodName: string;
+  };
+};
+const page = ({ params }: Props) => {
+  const { foodName } = params;
 
-    const images = [
-        "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/07/hinh-dep.jpg",
-        "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/07/hinh-dep.jpg",
-        "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/07/hinh-dep.jpg",
-    ]
+  const images = [
+    "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/07/hinh-dep.jpg",
+    "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/07/hinh-dep.jpg",
+    "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/07/hinh-dep.jpg",
+  ];
 
-    return (
-        <div>
-            <Slider foodName={foodName} />
-            <Info />
-            <CookInfo />
-            <ImageSwipe images={images} />
+  return (
+    <div>
+      <Slider foodName={foodName} />
+      <Info />
+      <CookInfo />
+      <ImageSwipe images={images} />
+    </div>
+  );
+};
 
-        </div >
-    )
-}
-
-export default page
+export default page;
