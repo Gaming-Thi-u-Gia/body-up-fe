@@ -1,7 +1,10 @@
 "use client";
 import "photoswipe/dist/photoswipe.css";
 import { Gallery, Item } from "react-photoswipe-gallery";
-const ImageSwipe = ({ images }: { images: any }) => {
+type Props = {
+  images: any[];
+};
+const ImageSwipe = ({ images }: Props) => {
   return (
     <div>
       <Gallery>
