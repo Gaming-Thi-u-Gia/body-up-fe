@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
@@ -16,7 +17,11 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
+import { usePathname } from "next/navigation";
 const PostUser = () => {
+    const pathname = usePathname();
+    const pathParts = pathname.split("/");
+    const title = pathParts[2];
     return (
         <div className="w-full mb-10 flex flex-col p-2 gap-2 bor hover:bg-[#f5f5f5] rounded-lg">
             <div className="w-full flex justify-between items-center ">
@@ -144,13 +149,13 @@ const PostUser = () => {
                 </div>
             </div>
             <Link
-                href="/community/fitness"
+                href={`/community/${title}/viewpost`}
                 className="text-black text-lg font-medium mt-3"
             >
                 How Was Your Workout Today? | Weekly Thread
             </Link>
             <Link
-                href="/community/fitness/viewpost"
+                href={`/community/${title}/viewpost`}
                 className="text-[#303033] text-[16px] h-[48px] mt-2 line-clamp-2 "
             >
                 Want to share your daily fitness journey with the community and
