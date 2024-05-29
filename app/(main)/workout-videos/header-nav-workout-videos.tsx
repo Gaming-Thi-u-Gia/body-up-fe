@@ -1,167 +1,84 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { title } from "process";
+import React from "react";
 import Image from "next/image";
-import { category } from "@/constants";
-import React, { useState } from "react";
-import { Link } from "lucide-react";
-
-
-const CategoryWorkoutVideos = () => {
-  const listCategoryItems = [
-    {
-      id: 1,
-      title: "Most Popular",
-      detail:
-        "These are some of the most popular workout videos. Give them a try and see why people love these routines.",
-      categoryURL: "#",
-      videos: [
-        {
-          id: 1,
-          title: "Abs in 2 Weeks",
-          img: "https://static.chloeting.com/videos/61bbdcdd017bbb985e15f8eb/28972560-5ed2-11ec-b99f-c33e6b9468db.jpeg",
-          views: "544M views",
-          date: "August 20",
-        },
-        {
-          id: 2,
-          title: "Do This Everyday to Lose Weight",
-          img: "https://static.chloeting.com/videos/61bbdc7e2cb3b78eb6ac2bba/efca6f80-5ed1-11ec-b182-df31ae6aab45.jpeg",
-          views: "217M views",
-          date: "August 15",
-        },
-        {
-          id: 3,
-          title: "11 Line Abs",
-          img: "https://static.chloeting.com/videos/61bbd89dc3d293024898b84d/9ff668d0-5ecf-11ec-b8cd-2976cd667d03.jpeg",
-          views: "78M views",
-          date: "April 19",
-        },
-        {
-          id: 4,
-          title: "Warm Up",
-          img: "https://static.chloeting.com/videos/61bbf59552c5c9bf0f2550eb/e43a1620-5ee0-11ec-9a04-3fd984621d67.jpeg",
-          views: "72M views",
-          date: "May 20",
-        },
-        {
-          id: 5,
-          title: "Flat Belly Abs",
-          img: "https://static.chloeting.com/videos/61bbbbf0c3d293024898b838/8873f260-5ebe-11ec-9a04-3fd984621d67.jpeg",
-          views: "61M views",
-          date: "Jan 19",
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "Most Popular",
-      detail:
-        "These are some of the most popular workout videos. Give them a try and see why people love these routines.",
-      categoryURL: "#",
-      videos: [
-        {
-          id: 1,
-          title: "Abs in 2 Weeks",
-          img: "https://static.chloeting.com/videos/61bbdcdd017bbb985e15f8eb/28972560-5ed2-11ec-b99f-c33e6b9468db.jpeg",
-          views: "544M views",
-          date: "August 20",
-        },
-        {
-          id: 2,
-          title: "Do This Everyday to Lose Weight",
-          img: "https://static.chloeting.com/videos/61bbdc7e2cb3b78eb6ac2bba/efca6f80-5ed1-11ec-b182-df31ae6aab45.jpeg",
-          views: "217M views",
-          date: "August 15",
-        },
-        {
-          id: 3,
-          title: "11 Line Abs",
-          img: "https://static.chloeting.com/videos/61bbd89dc3d293024898b84d/9ff668d0-5ecf-11ec-b8cd-2976cd667d03.jpeg",
-          views: "78M views",
-          date: "April 19",
-        },
-        {
-          id: 4,
-          title: "Warm Up",
-          img: "https://static.chloeting.com/videos/61bbf59552c5c9bf0f2550eb/e43a1620-5ee0-11ec-9a04-3fd984621d67.jpeg",
-          views: "72M views",
-          date: "May 20",
-        },
-        {
-          id: 5,
-          title: "Flat Belly Abs",
-          img: "https://static.chloeting.com/videos/61bbbbf0c3d293024898b838/8873f260-5ebe-11ec-9a04-3fd984621d67.jpeg",
-          views: "61M views",
-          date: "Jan 19",
-        },
-      ],
-    },
+import { Button } from "@/components/ui/button";
+const HeaderNavWorkoutVideos = () => {
+  const titleWorkoutVideos = [
+    "View all Collections",
+    "Latest Workouts",
+    "Most Popular",
+    "HIIT",
+    "Abs",
+    "Booty",
+    "Dumbbell",
+    "10 Mins",
+    "20 Mins+",
+    "Standing Workouts",
+    "No Jumping",
+    "No Planks",
+    "Burpee Free",
+    "Wrist Friendy",
   ];
-
+  function handleOnOrOfCategories () {
+    const currentCate = document.getElementById('current__cate');
+    const listCate = document.getElementById('list__cate');
+    if(listCate)listCate.classList.toggle('hidden');
+  }
   return (
-    <div>
-      {listCategoryItems.map((listCategoryItem) => (
-        <div key={listCategoryItem.id}>
-          <div className="flex justify-between py-2">
-            <div>
-              <h2 className="text-[#303033] text-xl font-semibold">
-                {listCategoryItem.title}
-              </h2>
-              <p className="text-sm font-normal">
-                {listCategoryItem.detail}
-              </p>
-            </div>
-            <Button variant="primaryOutline" size="default">
-              View All
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-5 gap-5 my-5">
-            {listCategoryItem.videos.map((video) => (
-              <div
-                key={video.id}
-                className="relative bg-white border border-solid border-[#E9E9EF] rounded-lg cursor-pointer h-60 w-56"
-                style={{ borderRadius: '20px' }}
-              >
-                <img
-                  className="rounded-t-lg w-full h-32 object-cover"
-                  src={video.img}
-                  alt={video.title}
-                />
-                <div className="p-3">
-                  <p className="text-lg font-medium text-[#303033] text-sm">
-                    {video.title}
-                  </p>
-                </div>
-                <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center text-sm text-gray-600">
-                  <span>{video.views} • {video.date}</span>
-                  <div className="flex space-x-2">
-                    <Button variant="secondary" size="icon" className="p-1">
-                      <Image
-                        width={16}
-                        height={16}
-                        src="/i.svg"
-                        alt="i"
-                      />
-                    </Button>
-                    <Button variant="secondary" size="icon" className="p-1">
-                      <Image
-                        width={18}
-                        height={18}
-                        src="/heart.svg"
-                        alt="heart"
-                      />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
+    <div className="border-b border-[#E3E4EB]">
+      <div className="  h-full mx-auto flex py-[20px] justify-between items-center">
+        <div className="py-[5px] relative">
+          <Button id="current__cate" onClick={handleOnOrOfCategories} variant="secondary"className="px-5" size="default">
+            Browse By Collection
+            <Image width={15} height={14} src="/more.svg" alt="More" />
+          </Button>
+          <div id="list__cate" className="hidden mt-2 absolute bg-white z-10 rounded-[15px] w-[220px]">
+            <ul >
+              {titleWorkoutVideos.map((title, index) => {
+                return (
+                  <li className="pl-3 py-[5px] hover:text-[gray] hover:bg-slate-400" key={index}>
+                    {title}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
-      ))}
+        <div className="flex h-8 ">
+          <div className="group">
+            <Button
+              className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out"
+              variant="defaultOutline"
+              size="default"
+              >
+              <Image width={20} height={20} src="/search.svg" alt="More" />
+              Search
+            </Button>
+            <input
+              className="group-hover:w-[240px] group-hover:opacity-100 opacity-0 group-hover:inline-flex w-[0px] transition-all duration-500 ease-in-out rounded-[15px] border-solid border-[1px] border-[#E9E9EF]"
+              placeholder="Search"
+            />
+          </div>
+          <div>
+            <Button
+              className="bg-transparent mr-1 cursor-not-allowed"
+              variant="disabled"
+              size="default"
+            >
+              <Image width={20} height={20} src="/heart.svg" alt="More" />
+              Favorites
+            </Button>
+          </div>
+          <div>
+            <Button variant="default" size="default">
+              <Image width={20} height={20} src="/filter.svg" alt="More" />{" "}
+              Filter
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default CategoryWorkoutVideos;
+export default HeaderNavWorkoutVideos;
