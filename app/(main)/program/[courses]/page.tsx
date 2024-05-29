@@ -1,10 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
 import React, { useState } from "react";
 
 const Page = () => {
     const [showDetails, setShowDetails] = useState(false);
+
+    const [showDiv, setShowDiv] = useState(false);
+
+    const [start, setStart] = useState(0);
+    const perPage = 8; 
 
     const toggleDetails = () => {
         setShowDetails(!showDetails);
@@ -188,9 +201,19 @@ const Page = () => {
                     </div>
                     <div className="py-4">
                         <div className="bg-[url('https://s3-alpha-sig.figma.com/img/74c0/5c47/68aebf8fe5cb405fcc9699545a438108?Expires=1717372800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=TcSqhjMytbIEI8BFO-ERBGBi3CXkbJr6-UV9Yg3t0q8Ldvo~QqDTja623kFb34wzC9oLlfeyuk-jKmGx3Z6gdlWiaLejHg5FCHlgtjAAyjxifE7vTxsUvrhOHuNwZl9hP2VDc-WYqorv5smBfT63F0TYFSKaYdeAUX79GVjjnqIDJM3ygxcO3K9OdXFdTy6ZRG2Mi26gSFSFeoO1vi4HQ08UNP-iyMIjv5M0R4Skj7SQUtaRReOpmtibgAciwoEv9hko6~lJRASR391H8Ud02C8xQP-Lzo2RQvu5xnKgJOOMrQdVbUasI~17YgFVXEgdnDxnGhXs08-OOQTGCw~XyQ')] bg-cover bg-center bg-no-repeat h-[200px] w-full rounded-2xl items-center justify-center py-5 px-5">
-                            <span className="text-lg font-bold py-4">Start This Challenge</span>
-                            <p className="text-[14px] font-normal pt-2">When you start a challenge your schedule is adapted to your calendar, and you can access more features such as teams</p>
-                            <Button className='mt-6 ml-0' variant='active' size='default'>
+                            <span className="text-lg font-bold py-4">
+                                Start This Challenge
+                            </span>
+                            <p className="text-[14px] font-normal pt-2">
+                                When you start a challenge your schedule is
+                                adapted to your calendar, and you can access
+                                more features such as teams
+                            </p>
+                            <Button
+                                className="mt-2 py-2 ml-0"
+                                variant="active"
+                                size="default"
+                            >
                                 Start Challenge
                             </Button>
                         </div>
@@ -223,28 +246,61 @@ const Page = () => {
                                 height="25"
                                 viewBox="0 0 25 25"
                                 fill="none"
+                                
                             >
                                 <path
                                     d="M7.00342 7.13281C7.00342 6.71094 6.85889 6.35547 6.56982 6.06641C6.28076 5.77734 5.92529 5.63281 5.50342 5.63281C5.08154 5.63281 4.72217 5.77734 4.42529 6.06641C4.12842 6.35547 3.97998 6.71094 3.97998 7.13281C3.97998 7.55469 4.12842 7.91406 4.42529 8.21094C4.72217 8.50781 5.08154 8.65625 5.50342 8.65625C5.92529 8.65625 6.28076 8.50781 6.56982 8.21094C6.85889 7.91406 7.00342 7.55469 7.00342 7.13281ZM8.76123 8.375H21.98V5.9375H8.76123V8.375ZM7.00342 12.5C7.00342 12.0781 6.85889 11.7188 6.56982 11.4219C6.28076 11.125 5.92529 10.9766 5.50342 10.9766C5.08154 10.9766 4.72217 11.125 4.42529 11.4219C4.12842 11.7188 3.97998 12.0781 3.97998 12.5C3.97998 12.9219 4.12842 13.2773 4.42529 13.5664C4.72217 13.8555 5.08154 14 5.50342 14C5.92529 14 6.28076 13.8555 6.56982 13.5664C6.85889 13.2773 7.00342 12.9219 7.00342 12.5ZM8.76123 13.7188H21.98V11.2812H8.76123V13.7188ZM7.00342 17.8438C7.00342 17.4219 6.85889 17.0664 6.56982 16.7773C6.28076 16.4883 5.92529 16.3438 5.50342 16.3438C5.08154 16.3438 4.72217 16.4883 4.42529 16.7773C4.12842 17.0664 3.97998 17.4219 3.97998 17.8438C3.97998 18.2656 4.12842 18.625 4.42529 18.9219C4.72217 19.2188 5.08154 19.3672 5.50342 19.3672C5.92529 19.3672 6.28076 19.2188 6.56982 18.9219C6.85889 18.625 7.00342 18.2656 7.00342 17.8438ZM8.76123 19.0391H21.98V16.625H8.76123V19.0391Z"
                                     fill="#303033"
                                 />
                             </svg>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="29"
-                                height="28"
-                                viewBox="0 0 29 28"
-                                fill="none"
-                            >
-                                <path
-                                    d="M8.29272 14.1318C8.29272 14.5361 8.1521 14.8789 7.87085 15.1602C7.5896 15.4414 7.25562 15.582 6.8689 15.582C6.4646 15.582 6.12183 15.4414 5.84058 15.1602C5.55933 14.8789 5.4187 14.5361 5.4187 14.1318C5.4187 13.7451 5.55933 13.4111 5.84058 13.1299C6.12183 12.8486 6.4646 12.708 6.8689 12.708C7.25562 12.708 7.5896 12.8486 7.87085 13.1299C8.1521 13.4111 8.29272 13.7451 8.29272 14.1318ZM16.1765 14.1318C16.1765 14.5361 16.0359 14.8789 15.7546 15.1602C15.4734 15.4414 15.1306 15.582 14.7263 15.582C14.3396 15.582 14.0056 15.4414 13.7244 15.1602C13.4431 14.8789 13.3025 14.5361 13.3025 14.1318C13.3025 13.7451 13.4431 13.4111 13.7244 13.1299C14.0056 12.8486 14.3396 12.708 14.7263 12.708C15.1306 12.708 15.4734 12.8486 15.7546 13.1299C16.0359 13.4111 16.1765 13.7451 16.1765 14.1318ZM24.0603 14.1318C24.0603 14.5361 23.9153 14.8789 23.6252 15.1602C23.3352 15.4414 22.9968 15.582 22.6101 15.582C22.2058 15.582 21.863 15.4414 21.5818 15.1602C21.3005 14.8789 21.1599 14.5361 21.1599 14.1318C21.1599 13.7451 21.3005 13.4111 21.5818 13.1299C21.863 12.8486 22.2058 12.708 22.6101 12.708C22.9968 12.708 23.3352 12.8486 23.6252 13.1299C23.9153 13.4111 24.0603 13.7451 24.0603 14.1318Z"
-                                    fill="#303033"
-                                />
-                            </svg>
+                            
+                            <div className="relative">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="29"
+                                    height="28"
+                                    viewBox="0 0 29 28"
+                                    fill="none"
+                                    onClick={() => setShowDiv(!showDiv)}
+                                    className="cursor-pointer"
+                                >
+                                    <path
+                                        d="M8.29272 14.1318C8.29272 14.5361 8.1521 14.8789 7.87085 15.1602C7.5896 15.4414 7.25562 15.582 6.8689 15.582C6.4646 15.582 6.12183 15.4414 5.84058 15.1602C5.55933 14.8789 5.4187 14.5361 5.4187 14.1318C5.4187 13.7451 5.55933 13.4111 5.84058 13.1299C6.12183 12.8486 6.4646 12.708 6.8689 12.708C7.25562 12.708 7.5896 12.8486 7.87085 13.1299C8.1521 13.4111 8.29272 13.7451 8.29272 14.1318ZM16.1765 14.1318C16.1765 14.5361 16.0359 14.8789 15.7546 15.1602C15.4734 15.4414 15.1306 15.582 14.7263 15.582C14.3396 15.582 14.0056 15.4414 13.7244 15.1602C13.4431 14.8789 13.3025 14.5361 13.3025 14.1318C13.3025 13.7451 13.4431 13.4111 13.7244 13.1299C14.0056 12.8486 14.3396 12.708 14.7263 12.708C15.1306 12.708 15.4734 12.8486 15.7546 13.1299C16.0359 13.4111 16.1765 13.7451 16.1765 14.1318ZM24.0603 14.1318C24.0603 14.5361 23.9153 14.8789 23.6252 15.1602C23.3352 15.4414 22.9968 15.582 22.6101 15.582C22.2058 15.582 21.863 15.4414 21.5818 15.1602C21.3005 14.8789 21.1599 14.5361 21.1599 14.1318C21.1599 13.7451 21.3005 13.4111 21.5818 13.1299C21.863 12.8486 22.2058 12.708 22.6101 12.708C22.9968 12.708 23.3352 12.8486 23.6252 13.1299C23.9153 13.4111 24.0603 13.7451 24.0603 14.1318Z"
+                                        fill="#303033"
+                                    />
+                                </svg> 
+                                {showDiv && <button  className="absolute text-center top-8 right-0 bg-white border border-gray-200 p-2 z-10 text-[14px] inline-block w-40 animate-accordion-down">Start this challenge</button>}
+                            </div>
                         </div>
                     </div>
-                    <div className="flex py-6 px-[51px] rounded-[200px] border border-[#EFF0F4] bg-white">
-
+                    <div className="w-full flex py-6 px-[51px] rounded-[200px] border border-[#EFF0F4] bg-white">
+                        <Carousel
+                            opts={{
+                                align: "start",
+                            }}
+                            className="w-full"
+                        >
+                            <CarouselContent>
+                                {Array.from({ length: 22 }).map((_, index) => (
+                                    <CarouselItem
+                                        key={index}
+                                        className="basis-1/7"
+                                    >
+                                        <div>
+                                            <Card className="w-[107px] h-[60px] flex-grow">
+                                                <CardContent className="flex aspect-square p-1">
+                                                    <span className="text-sm font-semibold">
+                                                        Day {index + 1}
+                                                    </span>
+                                                </CardContent>
+                                            </Card>
+                                        </div>
+                                    </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                            <CarouselPrevious />
+                            <CarouselNext />
+                        </Carousel>
                     </div>
                 </div>
             </div>
