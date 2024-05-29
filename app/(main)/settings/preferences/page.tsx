@@ -171,6 +171,7 @@ const PreferencesPage = () => {
                                     name="bio"
                                     render={({ field }) => (
                                         <Textarea
+                                            {...field}
                                             placeholder="Add your bio..."
                                             className="bg-white hover:ring-1 hover:ring-black p-4"
                                         />

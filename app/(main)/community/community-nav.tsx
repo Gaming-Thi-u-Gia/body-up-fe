@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import React from "react";
 
@@ -32,14 +33,16 @@ const CommunityNavbar = () => {
                         </svg>
                         <span className="text-sm">Search</span>
                     </div>
-                    <Button
-                        type="submit"
-                        variant="primary"
-                        size="full"
-                        className="h-[29px] px-[17px] text-sm"
-                    >
-                        Create Post
-                    </Button>
+                    <Link href={`/community/${title}/create`}>
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            size="full"
+                            className="h-[29px] px-[17px] text-sm"
+                        >
+                            Create Post
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </div>

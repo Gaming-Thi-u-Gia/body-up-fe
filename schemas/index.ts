@@ -61,6 +61,18 @@ export const ChangePasswordSchema = z
         }
     });
 
+export const PostSchema = z.object({
+    title: z.string().min(3, {
+        message: "Please enter a title for your post!",
+    }),
+    details: z.string().min(3, {
+        message: "Please enter details for your post!",
+    }),
+    tags: z.string().min(1, {
+        message: "Please select a tag for your post!",
+    }),
+});
+
 export const formSchema = z.object({
     firstName: z.string(),
     lastName: z.string(),
