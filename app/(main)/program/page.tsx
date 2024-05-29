@@ -2,9 +2,28 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import CatelogyModelProgram from "./catelogy-model-program";
 import ProgramCard from "./program-card";
+import Link from "next/link";
 const ProgramPage = () => {
     return (
         <div className="w-full px-[140px] py-[47px]">
+            <div className="flex w-full gap-5 pb-5 pt-8">
+                <div className="flex w-[60%] justify-between">
+                    <span className="text-[22px] font-semibold leading-7">Latest Challenges</span>
+                    <div>
+                        <Button variant="primaryOutline" size="default">
+                            <Link href="#">View All</Link>
+                        </Button>
+                    </div>
+                </div>
+                <div className="flex w-[40%] justify-between">
+                    <span className="text-[22px] font-semibold leading-7">Most Popular</span>
+                    <div>
+                        <Button variant="primaryOutline" size="default">
+                            <Link href="#">View All</Link>
+                        </Button>
+                    </div>
+                </div>
+            </div>
             <div className="grid grid-cols-5 gap-4 h-[430px]">
                 <div className="flex w-full bg-white rounded-2xl px-[15px] py-[47px] gap-3 col-span-2 ">
                     <img
@@ -102,9 +121,9 @@ const ProgramPage = () => {
                         </Button>
                     </div>
                 </div>
-                <ProgramCard/>
-                <ProgramCard/>
-                <ProgramCard/>
+                <ProgramCard />
+                <ProgramCard />
+                <ProgramCard />
             </div>
             <CatelogyModelProgram />
         </div>

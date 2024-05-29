@@ -4,7 +4,7 @@ import React from 'react'
 
 const ProgramTitle = () => {
   return (
-    <div className="flex w-full justify-between py-5 items-center">
+    <div className="flex w-full justify-between py-7 items-center">
                 <div>
                     <span className="leading-loose font-semibold text-2xl text-black">
                         Moderate to Advanced
