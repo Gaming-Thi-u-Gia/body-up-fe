@@ -1,137 +1,130 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { title } from "process";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { category } from "@/constants";
-import React, { useState } from "react";
-import { Link } from "lucide-react";
+
+interface VideoItem {
+    id: string;
+    title: string;
+    img: string;
+    views: string;
+    date: string;
+    duration: string;
+}
 
 const CategoryWorkoutVideos = () => {
-    const listCategoryItems = [
-        {
-            id: 1,
-            title: "Most Popular",
-            detail: "These are some of the most popular workout videos. Give them a try and see why people love these routines.",
-            categoryURL: "#",
-            videos: [
-                {
-                    id: 1,
-                    title: "Abs in 2 Weeks",
-                    img: "https://static.chloeting.com/videos/61bbdcdd017bbb985e15f8eb/28972560-5ed2-11ec-b99f-c33e6b9468db.jpeg",
-                    views: "544M views",
-                    date: "August 20",
-                },
-                {
-                    id: 2,
-                    title: "Do This Everyday to Lose Weight",
-                    img: "https://static.chloeting.com/videos/61bbdc7e2cb3b78eb6ac2bba/efca6f80-5ed1-11ec-b182-df31ae6aab45.jpeg",
-                    views: "217M views",
-                    date: "August 15",
-                },
-                {
-                    id: 3,
-                    title: "11 Line Abs",
-                    img: "https://static.chloeting.com/videos/61bbd89dc3d293024898b84d/9ff668d0-5ecf-11ec-b8cd-2976cd667d03.jpeg",
-                    views: "78M views",
-                    date: "April 19",
-                },
-                {
-                    id: 4,
-                    title: "Warm Up",
-                    img: "https://static.chloeting.com/videos/61bbf59552c5c9bf0f2550eb/e43a1620-5ee0-11ec-9a04-3fd984621d67.jpeg",
-                    views: "72M views",
-                    date: "May 20",
-                },
-                {
-                    id: 5,
-                    title: "Flat Belly Abs",
-                    img: "https://static.chloeting.com/videos/61bbbbf0c3d293024898b838/8873f260-5ebe-11ec-9a04-3fd984621d67.jpeg",
-                    views: "61M views",
-                    date: "Jan 19",
-                },
-            ],
-        },
-        {
-            id: 2,
-            title: "Most Popular",
-            detail: "These are some of the most popular workout videos. Give them a try and see why people love these routines.",
-            categoryURL: "#",
-            videos: [
-                {
-                    id: 1,
-                    title: "Abs in 2 Weeks",
-                    img: "https://static.chloeting.com/videos/61bbdcdd017bbb985e15f8eb/28972560-5ed2-11ec-b99f-c33e6b9468db.jpeg",
-                    views: "544M views",
-                    date: "August 20",
-                },
-                {
-                    id: 2,
-                    title: "Do This Everyday to Lose Weight",
-                    img: "https://static.chloeting.com/videos/61bbdc7e2cb3b78eb6ac2bba/efca6f80-5ed1-11ec-b182-df31ae6aab45.jpeg",
-                    views: "217M views",
-                    date: "August 15",
-                },
-                {
-                    id: 3,
-                    title: "11 Line Abs",
-                    img: "https://static.chloeting.com/videos/61bbd89dc3d293024898b84d/9ff668d0-5ecf-11ec-b8cd-2976cd667d03.jpeg",
-                    views: "78M views",
-                    date: "April 19",
-                },
-                {
-                    id: 4,
-                    title: "Warm Up",
-                    img: "https://static.chloeting.com/videos/61bbf59552c5c9bf0f2550eb/e43a1620-5ee0-11ec-9a04-3fd984621d67.jpeg",
-                    views: "72M views",
-                    date: "May 20",
-                },
-                {
-                    id: 5,
-                    title: "Flat Belly Abs",
-                    img: "https://static.chloeting.com/videos/61bbbbf0c3d293024898b838/8873f260-5ebe-11ec-9a04-3fd984621d67.jpeg",
-                    views: "61M views",
-                    date: "Jan 19",
-                },
-            ],
-        },
-    ];
+    const [videos, setVideos] = useState<VideoItem[]>([]);
+
+    useEffect(() => {
+        const fetchVideos = async () => {
+            try {
+                const playlistId = "UUCgLoMYIyP0U56dEhEL1wXQ";
+                const apiKey = "AIzaSyCKQUy2NeFm7Fp8DD9mD5tP8rpnBj48VIs";
+                let allVideos: VideoItem[] = [];
+                let nextPageToken = "";
+
+                do {
+                    const playlistResponse = await fetch(
+                        `https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${apiKey}&pageToken=${nextPageToken}`
+                    );
+                    const playlistData = await playlistResponse.json();
+
+                    const videoDetails = await Promise.all(
+                        playlistData.items.map(async (item: any) => {
+                            const videoId = item.snippet.resourceId.videoId;
+                            const videoResponse = await fetch(
+                                `https://youtube.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoId}&key=${apiKey}`
+                            );
+                            const videoData = await videoResponse.json();
+                            const videoInfo = videoData.items[0];
+
+                            return {
+                                id: videoId,
+                                title: item.snippet.title,
+                                img: item.snippet.thumbnails.high.url,
+                                views: formatViews(
+                                    videoInfo.statistics.viewCount
+                                ),
+                                date: new Date(
+                                    item.snippet.publishedAt
+                                ).toLocaleDateString(),
+                                duration: convertDuration(
+                                    videoInfo.contentDetails.duration
+                                ),
+                            };
+                        })
+                    );
+
+                    allVideos = allVideos.concat(videoDetails);
+                    nextPageToken = playlistData.nextPageToken;
+                } while (nextPageToken);
+
+                setVideos(allVideos);
+            } catch (error) {
+                console.error("Error fetching videos:", error);
+            }
+        };
+
+        fetchVideos();
+    }, []);
+
+    const convertDuration = (duration: string) => {
+        return duration
+            .replace("PT", "")
+            .replace("H", "h ")
+            .replace("M", "m ")
+            .replace("S", "s");
+    };
+
+    const formatViews = (views: string) => {
+        const num = parseInt(views);
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(0) + "M";
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(0) + "K";
+        } else {
+            return num.toString();
+        }
+    };
 
     return (
         <div>
-            <div>
-                <div className="flex justify-between py-2">
-                    <div>
-                        <h2 className="text-[#303033] text-xl font-semibold">
-                            Most Popular
-                        </h2>
-                        <p className="text-sm font-normal">
-                            These are some of the most popular workout videos.
-                            Give them a try and see why people love these
-                            routines.
-                        </p>
-                    </div>
-                    <Button variant="primaryOutline" size="default">
-                        View All
-                    </Button>
+            <div className="flex justify-between py-2">
+                <div>
+                    <h2 className="text-[#303033] text-xl font-semibold">
+                        Most Popular
+                    </h2>
+                    <p className="text-sm font-normal">
+                        These are some of the most popular workout videos. Give
+                        them a try and see why people love these routines.
+                    </p>
                 </div>
+                <Button variant="primaryOutline" size="default">
+                    View All
+                </Button>
+            </div>
 
-                <div className="grid grid-cols-5 gap-5 my-5">
+            <div className="grid grid-cols-5 gap-5 my-5">
+                {videos.map((video) => (
                     <div
+                        key={video.id}
                         className="relative bg-white border border-solid border-[#E9E9EF] rounded-lg cursor-pointer h-60 w-56"
                         style={{ borderRadius: "20px" }}
                     >
                         <img
                             className="rounded-t-lg w-full h-32 object-cover"
-                            src="https://static.chloeting.com/videos/61bbdcdd017bbb985e15f8eb/28972560-5ed2-11ec-b99f-c33e6b9468db.jpeg"
-                            alt=""
+                            src={video.img}
+                            alt={video.title}
                         />
                         <div className="p-3">
-                            <p className="font-medium text-[#303033] text-sm">
-                                Abs in 2 Weeks
+                            <p className="font-medium text-[#303033] text-sm line-clamp-2">
+                                {video.title}
                             </p>
                         </div>
                         <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center text-sm text-gray-600">
-                            <span>544M views • August 15</span>
+                            <span>
+                                {video.views} views • {video.date}
+                            </span>
                             <div className="flex space-x-2">
                                 <Button
                                     variant="secondary"
@@ -160,7 +153,7 @@ const CategoryWorkoutVideos = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                ))}
             </div>
         </div>
     );
