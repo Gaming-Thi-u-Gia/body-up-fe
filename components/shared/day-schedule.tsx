@@ -1,3 +1,4 @@
+"use client";
 import {
     Calendar,
     CalendarCheck,
@@ -17,6 +18,8 @@ import {
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
 import { DailyCarousel } from "./daily-carousel";
+import { useState } from "react";
+import { VideoDailyCard } from "./video-daily-card";
 type Props = {
     title: string;
     releaseDate: string;
@@ -25,6 +28,20 @@ type Props = {
     type: string;
     equipment: string;
 };
+//TODO: fetch API
+const dailyVideoData = {
+    title: "Full Body Warm Up",
+    target: "Warm Up",
+    view: "1.2M",
+    releaseDate: "2021-06-01",
+    duration: "05:00",
+    bannerUrl:
+        "https://s3-alpha-sig.figma.com/img/2b8e/37ca/aa986d36e5fc3e804ad5e502069efb47?Expires=1717977600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=n8pFiICMRBK9zzFtA4ig6y6R0GBdJSHGddCiKEZrUmTDJTghDuuYREdmMv-qQFI85VJiLylMntbgKWmQoegbK9fVqd0eSUZ4H7WyGC9EGcdoRFVnCZshloQpiA~GRmk8D-YBI~fyThe83yH~75F2Eht7EA4g3CG-i1oxGTym3O7zuWw7-Hrn-~FB5DrVfAHFUAqcXi5yK8PvyeujumahKnoi0HRjJsPd1EmhSkXz5V3JBOApCkGrdQ3G5UFAd7JFJwZTKfHKyPt6xIFuZUiprGuxagMKqkgceja7ErYVuhak7xuJCMOh3FVSsNMHt6LM9XrUp9VtsGqK22JTye4CXw__",
+    isOptional: true,
+    status: "incomplete",
+    url: "https://www.youtube.com/watch?v=j5SHMJ6mUoA",
+};
+
 export const DaySchedule = ({
     title,
     releaseDate,
@@ -33,6 +50,17 @@ export const DaySchedule = ({
     type,
     equipment,
 }: Props) => {
+    const [data, setData] = useState("");
+    const validatedStatus =
+        dailyVideoData.status === "complete" ||
+        dailyVideoData.status === "incomplete"
+            ? dailyVideoData.status
+            : "incomplete";
+    //TODO: SET DATA WHEN CLICK ON SCHEDULE
+    const onClick = (index: number) => {
+        const day = "Day" + index;
+        setData(day);
+    };
     return (
         <div>
             <div className='flex justify-between items-center'>
@@ -114,9 +142,38 @@ export const DaySchedule = ({
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
-                <DailyCarousel />
+                <DailyCarousel day='Mon 23' title='Test' onClick={onClick} />
             </div>
-            <div className='w-full py-[30px] bg-white border-[#c4c4c4] border-[1px] rounded-lg items-start my-4'></div>
+            <div className='w-full py-[30px] px-[18px] bg-white border-[#c4c4c4] border-[1px] rounded-lg items-start my-4'>
+                <Accordion type='single' collapsible>
+                    <AccordionItem value='item-1' className='border-none '>
+                        <AccordionTrigger className='flex justify-between items-center py-0'>
+                            <h4 className='flex-1 text-[22px] font-semibold text-start'>
+                                Today&apos;s Workout{" "}
+                            </h4>
+                            <p className='text-[14px] text-[#868A93]'>
+                                4 Workouts | 46 Mins (Excludes Optional Videos)
+                            </p>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                            {Array.from({ length: 5 }).map((_, index) => (
+                                <VideoDailyCard
+                                    key={index}
+                                    title={dailyVideoData.title + " " + data}
+                                    bannerUrl={dailyVideoData.bannerUrl}
+                                    duration={dailyVideoData.duration}
+                                    releaseDate={dailyVideoData.releaseDate}
+                                    target={dailyVideoData.target}
+                                    view={dailyVideoData.view}
+                                    isOptional={dailyVideoData.isOptional}
+                                    url={dailyVideoData.url}
+                                    initialStatus={validatedStatus}
+                                />
+                            ))}
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+            </div>
         </div>
     );
 };
