@@ -30,7 +30,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Comment from "../../comment";
-const FitnessPost = () => {
+const MyPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
@@ -286,4 +286,4 @@ const FitnessPost = () => {
     );
 };
 
-export default FitnessPost;
+export default MyPost;

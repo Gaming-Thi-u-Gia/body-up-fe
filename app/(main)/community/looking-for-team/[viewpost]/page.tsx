@@ -30,12 +30,12 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Comment from "../../comment";
-const FitnessPost = () => {
+const LookingForTeamPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
     return (
-        <div className="w-[823px] mt-3">
+        <div className="w-[823px] mt-[5%]">
             <Link
                 href={`/community/${title}`}
                 className="flex gap-2 items-center justify-start mb-4"
@@ -286,4 +286,4 @@ const FitnessPost = () => {
     );
 };
 
-export default FitnessPost;
+export default LookingForTeamPost;

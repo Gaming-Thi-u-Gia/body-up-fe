@@ -8,11 +8,8 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ChangePasswordSchema, PostSchema } from "@/schemas";
-import { handleSetNewPassword } from "@/utils/auth";
+import { PostSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -25,7 +22,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { title } from "process";
+
 const CreatePost = () => {
     const form = useForm({
         resolver: zodResolver(PostSchema),
@@ -94,27 +91,31 @@ const CreatePost = () => {
                             <span className="text-[10px] pt-2 font-bold flex items-center">
                                 Select A Tag
                             </span>
+
                             <FormField
                                 control={form.control}
                                 name="tags"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
-                                            <Select>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                            >
                                                 <SelectTrigger className="w-full rounded-lg">
                                                     <SelectValue placeholder="Select a tag" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="light">
+                                                    <SelectItem value="Workout">
                                                         Workout
                                                     </SelectItem>
-                                                    <SelectItem value="dark">
+                                                    <SelectItem value="Food">
                                                         Food
                                                     </SelectItem>
-                                                    <SelectItem value="system">
+                                                    <SelectItem value="Chloe's Programs">
                                                         Chloe's Programs
                                                     </SelectItem>
-                                                    <SelectItem value="system">
+                                                    <SelectItem value="Misc">
                                                         Misc
                                                     </SelectItem>
                                                 </SelectContent>

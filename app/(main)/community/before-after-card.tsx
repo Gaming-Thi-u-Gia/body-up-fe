@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
     Sheet,
@@ -12,7 +13,11 @@ import before_after from "/public/before-after-icon.svg";
 import { Button } from "@/components/ui/button";
 import challenges_icon from "/public/challenges-icon.svg";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 const BeforAfterPost = () => {
+    const pathname = usePathname();
+    const pathParts = pathname.split("/");
+    const title = pathParts[2];
     return (
         <div className=" bg-white rounded-md px-2 py-3">
             <div className="flex items-center justify-between ">
@@ -128,7 +133,10 @@ const BeforAfterPost = () => {
             <h1 className="text-[14px] font-bold p-2">
                 Happy with the results
             </h1>
-            <div className="flex gap-2 rounded-md items-center justify-center px-1">
+            <Link
+                href={`/community/${title}/viewpost`}
+                className="flex gap-2 rounded-md items-center justify-center px-1"
+            >
                 {/* <Link href="/"></Link> */}
                 <img
                     src="https://static.chloeting.com/users/66181662ed0fcedc0969bc7e/photos/66412e739810b23039b25727/fa318370-10a2-11ef-95aa-b9f652f19ec5.jpeg"
@@ -139,7 +147,7 @@ const BeforAfterPost = () => {
                     src="https://static.chloeting.com/users/66181662ed0fcedc0969bc7e/photos/6654dcb6b624db48640b02d3/03b54690-1c5e-11ef-a2e9-f78e7e898479.jpeg"
                     className="w-[50%] h-[378px] object-cover rounded-xl"
                 />
-            </div>
+            </Link>
         </div>
     );
 };

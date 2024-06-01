@@ -19,6 +19,38 @@ import reply_icon from "/public/reply-icon.svg";
 const Comment = () => {
     const [isOpennedReply, setIsOpennedReply] = useState(false);
     const [countUpvoted, setCountUpvoted] = useState<number>(0);
+    const [isUpvoted, setIsUpvoted] = useState(false);
+    const [isDownvoted, setIsDownvoted] = useState(false);
+    const handleUpvoteClick = () => {
+        if (isUpvoted) {
+            setCountUpvoted(countUpvoted - 1);
+            setIsUpvoted(false);
+        } else {
+            if (isDownvoted) {
+                setCountUpvoted(countUpvoted + 2);
+                setIsDownvoted(false);
+            } else {
+                setCountUpvoted(countUpvoted + 1);
+            }
+            setIsUpvoted(true);
+        }
+    };
+
+    const handleDownvoteClick = () => {
+        if (isDownvoted) {
+            setCountUpvoted(countUpvoted + 1);
+            setIsDownvoted(false);
+        } else {
+            if (isUpvoted) {
+                setCountUpvoted(countUpvoted - 2);
+                setIsUpvoted(false);
+            } else {
+                setCountUpvoted(countUpvoted - 1);
+            }
+            setIsDownvoted(true);
+        }
+    };
+
     return (
         <div className="w-full flex flex-col gap-3 items-center mt-7 justify-between p-3">
             <div className="w-full flex justify-between items-center  ">
@@ -148,12 +180,10 @@ const Comment = () => {
                             alt="logo"
                             width={18}
                             height={18}
-                            className="cursor-pointer"
-                            onClick={() =>
-                                setCountUpvoted(
-                                    (countUpvoted) => countUpvoted + 1
-                                )
-                            }
+                            className={`cursor-pointer ${
+                                isUpvoted ? "bg-blue-500" : ""
+                            }`}
+                            onClick={handleUpvoteClick}
                         />
 
                         <span className="text-[14px]">{countUpvoted}</span>
@@ -163,12 +193,10 @@ const Comment = () => {
                             alt="logo"
                             width={18}
                             height={18}
-                            className="cursor-pointer"
-                            onClick={() =>
-                                setCountUpvoted(
-                                    (countUpvoted) => countUpvoted - 1
-                                )
-                            }
+                            className={`cursor-pointer ${
+                                isDownvoted ? "bg-red-500" : ""
+                            }`}
+                            onClick={handleDownvoteClick}
                         />
                     </div>
                 </div>

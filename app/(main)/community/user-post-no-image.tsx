@@ -137,15 +137,6 @@ const PostUser = () => {
                         />
                         <span className="text-[12px]">Workout</span>
                     </div>
-                    <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] h-7 justify-center items-center">
-                        <Image
-                            src={fitness_icon}
-                            alt="logo"
-                            width={13}
-                            height={12}
-                        />
-                        <span className="text-[12px]">Workout</span>
-                    </div>
                 </div>
             </div>
             <Link
@@ -183,7 +174,13 @@ const PostUser = () => {
                     variant="secondary"
                     className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
                 >
-                    <Image src={saved_icon} alt="logo" width={20} height={20} />
+                    <Image
+                        src={saved_icon}
+                        alt="logo"
+                        width={20}
+                        height={20}
+                        className=""
+                    />
                     <span className="text-[12px]">Saved</span>
                 </Button>
                 <Button
