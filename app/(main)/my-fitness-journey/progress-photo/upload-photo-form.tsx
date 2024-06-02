@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { UploadPhotoSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 
 export const UploadPhotoForm = () => {
     const form = useForm({
@@ -39,24 +40,37 @@ export const UploadPhotoForm = () => {
         },
     });
     const [preview, setPreview] = useState<string | null>(null);
-    const onDrop = useCallback((acceptedFiles: FileList) => {
-        // Do something with the files
-        const file = new FileReader();
-        file.onload = () => {
-            setPreview(file.result as string);
-        };
+    const onDrop = useCallback(
+        (acceptedFiles: FileList, fileRejections: FileList) => {
+            // Do something with the files
+            if (fileRejections.length > 0) {
+                toast.error("Invalid file type or file size is too large");
+                return;
+            }
+            const file = new FileReader();
+            file.onload = () => {
+                setPreview(file.result as string);
+            };
 
-        file.readAsDataURL(acceptedFiles[0]);
-    }, []);
-    const { acceptedFiles, getRootProps, getInputProps, isDragActive } =
-        useDropzone({
-            //@ts-ignore
-            onDrop,
-            accept: {
-                "image/jpeg": [".jpg"],
-                "image/png": [".png"],
-            },
-        });
+            file.readAsDataURL(acceptedFiles[0]);
+        },
+        []
+    );
+    const {
+        acceptedFiles,
+        fileRejections,
+        getRootProps,
+        getInputProps,
+        isDragActive,
+    } = useDropzone({
+        //@ts-ignore
+        onDrop,
+        accept: {
+            "image/jpeg": [".jpg", ".jpeg"],
+            "image/png": [".png"],
+        },
+        maxSize: 10 * 1024 * 1024,
+    });
     const handleDelete = () => {
         setPreview(null);
         form.setValue("img", null);
@@ -90,6 +104,7 @@ export const UploadPhotoForm = () => {
                                                         {...field}
                                                         className='bg-transparent'
                                                         type='file'
+                                                        value={undefined}
                                                         {...getInputProps()}
                                                     />
 
@@ -114,6 +129,7 @@ export const UploadPhotoForm = () => {
                                         </FormItem>
                                     )}
                                 ></FormField>
+                                {/* TODO */}
                             </div>
                         ) : (
                             <div className='w-[298px] h-[366px] rounded-xl bg bg-[#fff7f7] flex items-center overflow-hidden'>

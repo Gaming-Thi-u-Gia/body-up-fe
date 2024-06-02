@@ -65,7 +65,7 @@ const ProgressPhotoPage = () => {
                         <Upload width={16} height={16} />
                     </div>
                     <p className='text-center mt-2 group-hover:text-[#4fadff]'>
-                        Upload your first progress photo
+                        Upload your progress photo
                     </p>
                 </div>
             </div>
