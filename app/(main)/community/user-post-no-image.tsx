@@ -18,6 +18,7 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
+import { Bookmark } from "lucide-react";
 const PostUser = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
@@ -174,12 +175,18 @@ const PostUser = () => {
                     variant="secondary"
                     className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
                 >
-                    <Image
+                    {/* <Image
                         src={saved_icon}
                         alt="logo"
                         width={20}
                         height={20}
                         className=""
+                    /> */}
+                    <Bookmark
+                        size={20}
+                        // className="text-red-500"
+                        // fill="red"
+                        // strokeWidth="0"
                     />
                     <span className="text-[12px]">Saved</span>
                 </Button>

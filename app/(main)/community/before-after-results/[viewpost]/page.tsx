@@ -150,7 +150,7 @@ const BeforeAfterPost = () => {
                     </div>
                 </div>
                 <Link
-                    href="/community/fitness"
+                    href={`/community/${title}`}
                     className="text-black text-lg font-medium mt-3"
                 >
                     How Was Your Workout Today? | Weekly Thread
