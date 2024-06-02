@@ -68,3 +68,19 @@ export const formSchema = z.object({
     username: z.string().optional(),
     profileTitle: z.string().optional(),
 });
+const imageFile = z.instanceof(File).refine(
+    (file) => {
+        const validImageTypes = ["image/gif", "image/jpeg", "image/png"];
+        return validImageTypes.includes(file.type);
+    },
+    {
+        message: "File must be an image",
+    }
+);
+export const UploadPhotoSchema = z.object({
+    direction: z.string(),
+    isVisibility: z.boolean(),
+    datePhotoTaken: z.date(),
+    caption: z.string().max(10, { message: "Not" }),
+    img: imageFile.nullable(),
+});

@@ -52,7 +52,7 @@ export const Sidebar = () => {
             <div className='flex flex-col p-5'>
                 {myFitness.map((item) => (
                     <SidebarItem
-                        href={item.url}
+                        href={"/my-fitness-journey" + item.url}
                         title={item.name}
                         key={item.name}
                         icon={item.icon}

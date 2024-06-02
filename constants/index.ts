@@ -84,7 +84,7 @@ export const myFitness = [
     },
     {
         name: "My Progress Photos",
-        url: "/",
+        url: "/progress-photo",
         icon: "/photo-icon.svg",
     },
     {
