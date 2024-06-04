@@ -10,7 +10,7 @@ const ImageSwipe = ({ images }: Props) => {
       <Gallery>
         <div className="grid grid-cols-3 gap-1">
           {images.map((image, index) => (
-            <div key={index} className="h-[1000px]">
+            <div key={index}>
               <Item
                 original={image}
                 thumbnail={image}

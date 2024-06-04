@@ -24,7 +24,8 @@
     "react-photoswipe-gallery": "^3.0.1",
     "react-stars": "^2.2.5",
     "tailwind-merge": "^2.3.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "tailwindcss-line-clamp": "^1.0.5"
   },
   "devDependencies": {
     "@types/node": "^20",

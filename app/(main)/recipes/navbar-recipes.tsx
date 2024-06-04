@@ -2,6 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Heart, Search } from "lucide-react";
 const NavbarRecipes = () => {
   const titleRecipes = [
     "View all Collections",
@@ -61,17 +62,15 @@ const NavbarRecipes = () => {
         <div className="group inline-flex h-full ">
           <span className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out h-full">
             <Button variant="defaultOutline" size="default">
-              <Image width={20} height={20} src="/search.svg" alt="More" />
+              <Search width={20} strokeWidth={1} />
               Search
             </Button>
           </span>
           <span className="relative inline-flex group-hover:w-[240px] items-center group-hover:opacity-100 transition-all ease-in-out duration-1000 h-full rounded-[15px] w-0 opacity-0">
-            <Image
-              className="absolute left-[2px] cursor-pointer"
+            <Search
               width={20}
-              height={20}
-              src="/search.svg"
-              alt="More"
+              strokeWidth={1}
+              className="absolute left-[2px] cursor-pointer"
             />
             <input
               className="pl-5 w-full rounded-[15px] border-2 border-black"
@@ -85,7 +84,7 @@ const NavbarRecipes = () => {
             variant="disabled"
             size="default"
           >
-            <Image width={20} height={20} src="/heart.svg" alt="More" />
+            <Heart width={20} strokeWidth={1} />
             Saved Recipes
           </Button>
         </div>

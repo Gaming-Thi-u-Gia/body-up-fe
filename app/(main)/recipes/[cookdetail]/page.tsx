@@ -1,15 +1,16 @@
 import { title } from "process";
-import Slider from "./Slider";
-import Info from "./Info";
-import CookInfo from "./CookInfo";
-import ImageSwipe from "./ImageSwipe";
+import Slider from "./slider";
+import Info from "./info";
+import CookInfo from "./cook-info";
+import ImageSwipe from "./image-swipe";
+import Recommended from "./recommend";
 /* eslint-disable @next/next/no-img-element */
 type Props = {
   params: {
     foodName: string;
   };
 };
-const page = ({ params }: Props) => {
+const CookDetail = ({ params }: Props) => {
   const { foodName } = params;
 
   const images = [
@@ -24,8 +25,9 @@ const page = ({ params }: Props) => {
       <Info />
       <CookInfo />
       <ImageSwipe images={images} />
+      <Recommended />
     </div>
   );
 };
 
-export default page;
+export default CookDetail;
