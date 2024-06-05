@@ -75,3 +75,36 @@ export const socialMedia = [
         iconSrc: "/youtube.svg",
     },
 ];
+
+export const myFitness = [
+    {
+        name: "My Achievements",
+        url: "/",
+        icon: "/star-icon.svg",
+    },
+    {
+        name: "My Progress Photos",
+        url: "/progress-photo",
+        icon: "/photo-icon.svg",
+    },
+    {
+        name: "My Favorite Videos",
+        url: "/",
+        icon: "/heart-icon.svg",
+    },
+    {
+        name: "My Journal",
+        url: "/",
+        icon: "/my-journey-icon.svg",
+    },
+    {
+        name: "My Workout History",
+        url: "/",
+        icon: "/history-icon.svg",
+    },
+    {
+        name: "My Saved Recipes",
+        url: "/",
+        icon: "/recipe-icon.svg",
+    },
+];

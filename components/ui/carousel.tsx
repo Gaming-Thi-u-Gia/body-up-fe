@@ -203,7 +203,7 @@ const CarouselPrevious = React.forwardRef<
   return (
     <Button
       ref={ref}
-      variant={variant as "default" | "defaultOutline" | "primary" | "primaryOutline" | "secondary" | "active" | "disabled" | null | undefined}
+      variant={variant}
       size={size}
       className={cn(
         "absolute  h-8 w-8 rounded-full",
@@ -232,7 +232,7 @@ const CarouselNext = React.forwardRef<
   return (
     <Button
       ref={ref}
-      variant={variant as "default" | "defaultOutline" | "primary" | "primaryOutline" | "secondary" | "active" | "disabled" | null | undefined}
+      variant={variant}
       size={size}
       className={cn(
         "absolute h-8 w-8 rounded-full",
