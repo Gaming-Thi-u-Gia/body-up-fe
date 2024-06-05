@@ -63,7 +63,7 @@ export const BmiModal = () => {
     };
 
     return (
-        <Dialog open={true} onOpenChange={close}>
+        <Dialog open={isOpen} onOpenChange={close}>
             <DialogContent className="w-full">
                 <DialogHeader>
                     <div className="flex items-center w-full mb-5 justify-center">
