@@ -13,6 +13,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { VerifyCodeModel } from "@/components/modals/verify-code-modal";
 import { VerifyResetCodeModel } from "@/components/modals/verify-reset-code-modal";
 import { UploadPhotoModal } from "@/components/modals/upload-photo-modal";
+import BmiCaculate from "@/components/shared/bmi-calculate";
+import { BmiModal } from "@/components/modals/bmi-modal";
 const font = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -41,13 +43,15 @@ export default async function RootLayout({
                     initialUser={res?.payload}
                 >
                     <Navbar />
-                    <main className='mt-[56px] flex-1'>
+                    <main className='relative mt-[56px] flex-1'>
                         <VerifyCodeModel />
                         <VerifyResetCodeModel />
                         <AvatarModal />
                         <DeleteAvatarModal />
                         <UploadPhotoModal />
+                        <BmiModal/>
                         {children}
+                        <BmiCaculate />
                     </main>
 
                     <Toaster position='top-right' />
