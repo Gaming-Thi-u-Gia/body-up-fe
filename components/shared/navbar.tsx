@@ -27,9 +27,8 @@ import { handleLogout } from "@/utils/auth";
 
 // import Notification from "/Notification.svg";
 export const Navbar = () => {
-    const { sessionToken, user } = useAuthStore((store) => store);
     const router = useRouter();
-    const { isLoggedIn, logout } = useAuthStore((store) => store);
+    const { isLoggedIn, logout, user } = useAuthStore((store) => store);
     const pathname = usePathname();
     const onClick = async (event: React.MouseEvent) => {
         event.preventDefault();
