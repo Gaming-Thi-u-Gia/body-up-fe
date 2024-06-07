@@ -20,6 +20,8 @@ import { Badge } from "../ui/badge";
 import { DailyCarousel } from "./daily-carousel";
 import { useState } from "react";
 import { VideoDailyCard } from "./video-daily-card";
+import { Button } from "../ui/button";
+import { date } from "zod";
 type Props = {
     title: string;
     releaseDate: string;
@@ -58,7 +60,7 @@ export const DaySchedule = ({
             : "incomplete";
     //TODO: SET DATA WHEN CLICK ON SCHEDULE
     const onClick = (index: number) => {
-        const day = "Day" + index;
+        const day = "Day " + index;
         setData(day);
     };
     return (
@@ -170,6 +172,9 @@ export const DaySchedule = ({
                                     initialStatus={validatedStatus}
                                 />
                             ))}
+                            <Button variant='primary' className='my-4 ml-2'>
+                                Mark {data} as Complete
+                            </Button>
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
