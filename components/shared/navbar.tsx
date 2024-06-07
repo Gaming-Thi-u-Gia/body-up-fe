@@ -38,7 +38,7 @@ export const Navbar = () => {
         });
     };
     return (
-        <nav className='bg-[#F7F7F7] border-b border-[#C4C4C4] fixed w-full'>
+        <nav className='bg-[#F7F7F7] border-b border-[#C4C4C4] fixed w-full z-50'>
             <div className='max-w-7xl px-2 sm:px-6 lg:px-8 mx-auto '>
                 <div className='h-[56px] flex justify-between items-center font-medium'>
                     <h3 className='font-bold text-[20px]'>BODY UP!!!</h3>
