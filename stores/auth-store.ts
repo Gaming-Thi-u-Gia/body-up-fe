@@ -1,6 +1,7 @@
 import { createStore } from "zustand/vanilla";
 
 export type UserState = {
+    id?: number;
     firstName?: string;
     lastName?: string;
     email?: string;
