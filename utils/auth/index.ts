@@ -36,7 +36,38 @@ export const handleSetNewPassword = async (
         throw new Error("Something went wrong");
     }
 };
-
+export const handleChangePassword = async (
+    data: z.infer<typeof ChangePasswordSchema>,
+    sessionToken: string
+) => {
+    const { password } = data;
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/change-password`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+                body: JSON.stringify({ password }),
+            }
+        ).then(async (res) => {
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return data;
+        });
+        return res;
+    } catch (error) {
+        throw new Error("Something went wrong");
+    }
+};
 export const handleResetPassCode = async (data: z.infer<typeof OtpSchema>) => {
     const { pin } = data;
     console.log(pin);
