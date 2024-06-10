@@ -1,7 +1,7 @@
 // "use client";
 import React from "react";
-import PostFitness from "../user-post-no-image";
-import PostUser from "../user-post-no-image";
+
+import PostUser from "@/app/(main)/community/user-post-no-image";
 
 const FitnessPage = () => {
     return (
