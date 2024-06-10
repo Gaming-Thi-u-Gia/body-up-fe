@@ -103,9 +103,8 @@ const PreferencesPage = () => {
                                             <FormControl>
                                                 <Input
                                                     {...field}
-                                                    placeholder={
-                                                        user?.firstName
-                                                    }
+                                                    placeholder={"First Name"}
+                                                    value={user?.firstName}
                                                     className="bg-white hover:ring-1 hover:ring-black "
                                                 />
                                             </FormControl>
@@ -124,6 +123,7 @@ const PreferencesPage = () => {
                                                 <Input
                                                     {...field}
                                                     placeholder="Last Name"
+                                                    value={user?.lastName}
                                                     className="bg-white hover:ring-1 hover:ring-black"
                                                 />
                                             </FormControl>
