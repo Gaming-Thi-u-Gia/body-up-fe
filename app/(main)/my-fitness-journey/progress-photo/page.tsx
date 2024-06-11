@@ -1,12 +1,36 @@
 "use client";
+import { useAuthStore } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { useUploadPhotoModal } from "@/stores/use-upload-photo";
+import { getAllProgressPhoto } from "@/utils/user";
 import { Plus, Upload } from "lucide-react";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import { ImageCard } from "./image-card";
+type PhotoProps = {
+    id: number;
+    imgUrl: string;
+    photoAngle: string;
+    visibility: boolean;
+    date: string;
+};
 const ProgressPhotoPage = () => {
     const [activeTab, setActiveTab] = useState("all");
+    const { sessionToken } = useAuthStore((store) => store);
+    const [photos, setPhotos] = useState([]);
     const { open } = useUploadPhotoModal((store) => store);
+    useEffect(() => {
+        const res = getAllProgressPhoto(sessionToken!, activeTab).then(
+            (res) => {
+                //sort by date
+                res.payload.sort((a: PhotoProps, b: PhotoProps) => {
+                    return (
+                        new Date(b.date).getTime() - new Date(a.date).getTime()
+                    );
+                });
+                setPhotos(res.payload);
+            }
+        );
+    }, [activeTab, sessionToken]);
     return (
         <div>
             <h2 className='text-3xl font-bold'>My Progress Photos</h2>
@@ -50,16 +74,31 @@ const ProgressPhotoPage = () => {
                     </Button>
                 </div>
                 <div className='flex'>
-                    <Button variant='primary' size='default' onClick={open}>
+                    <Button
+                        variant='primary'
+                        size='default'
+                        onClick={() => open()}
+                    >
                         <Plus width={14} height={14} className='mr-2' />
                         New Photo
                     </Button>
                 </div>
             </div>
-            <div className='flex mt-4'>
+            <div className='flex flex-wrap gap-4 my-4'>
+                {/* TODO: Fetch IMAGE */}
+                {photos.map((photo: PhotoProps) => (
+                    <ImageCard
+                        key={photo.id}
+                        date={photo.date}
+                        id={photo.id}
+                        imgUrl={photo.imgUrl}
+                        photoAngle={photo.photoAngle}
+                        visibility={photo.visibility}
+                    />
+                ))}
                 <div
                     className='flex flex-col justify-center items-center w-[234px] h-[312px] py-[37px] px-[21px] border-dashed border-[#D9D9D9] hover:border-[#c1e2ff] border-2 rounded-xl cursor-pointer group '
-                    onClick={open}
+                    onClick={() => open()}
                 >
                     <div className='flex justify-center items-center p-3 border border-black rounded-full w-fit group-hover:border-[#96ceff] group-hover:text-[#4fadff]'>
                         <Upload width={16} height={16} />
