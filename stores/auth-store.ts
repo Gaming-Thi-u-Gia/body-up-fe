@@ -1,3 +1,4 @@
+import { BookmarkPosts } from "@/interface";
 import { createStore } from "zustand/vanilla";
 
 export type UserState = {
@@ -6,6 +7,16 @@ export type UserState = {
     lastName?: string;
     email?: string;
     avatar?: string;
+    userName2?: string;
+    bio?: string;
+    bookmarkPosts?: BookmarkPosts[];
+    bookmarkRecipes?: [];
+    bookmarkVideos?: [];
+    posts?: [];
+    ratingRecipes?: [];
+    userChallenges?: [];
+    userDailyChallenges?: [];
+    userProgressPhotos?: [];
 };
 export type AuthState = {
     isLoggedIn: boolean;
