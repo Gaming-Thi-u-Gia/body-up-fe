@@ -40,10 +40,10 @@ const PreferencesPage = () => {
     const router = useRouter();
     const form = useForm({
         defaultValues: {
-            firstName: "",
-            lastName: "",
-            username: "",
-            bio: "",
+            firstName: user?.firstName,
+            lastName: user?.lastName,
+            username: `bodyup.com/${user?.userName2}`,
+            bio: user?.bio,
             profileTitle: "",
         },
     });
@@ -62,7 +62,6 @@ const PreferencesPage = () => {
                     },
                 });
                 // console.log(error);
-                console.log(result);
                 updateProfile(result?.payload.results);
                 router.refresh();
             } catch (error) {
@@ -103,8 +102,9 @@ const PreferencesPage = () => {
                                             <FormControl>
                                                 <Input
                                                     {...field}
-                                                    placeholder={"First Name"}
-                                                    value={user?.firstName}
+                                                    placeholder={
+                                                        user?.firstName
+                                                    }
                                                     className="bg-white hover:ring-1 hover:ring-black "
                                                 />
                                             </FormControl>
@@ -122,8 +122,7 @@ const PreferencesPage = () => {
                                             <FormControl>
                                                 <Input
                                                     {...field}
-                                                    placeholder="Last Name"
-                                                    value={user?.lastName}
+                                                    placeholder={user?.lastName}
                                                     className="bg-white hover:ring-1 hover:ring-black"
                                                 />
                                             </FormControl>
@@ -138,8 +137,8 @@ const PreferencesPage = () => {
                         </label>
                         <div className="flex w-[604px] flex-col pt-1 pb-[10px] gap-[13px] mb-5 ">
                             <span className="block text-[#868A93] text-sm">
-                                Changing your username will also change your
-                                profile link
+                                Your username will be used to create your
+                                profile
                             </span>
                             <FormField
                                 control={form.control}
@@ -149,8 +148,9 @@ const PreferencesPage = () => {
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder="chloeting.com/"
+                                                placeholder={`bodyup.com/${user?.userName2}`}
                                                 className="bg-white hover:ring-1 hover:ring-black"
+                                                disabled
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -171,9 +171,11 @@ const PreferencesPage = () => {
                                     name="bio"
                                     render={({ field }) => (
                                         <Textarea
-                                            {...field}
-                                            placeholder="Add your bio..."
+                                            placeholder={`${
+                                                user?.bio || "Add a bio..."
+                                            }`}
                                             className="bg-white hover:ring-1 hover:ring-black p-4"
+                                            {...field}
                                         />
                                     )}
                                 ></FormField>
