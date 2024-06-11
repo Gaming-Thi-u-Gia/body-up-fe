@@ -62,9 +62,9 @@ export const ChangePasswordSchema = z
     });
 
 export const formSchema = z.object({
-    firstName: z.string(),
-    lastName: z.string(),
-    bio: z.string(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    bio: z.string().optional(),
     username: z.string().optional(),
     profileTitle: z.string().optional(),
 });

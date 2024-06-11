@@ -22,7 +22,9 @@ export function DeleteAvatarModal() {
     const [isPending, startTransition] = useTransition();
     const { isOpen, close } = useDeleteAvatarModal((store) => store);
     const [isClient, setIsClient] = useState(false);
-    const { sessionToken, updateProfile } = useAuthStore((store) => store);
+    const { sessionToken, updateProfile, user } = useAuthStore(
+        (store) => store
+    );
     useEffect(() => setIsClient(true), []);
     const handleDeleteAva = async () => {
         if (!sessionToken) {
