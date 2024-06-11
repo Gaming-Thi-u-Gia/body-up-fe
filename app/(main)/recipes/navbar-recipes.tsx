@@ -1,24 +1,30 @@
 "use client";
-import React from "react";
+import React, { use, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Heart, Search } from "lucide-react";
+import { toast } from "sonner";
+import { fetchTopicRecipeData } from "@/utils/recipe";
+type TopicRecipes = {
+  id: number;
+  topic: string;
+  name: string;
+};
+
 const NavbarRecipes = () => {
-  const titleRecipes = [
-    "View all Collections",
-    "Latest Recipes",
-    "Featured Recipes",
-    "Trending Recipes",
-    "Budget Meals",
-    "Easy Breakfast Ideas",
-    "Healthy Dessert Recipes",
-    "Quick And Easy Recipes",
-    "Healthy Snacks Ideas",
-    "Healthy Drinks Recipes",
-    "Easy Vegan Recipes",
-    "Healthy Pancakes Recipes",
-    "Party Food Recipes",
-  ];
+  const [topicRecipes, setTopicRecipes] = React.useState<TopicRecipes[]>([]);
+  useEffect(() => {
+    const fetchTopicRecipes = async () => {
+      console.log("hi");
+      try {
+        const data = await fetchTopicRecipeData();
+        setTopicRecipes(data);
+      } catch (error) {
+        toast.error("Failed to fetch recipe collections");
+        console.log(error);
+      }
+    };
+    fetchTopicRecipes();
+  }, []);
   function handleOnOrOfCategories() {
     const currentCate = document.getElementById("current__cate");
     const listCate = document.getElementById("list__cate");
@@ -45,13 +51,13 @@ const NavbarRecipes = () => {
           className=" hidden mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px]"
         >
           <ul>
-            {titleRecipes.map((title, index) => {
+            {topicRecipes.map((topicRecipe, index) => {
               return (
                 <li
                   className=" py-[5px] px-5 hover:text-[#000000d9] hover:bg-[#F7F7F7] cursor-pointer whitespace-nowrap text-[14px]"
                   key={index}
                 >
-                  {title}
+                  {topicRecipe.name}
                 </li>
               );
             })}
@@ -62,15 +68,17 @@ const NavbarRecipes = () => {
         <div className="group inline-flex h-full ">
           <span className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out h-full">
             <Button variant="defaultOutline" size="default">
-              <Search width={20} strokeWidth={1} />
+              <Image width={20} height={20} src="/search.svg" alt="More" />
               Search
             </Button>
           </span>
           <span className="relative inline-flex group-hover:w-[240px] items-center group-hover:opacity-100 transition-all ease-in-out duration-1000 h-full rounded-[15px] w-0 opacity-0">
-            <Search
-              width={20}
-              strokeWidth={1}
+            <Image
               className="absolute left-[2px] cursor-pointer"
+              width={20}
+              height={20}
+              src="/search.svg"
+              alt="More"
             />
             <input
               className="pl-5 w-full rounded-[15px] border-2 border-black"
@@ -84,7 +92,7 @@ const NavbarRecipes = () => {
             variant="disabled"
             size="default"
           >
-            <Heart width={20} strokeWidth={1} />
+            <Image width={20} height={20} src="/heart.svg" alt="More" />
             Saved Recipes
           </Button>
         </div>

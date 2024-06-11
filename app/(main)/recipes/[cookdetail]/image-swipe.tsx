@@ -2,18 +2,23 @@
 import "photoswipe/dist/photoswipe.css";
 import { Gallery, Item } from "react-photoswipe-gallery";
 type Props = {
-  images: any[];
+  otherImageRecipes: [
+    {
+      id: number;
+      img: string;
+    },
+  ];
 };
-const ImageSwipe = ({ images }: Props) => {
+const ImageSwipe = ({ otherImageRecipes }: Props) => {
   return (
     <div>
       <Gallery>
         <div className="grid grid-cols-3 gap-1">
-          {images.map((image, index) => (
-            <div key={index}>
+          {otherImageRecipes.map((image, index) => (
+            <div key={index} className="h-[1000px]">
               <Item
-                original={image}
-                thumbnail={image}
+                original={image.img}
+                thumbnail={image.img}
                 width="1024"
                 height="700"
               >
@@ -22,7 +27,7 @@ const ImageSwipe = ({ images }: Props) => {
                   <img
                     ref={ref}
                     onClick={open}
-                    src={image}
+                    src={image.img}
                     alt="picture error"
                     className="object-cover h-[850px] w-full rounded-xl"
                   />

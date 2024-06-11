@@ -1,151 +1,184 @@
 "use client";
+import { useAuthStore } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
+import {
+  fetchRatingRecipeData,
+  fetchSendBookmarkRecipe,
+  fetchSendRatingRecipe,
+} from "@/utils/recipe";
+import { Heart } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
-const Info = () => {
-  const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(0);
-  const title =
-    "Baked.. avocado? Promise me you won’t knock it till you try it! A fantastic indulgent brunch dish, these baked eggs in avocado are quick, delicious and nutritious. Dress them up with your favorite toppings, and serve with toasted sourdough bread to mop up all the glorious runny yolk and creamy avocado.";
-  const star = {
-    numberOfRate: 200,
-    avgStar: 4.5,
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+type Props = {
+  recipeId: number;
+  name: string;
+  avgStar: number;
+  ingredientRecipes: {
+    id: number;
+    amount: string;
+    name: string;
+  }[];
+  recipeCategories: {
+    id: number;
+    name: string;
+  }[];
+  img: string;
+  noteRecipes: {
+    id: number;
+    detail: string;
+  }[];
+  totalRating: number;
+  bookmarkUsers: {
+    id: number;
+  }[];
+};
+
+const Info = ({
+  recipeId,
+  avgStar,
+  recipeCategories,
+  ingredientRecipes,
+  name,
+  img,
+  totalRating,
+  bookmarkUsers,
+}: Props) => {
+  const [hover, setHover] = useState<null | number>(null);
+  const { user, sessionToken } = useAuthStore((store) => store);
+  const [currentRating, setCurrentRating] = useState<number>(0);
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  useEffect(() => {
+    const fetchRatingRecipe = async () => {
+      if (!user) return;
+      try {
+        const data = await fetchRatingRecipeData(
+          user.id!,
+          recipeId,
+          sessionToken!
+        );
+        setCurrentRating(data);
+        toast.success("Successfully fetched rating data");
+      } catch (error) {
+        toast.error("Failed to fetch rating data");
+      }
+    };
+    fetchRatingRecipe();
+  }, []);
+
+  const handleRating = async (newRating: number) => {
+    console.log("newRating", newRating);
+    if (!user) {
+      redirect("/login");
+      return;
+    }
+    try {
+      setCurrentRating(newRating);
+      await fetchSendRatingRecipe(recipeId, user.id!, newRating, sessionToken!);
+      window.location.reload();
+    } catch (error) {
+      toast.error("Failed to submit rating");
+    }
   };
-  const categorys = ["Vegetarian", "Daily free", "Gluten free"];
-  const ingidients = {
-    main: [
-      {
-        mount: "120g",
-        unit: "Greek style soy yogurt",
-      },
-      {
-        mount: "1/4 tsp",
-        unit: "instant coffee powder",
-      },
-      {
-        mount: "1/2 tsp",
-        unit: "cocoa powder",
-      },
-      {
-        mount: "5 drops",
-        unit: "stevia extract",
-      },
-      {
-        mount: "1/4 tsp",
-        unit: "vanilla extract",
-      },
-    ],
-    optional: [
-      {
-        mount: "30g",
-        unit: "raspberries",
-      },
-      {
-        mount: "30g",
-        unit: "strawberries, chopped",
-      },
-      {
-        mount: "1",
-        unit: "small banana, sliced",
-      },
-      {
-        mount: "10g ",
-        unit: "sugar-free dark chocolate chips",
-      },
-      {
-        mount: "1 tbsp",
-        unit: "hemp seeds",
-      },
-      {
-        mount: "1/4 tsp",
-        unit: "cocoa powder",
-      },
-    ],
+  const handleBookmark = async () => {
+    if (!user) {
+      redirect("/login");
+      return;
+    }
+    try {
+      await fetchSendBookmarkRecipe(recipeId, user.id!, sessionToken!);
+      window.location.reload();
+    } catch (error) {
+      toast.error("Failed to submit bookmark");
+    }
   };
+  useEffect(() => {
+    if (!user) return;
+    const isBookmarked = bookmarkUsers.some(
+      (bookmarkUser) => bookmarkUser.id === user.id
+    );
+    setIsBookmarked(isBookmarked);
+  }, [bookmarkUsers, user]);
+  console.log("isBookmarked", isBookmarked);
   return (
-    <div className="border-b-2 border-[#C4C4C4 ">
-      <div className="flex m-auto  max-w-7xl h-[auto]  box-border">
-        <div className="grid grid-cols-2 w-full h-full ">
+    <div className="border-b-2 border-[#C4C4C4]">
+      <div className="flex m-auto max-w-7xl h-auto box-border">
+        <div className="grid grid-cols-2 w-full h-full items-center">
           <div className="w-full h-full border-r-2 border-[#C4C4C4]">
             <div className="mt-[10%]">
-              {categorys.map((category, index) => (
+              {recipeCategories.map((category) => (
                 <a
-                  key={index}
+                  key={category.id}
                   href="#"
                   className="inline-flex bg-black text-white rounded-[54px] px-3 py-1 text-[12px] mr-[10px]"
                 >
-                  {category}
+                  {category.name}
                 </a>
               ))}
             </div>
-            <p className="text-[38px] font-normal #303033 my-10 pr-10">
-              {title}
+            <p className="text-[32px] leading-[45px] text-[#303033] my-10">
+              {name}
             </p>
             <div>
-              <div className="flex text-[#868A93] text-[13px] items-center">
+              <div className="flex text-[#868A93] text-[13px] items-stretch">
                 <div>
                   <span className="cursor-pointer">
-                    {[...Array(5)].map((star, index) => {
-                      const currentRating = index + 1;
-                      return (
-                        <span key={currentRating} className="star-label">
-                          <span
-                            className={`text-[34px] ${currentRating <= (hover || rating) ? "text-[#FEE58E]" : ""}`}
-                            onMouseEnter={() => setHover(currentRating)}
-                            onMouseLeave={() => setHover(0)}
-                            onClick={() => setRating(currentRating)}
-                          >
-                            &#9733;
-                          </span>
+                    {[...Array(5)].map((_, index) => (
+                      <span key={index} className="star-label">
+                        <span
+                          className={`text-[34px] ${
+                            (hover ?? currentRating) > index
+                              ? "text-[#FEE58E]"
+                              : "text-[#D3D3D3]"
+                          }`}
+                          onMouseEnter={() => setHover(index + 1)}
+                          onMouseLeave={() => setHover(null)}
+                          onClick={() => handleRating(index + 1)}
+                        >
+                          &#9733;
                         </span>
-                      );
-                    })}
+                      </span>
+                    ))}
                   </span>
                   <div className="pl-5">
                     <p>
-                      Avg {star.avgStar} starts({star.numberOfRate})
+                      Avg {avgStar} stars ({totalRating})
                     </p>
                   </div>
                 </div>
-                <span className="pb-4 pl-2">
+                <span>
                   <p>Rate this recipe</p>
                 </span>
               </div>
             </div>
             <div className="flex my-10">
-              <Button className="mr-4" variant="secondary" size="icon">
-                <Image width={20} height={20} src="../add.svg" alt="add" />
-              </Button>
               <Button variant="secondary" size="icon">
-                <Image width={24} height={25} src="../heart.svg" alt="heart" />
+                <Heart
+                  width={24}
+                  height={25}
+                  strokeWidth={1}
+                  fill={isBookmarked ? "#FF0000" : "#000000"}
+                  onClick={() => handleBookmark()}
+                />
               </Button>
             </div>
             <img
               className="w-[90%] h-[700px] object-cover mb-[10%]"
-              src="https://static.chloeting.com/recipes/64215da10b0e98db5eafe951/images/vegan-mocha-yogurt-bowl-1679908260906-1.webp"
-              alt="avocado"
+              src={img}
+              alt={name}
             />
           </div>
-          <div className="w-full h-full">
+          <div className="flex w-full h-full items-center">
             <div className="pl-[15%] pt-[10%]">
               <div>
-                <p className="text-[26px] font-medium mb-5">Ingridients</p>
-                <div className="text-[14px]">
-                  {ingidients.main.map((ing, index) => (
-                    <div key={index} className="flex py-1">
-                      <p className="min-w-20">{ing.mount}</p>
-                      <p className="flex-1">{ing.unit}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="pt-10">
-                <p className="text-[18px] font-bold">Toppings (optional)</p>
+                <p className="text-[25px] font-bold mb-5">Ingredients</p>
                 <div className="text-[18px]">
-                  {ingidients.optional.map((ing, index) => (
-                    <div key={index} className="flex py-1">
-                      <p className="min-w-20">{ing.mount}</p>
-                      <p className="flex-1">{ing.unit}</p>
+                  {ingredientRecipes.map((ing) => (
+                    <div key={ing.id} className="flex py-1">
+                      <p className="min-w-20">{ing.amount}</p>
+                      <p className="flex-1">{ing.name}</p>
                     </div>
                   ))}
                 </div>

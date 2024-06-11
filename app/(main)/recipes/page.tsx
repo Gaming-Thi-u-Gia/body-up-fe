@@ -2,6 +2,7 @@ import NavbarRecipes from "./navbar-recipes";
 import LatestRecipes from "./latest-recipes";
 import PopularCategories from "./popular-categories";
 import RecipeCategoryList from "./list-recipe-category";
+
 const page = () => {
   return (
     <>
