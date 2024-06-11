@@ -5,8 +5,9 @@ import { useUploadPhotoModal } from "@/stores/use-upload-photo";
 import { getAllProgressPhoto } from "@/utils/user";
 import { Plus, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ImageCard } from "./image-card";
-type PhotoProps = {
+import { ImageCard } from "@/components/shared/image-card";
+
+export type PhotoProps = {
     id: number;
     imgUrl: string;
     photoAngle: string;

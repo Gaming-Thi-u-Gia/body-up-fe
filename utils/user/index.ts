@@ -129,6 +129,25 @@ export const getAllProgressPhoto = async (sessionToken:string,photoAngle?:string
     return result;
 }
 
+export const getAllProgressPhotoByUserId = async (userId:number,photoAngle?:string) => {
+    let path = photoAngle !== "all" ? `getPhotoByUserIdAndPhotoAngle?userId=${userId}&photoAngle=${photoAngle}` : `getPhotoByUserId?userId=${userId}`
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/${path}`,{
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        }
+    }) 
+    if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    const payload = await res.json();
+    const result = {
+        status: res.status,
+        payload,
+    };
+    return result;
+}
+
 //Add new progress photo
 export const addProgressPhoto = async (
     sessionToken: string,
@@ -199,14 +218,13 @@ export const deletePhoto = async (sessionToken:string,progressPhotoId:number) =>
 }
 
 export const getProgressPhotoById = async (sessionToken:string,progressPhotoId:number) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/getUserProgressPhotoById?progressPhotoId=${progressPhotoId}`,{
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/getProgressPhotoById?progressPhotoId=${progressPhotoId}`,{
         method: "GET",
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${sessionToken}`,
         }
     }) 
-    console.log(res)
     const payload = await res.json();
     const result = {
         status: res.status,
@@ -269,3 +287,18 @@ export const updateProgreePhoto = async (
     }
     return resultFromSv;
 };
+
+export const getUserByUserName2 = async (username2:string) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/getUserByUsername2?username2=${username2}`,{
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        }
+    }) 
+    const payload = await res.json();
+    const result = {
+        status: res.status,
+        payload,
+    };
+    return result;
+}

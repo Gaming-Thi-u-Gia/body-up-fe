@@ -54,15 +54,14 @@ export const UploadPhotoForm = () => {
     });
     const [preview, setPreview] = useState<string | null>(null);
     useEffect(() => {
-        const res = getProgressPhotoById(sessionToken!, progressPhotoId!).then(
-            (res) => {
-                form.setValue("photoAngle", res.payload.photoAngle);
-                form.setValue("visibility", res.payload.visibility);
-                form.setValue("date", new Date(res.payload.date));
-                form.setValue("caption", res.payload.caption);
-                setPreview(res.payload.imgUrl);
-            }
-        );
+        if (!progressPhotoId || progressPhotoId < 0) return;
+        getProgressPhotoById(sessionToken!, progressPhotoId!).then((res) => {
+            form.setValue("photoAngle", res.payload.photoAngle);
+            form.setValue("visibility", res.payload.visibility);
+            form.setValue("date", new Date(res.payload.date));
+            form.setValue("caption", res.payload.caption);
+            setPreview(res.payload.imgUrl);
+        });
     }, [progressPhotoId, sessionToken]);
     const onDrop = useCallback(
         (acceptedFiles: FileList, fileRejections: FileList) => {

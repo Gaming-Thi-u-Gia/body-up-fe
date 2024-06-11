@@ -1,8 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Copy } from "lucide-react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,10 @@ import { UserProgressPhoto } from "./user-progress-photo";
 import { UserBar } from "./userbar";
 import defaultProfile from "/public/default-iProfile.png";
 import { toast } from "sonner";
+import { usePathname } from "next/navigation";
+import { getUserByUserName2 } from "@/utils/user";
+import { set } from "zod";
+import { UserState } from "@/stores/auth-store";
 const photoAngle = [
     {
         type: "all",
@@ -32,18 +35,27 @@ const photoAngle = [
     },
 ];
 export const UserProfile = () => {
-    const username = usePathname();
+    const username = usePathname().split("/")[1];
+    const { user: initUser } = useAuthStore((state) => state);
     const [angle, setAngle] = useState("all");
-    const { user } = useAuthStore((store) => store);
+    const [user, setUser] = useState<UserState>();
     const [page, setPage] = useState("photo");
     const onClick = (page: string) => setPage(page);
     const onClickAngle = (angle: string) => setAngle(angle);
     const onCopy = () => {
         navigator.clipboard.writeText(
-            process.env.NEXT_PUBLIC_DOMAIN + username
+            process.env.NEXT_PUBLIC_DOMAIN + "/" + username
         );
         toast.success("Copied to clipboard");
     };
+    useEffect(() => {
+        getUserByUserName2(username).then((res) => {
+            if (res.status !== 200) {
+                toast.error("User not found");
+            }
+            setUser(res.payload);
+        });
+    }, [username]);
     return (
         <>
             <div className='max-w-7xl mx-auto py-[55px]'>
@@ -61,8 +73,7 @@ export const UserProfile = () => {
                         </h4>
                         <div className='flex gap-2 items-center mt-2'>
                             <p className='text-xs text-[#868A93] font-bold uppercase'>
-                                {process.env.NEXT_PUBLIC_DOMAIN}
-                                {username}
+                                bodyup.com/{username}
                             </p>
                             <Copy
                                 width={14}
@@ -81,9 +92,13 @@ export const UserProfile = () => {
                             </div>
                         </div>
                     </div>
-                    <Button variant='primaryOutline'>
-                        <Link href='/settings/preferences'>Preferences</Link>
-                    </Button>
+                    {initUser?.userName2 === username && (
+                        <Button variant='primaryOutline'>
+                            <Link href='/settings/preferences'>
+                                Preferences
+                            </Link>
+                        </Button>
+                    )}
                 </div>
             </div>
             <div className='flex-1 bg-[#FFFFFF]'>
@@ -94,6 +109,7 @@ export const UserProfile = () => {
                             photoAngle={photoAngle}
                             onClick={onClickAngle}
                             angle={angle}
+                            userId={user?.id!}
                         />
                     )}
                     {page === "challenges" && <UserChallenges />}

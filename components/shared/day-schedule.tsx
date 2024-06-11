@@ -38,7 +38,7 @@ const dailyVideoData = {
     releaseDate: "2021-06-01",
     duration: "05:00",
     bannerUrl:
-        "https://s3-alpha-sig.figma.com/img/2b8e/37ca/aa986d36e5fc3e804ad5e502069efb47?Expires=1717977600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=n8pFiICMRBK9zzFtA4ig6y6R0GBdJSHGddCiKEZrUmTDJTghDuuYREdmMv-qQFI85VJiLylMntbgKWmQoegbK9fVqd0eSUZ4H7WyGC9EGcdoRFVnCZshloQpiA~GRmk8D-YBI~fyThe83yH~75F2Eht7EA4g3CG-i1oxGTym3O7zuWw7-Hrn-~FB5DrVfAHFUAqcXi5yK8PvyeujumahKnoi0HRjJsPd1EmhSkXz5V3JBOApCkGrdQ3G5UFAd7JFJwZTKfHKyPt6xIFuZUiprGuxagMKqkgceja7ErYVuhak7xuJCMOh3FVSsNMHt6LM9XrUp9VtsGqK22JTye4CXw__",
+        "https://static.chloeting.com/videos/61bc1877dff295b571b03e08/af196bc0-5ef5-11ec-b4e8-6545cdfc138f.jpeg",
     isOptional: true,
     status: "incomplete",
     url: "https://www.youtube.com/watch?v=j5SHMJ6mUoA",
