@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { createPostNoImage, fetchBadgesData } from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import { usePathname, useRouter } from "next/navigation";
 
 type Badges = {
     id: number;
@@ -39,7 +40,10 @@ const CreatePost = ({ categoryId }: CategoryId) => {
     const { sessionToken } = useAuthStore((store) => store);
     const [badges, setBadges] = useState<Badges[]>([{ id: 0, name: "" }]);
     const [isPending, startTransition] = useTransition();
-
+    const pathname = usePathname();
+    const pathParts = pathname.split("/");
+    const title = pathParts[2];
+    const router = useRouter();
     const form = useForm({
         resolver: zodResolver(PostSchema),
         defaultValues: {
@@ -86,6 +90,7 @@ const CreatePost = ({ categoryId }: CategoryId) => {
                     selectedBadge.id,
                     categoryId
                 );
+
                 toast.success("Create Post Successfully!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
@@ -93,6 +98,7 @@ const CreatePost = ({ categoryId }: CategoryId) => {
                         onClick: () => console.log("Close"),
                     },
                 });
+                router.push(`/community/${title}`);
             } catch (error) {
                 toast.error("Something Went Wrong!", {
                     description: `${new Date().toLocaleString()}`,

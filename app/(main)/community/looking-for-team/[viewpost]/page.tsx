@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { use, useEffect, useState, useTransition } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import fitness_icon from "/public/fitness-icon.svg";
@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import back_Icon from "/public/back-icon.svg";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 
 import {
@@ -30,10 +30,113 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Comment from "../../comment";
-const LookingForTeamPost = () => {
+import {
+    createComment,
+    fetchCommentData,
+    fetchPostById,
+} from "@/utils/community";
+import { Posts } from "../page";
+import { toast } from "sonner";
+import { CommentSchema } from "@/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormMessage,
+} from "@/components/ui/form";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import { useRouter } from "next/navigation";
+
+export type Comments = {
+    id: number;
+    detail: string;
+    upVote: number;
+    user: {
+        avatar: string;
+        firstName: string;
+        email: string;
+        lastName: string;
+        id: number;
+    };
+};
+
+const FitnessPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
+    const postId = pathParts[3];
+    const [posts, setPosts] = useState<Posts>();
+    const { sessionToken } = useAuthStore((store) => store);
+    const [isPending, startTransition] = useTransition();
+    const [comments, setComments] = useState<Comments[]>([]);
+    const router = useRouter();
+    const form = useForm({
+        resolver: zodResolver(CommentSchema),
+        defaultValues: {
+            detail: "",
+        },
+    });
+
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                console.log("render");
+                const res = await fetchCommentData(Number(postId));
+                console.log(res);
+                setComments(res);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchComments();
+    }, [postId]);
+
+    useEffect(() => {
+        const fetchFullPost = async () => {
+            try {
+                const data = await fetchPostById(Number(postId));
+                console.log(data);
+                setPosts(data);
+            } catch (error) {
+                toast.error("Something went wrong");
+            }
+        };
+        fetchFullPost();
+    }, [postId]);
+    const onSubmit = (data: z.infer<typeof CommentSchema>) => {
+        console.log(data);
+
+        startTransition(async () => {
+            try {
+                const res = await createComment(
+                    sessionToken!,
+                    Number(postId),
+                    data
+                );
+                toast.success("Create Comment Successfully!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+                // window.location.reload();
+            } catch (error) {
+                toast.error("Something went wrong", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            }
+        });
+    };
+
     return (
         <div className="w-[823px] mt-[5%]">
             <Link
@@ -52,11 +155,11 @@ const LookingForTeamPost = () => {
                         <Sheet>
                             <SheetTrigger>
                                 <Image
-                                    src={defaultProfile}
+                                    src={posts?.user.avatar || defaultProfile}
                                     alt="logo"
                                     width={32}
                                     height={32}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer rounded-full"
                                 />
                             </SheetTrigger>
                             <SheetContent className="w-[350px]">
@@ -67,21 +170,23 @@ const LookingForTeamPost = () => {
                                 </SheetHeader>
                                 <div className="flex flex-col">
                                     <Image
-                                        src={defaultProfile}
+                                        src={
+                                            posts?.user.avatar || defaultProfile
+                                        }
                                         alt="logo"
                                         width={50}
                                         height={50}
-                                        className="cursor-pointer py-2"
+                                        className="cursor-pointer py-2 rounded-full"
                                     />
                                     <label
                                         className="text-[16px] font-semibold mt-2"
                                         htmlFor=""
                                     >
-                                        Destiny
+                                        {posts?.user.firstName}
                                     </label>
                                     <div className="flex flex-col gap-2 mt-1">
                                         <span className="text-sm">
-                                            @destinyguillory2000
+                                            {posts?.user.email}
                                         </span>
 
                                         <div className="flex gap-1">
@@ -156,7 +261,7 @@ const LookingForTeamPost = () => {
                             className="text-[#303033] text-sm font-bold cursor-pointer"
                             htmlFor=""
                         >
-                            stellaria
+                            {posts?.user.firstName}
                         </label>
                         <span className="text-sm">5 days ago</span>
                     </div>
@@ -168,16 +273,9 @@ const LookingForTeamPost = () => {
                                 width={13}
                                 height={12}
                             />
-                            <span className="text-[12px]">Workout</span>
-                        </div>
-                        <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] p-2 justify-center items-center">
-                            <Image
-                                src={fitness_icon}
-                                alt="logo"
-                                width={13}
-                                height={12}
-                            />
-                            <span className="text-[12px]">Workout</span>
+                            <span className="text-[12px]">
+                                {posts?.badge.name}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -185,14 +283,10 @@ const LookingForTeamPost = () => {
                     href="/community/fitness"
                     className="text-black text-lg font-medium mt-3"
                 >
-                    How Was Your Workout Today? | Weekly Thread
+                    {posts?.title}
                 </Link>
                 <div className="text-[#303033] text-[16px] mt-2">
-                    Want to share your daily fitness journey with the community
-                    and cheer each other on? This is the place to do it! Tell us
-                    how your workout went, what program or activity you did, new
-                    habits you're working on, and see how others are doing too.
-                    Refreshing the workout thread for a new week ahead!
+                    {posts?.description}
                 </div>
                 <div className="flex gap-2 items-center mt-6">
                     <Button
@@ -237,21 +331,45 @@ const LookingForTeamPost = () => {
 
                 <hr className="mt-3" />
             </div>
-            <div className="w-full px-2 flex flex-col gap-1">
-                <h1 className="flex items-center p-1 font-bold">
-                    Post A Reply
-                </h1>
-                <Textarea
-                    placeholder="Write a response for this post"
-                    className="rounded-lg bg-transparent p-3 text-[16px]"
-                />
-                <div className=" flex items-center justify-end mt-3">
-                    <Button variant="primary" className="w-[188px] h-9 flex">
-                        Reply
-                    </Button>
-                </div>
-                <hr className="mt-3" />
-            </div>
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-5 mt-2"
+                >
+                    <div className="w-full px-2 flex flex-col gap-1">
+                        <h1 className="flex items-center p-1 font-bold">
+                            Post A Reply
+                        </h1>
+                        <FormField
+                            control={form.control}
+                            name="detail"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Textarea
+                                            {...field}
+                                            placeholder="Write a response for this post"
+                                            className="rounded-lg bg-transparent p-3 text-[16px]"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        ></FormField>
+
+                        <div className=" flex items-center justify-end mt-3">
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                className="w-[188px] h-9 flex"
+                            >
+                                Reply
+                            </Button>
+                        </div>
+                        <hr className="mt-3" />
+                    </div>
+                </form>
+            </Form>
 
             {/* comment section */}
             <div className="flex items-center mt-10 gap-2">
@@ -277,13 +395,17 @@ const LookingForTeamPost = () => {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-
+            {comments.map((comment: Comments) => (
+                <div key={comment.id}>
+                    <Comment comment={comment} />
+                </div>
+            ))}
+            {/* <Comment />
             <Comment />
             <Comment />
-            <Comment />
-            <Comment />
+            <Comment /> */}
         </div>
     );
 };
 
-export default LookingForTeamPost;
+export default FitnessPost;

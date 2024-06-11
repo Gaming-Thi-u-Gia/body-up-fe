@@ -16,7 +16,8 @@ import defaultProfile from "/public/default-iProfile.png";
 import upvote_icon from "/public/upvote-icon.svg";
 import updown_icon from "/public/updown-icon.svg";
 import reply_icon from "/public/reply-icon.svg";
-const Comment = () => {
+import { Comments } from "./fitness/[viewpost]/page";
+const Comment = ({ comment }: { comment: Comments }) => {
     const [isOpennedReply, setIsOpennedReply] = useState(false);
     const [countUpvoted, setCountUpvoted] = useState<number>(0);
     const [isUpvoted, setIsUpvoted] = useState(false);
@@ -52,17 +53,17 @@ const Comment = () => {
     };
 
     return (
-        <div className="w-full flex flex-col gap-3 items-center mt-7 justify-between p-3">
-            <div className="w-full flex justify-between items-center  ">
-                <div className="flex gap-2 items-center ">
+        <div className="w-[823px] flex flex-col gap-3 items-center mt-7 justify-between p-3">
+            <div className="w-full flex justify-between items-center">
+                <div className="flex gap-2 items-center w-full ">
                     <Sheet>
                         <SheetTrigger>
                             <Image
-                                src={defaultProfile}
+                                src={comment.user.avatar || defaultProfile}
                                 alt="logo"
                                 width={32}
                                 height={32}
-                                className="cursor-pointer"
+                                className="cursor-pointer rounded-full"
                             />
                         </SheetTrigger>
                         <SheetContent className="w-[350px]">
@@ -73,11 +74,11 @@ const Comment = () => {
                             </SheetHeader>
                             <div className="flex flex-col">
                                 <Image
-                                    src={defaultProfile}
+                                    src={comment.user.avatar || defaultProfile}
                                     alt="logo"
                                     width={50}
                                     height={50}
-                                    className="cursor-pointer py-2"
+                                    className="cursor-pointer py-2 rounded-full"
                                 />
                                 <label
                                     className="text-[16px] font-semibold mt-2"
@@ -87,7 +88,7 @@ const Comment = () => {
                                 </label>
                                 <div className="flex flex-col gap-2 mt-1">
                                     <span className="text-sm">
-                                        @destinyguillory2000
+                                        {comment.user.email}
                                     </span>
 
                                     <div className="flex gap-1">
@@ -152,7 +153,7 @@ const Comment = () => {
                         className="text-[#303033] text-sm font-bold cursor-pointer"
                         htmlFor=""
                     >
-                        stellaria
+                        {comment.user.firstName || "Anonymous"}
                     </label>
                     <span className="text-sm">5 days ago</span>
                 </div>
@@ -201,12 +202,9 @@ const Comment = () => {
                     </div>
                 </div>
             </div>
-
-            <p>
-                Back to working out after 20-25 days break, on day 2 of slim
-                thigh challenge. I thought it would be easy, but god, it's
-                killing me!!
-            </p>
+            <div className="flex justify-start items-start  ">
+                <div className="flex justify-start">{comment.detail}</div>
+            </div>
             {isOpennedReply && (
                 <div className="w-full flex flex-col gap-1">
                     <h1 className="flex items-center p-1 font-semibold">

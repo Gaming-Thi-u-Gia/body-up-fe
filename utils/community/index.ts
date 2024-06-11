@@ -103,7 +103,7 @@ export const createComment = async (
 ) => {
     try {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/comments?postId=${postId}`,
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/comments/create?postId=${postId}`,
             {
                 method: "POST",
                 headers: {
@@ -133,7 +133,7 @@ export const createComment = async (
 export const fetchCommentData = async (postId: number) => {
     try {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/comments`,
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/comments/getAllComments?postId=${postId}`,
             {
                 method: "GET",
                 headers: {

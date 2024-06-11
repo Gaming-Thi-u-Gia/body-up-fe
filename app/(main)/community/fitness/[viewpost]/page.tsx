@@ -49,6 +49,20 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useAuthStore } from "@/components/providers/auth-provider";
+
+export type Comments = {
+    id: number;
+    detail: string;
+    upVote: number;
+    user: {
+        avatar: string;
+        firstName: string;
+        email: string;
+        lastName: string;
+        id: number;
+    };
+};
+
 const FitnessPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
@@ -57,7 +71,7 @@ const FitnessPost = () => {
     const [posts, setPosts] = useState<Posts>();
     const { sessionToken } = useAuthStore((store) => store);
     const [isPending, startTransition] = useTransition();
-    const [comments, setComments] = useState([]);
+    const [comments, setComments] = useState<Comments[]>([]);
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -68,6 +82,7 @@ const FitnessPost = () => {
     useEffect(() => {
         const fetchComments = async () => {
             try {
+                console.log("render");
                 const res = await fetchCommentData(Number(postId));
                 console.log(res);
                 setComments(res);
@@ -248,7 +263,7 @@ const FitnessPost = () => {
                         <span className="text-sm">5 days ago</span>
                     </div>
                     <div className="flex gap-2 items-center">
-                        <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] p-2 justify-center items-center">
+                        <div className="flex gap-1 rounded-full bg-[#EFF0F4] px-3 py-2 justify-center items-center">
                             <Image
                                 src={fitness_icon}
                                 alt="logo"
@@ -377,11 +392,15 @@ const FitnessPost = () => {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-
+            {comments.map((comment: Comments) => (
+                <div key={comment.id}>
+                    <Comment comment={comment} />
+                </div>
+            ))}
+            {/* <Comment />
             <Comment />
             <Comment />
-            <Comment />
-            <Comment />
+            <Comment /> */}
         </div>
     );
 };

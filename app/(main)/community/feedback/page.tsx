@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import PostUser from "../user-post-no-image";
 import { fetchPostData } from "@/utils/community";
@@ -39,7 +40,9 @@ const FeedbackPage = () => {
                 console.log(error);
             }
         };
+        // if (posts === null) {
         getPostsByCategory();
+        //
     }, [categoryId]);
 
     return (

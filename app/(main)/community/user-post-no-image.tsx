@@ -155,7 +155,7 @@ const PostUser = ({ post }: { post: Posts }) => {
                 {post.title}
             </Link>
             <Link
-                href={`/community/${title}/viewpost`}
+                href={`/community/${title}/${post.id}`}
                 className="text-[#303033] text-[16px] h-[48px] mt-2 line-clamp-2 "
             >
                 {post.description}
@@ -171,9 +171,12 @@ const PostUser = ({ post }: { post: Posts }) => {
                         width={20}
                         height={20}
                     />
-                    <span className="text-[12px]">
+                    <Link
+                        href="/community/${title}/${post.id}"
+                        className="text-[12px]"
+                    >
                         <span>33</span> Replies
-                    </span>
+                    </Link>
                 </Button>
                 <Button
                     variant="secondary"
