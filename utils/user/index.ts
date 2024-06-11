@@ -60,7 +60,7 @@ export const handleUpdateProfileUser = async (
     data: z.infer<typeof formSchema>,
     sessionToken: string
 ) => {
-    const { firstName, lastName } = data;
+    const { firstName, lastName, bio } = data;
 
     const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/profile`,
@@ -73,6 +73,7 @@ export const handleUpdateProfileUser = async (
             body: JSON.stringify({
                 firstName,
                 lastName,
+                bio,
             }),
         }
     );

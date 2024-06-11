@@ -66,9 +66,9 @@ export const AvatarModal = () => {
     }
     return (
         <Dialog open={isOpen} onOpenChange={close}>
-            <DialogContent className="max-w-md">
+            <DialogContent className='max-w-md'>
                 <DialogHeader>
-                    <div className="flex items-center w-full justify-center mb-5">
+                    <div className='flex items-center w-full justify-center mb-5'>
                         Update profile picture
                     </div>
                     <DialogTitle>Your avatar :</DialogTitle>
@@ -85,21 +85,21 @@ export const AvatarModal = () => {
                     src={src}
                 />
 
-                <DialogFooter className="mb-4">
-                    <div className="flex flex-col gap-y-4 w-full">
+                <DialogFooter className='mb-4'>
+                    <div className='flex flex-col gap-y-4 w-full'>
                         <Button
-                            variant="primary"
-                            className="w-full"
-                            size="lg"
+                            variant='primary'
+                            className='w-full'
+                            size='lg'
                             onClick={handleClick}
                             disabled={isPending}
                         >
                             Save Image
                         </Button>
                         <Button
-                            variant="secondary"
-                            className="w-full"
-                            size="lg"
+                            variant='secondary'
+                            className='w-full'
+                            size='lg'
                             onClick={close}
                             disabled={isPending}
                         >
