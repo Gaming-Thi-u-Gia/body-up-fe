@@ -28,8 +28,8 @@ const EditPost = () => {
         resolver: zodResolver(PostSchema),
         defaultValues: {
             title: "",
-            details: "",
-            tags: "",
+            description: "",
+            badge: "",
         },
     });
     const onSubmit = (data: z.infer<typeof PostSchema>) => {
@@ -74,7 +74,7 @@ const EditPost = () => {
 
                             <FormField
                                 control={form.control}
-                                name="details"
+                                name="description"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
@@ -94,7 +94,7 @@ const EditPost = () => {
 
                             <FormField
                                 control={form.control}
-                                name="tags"
+                                name="badge"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>

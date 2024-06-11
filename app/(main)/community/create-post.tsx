@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     Form,
     FormControl,
@@ -22,16 +22,42 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-
+import { fetchBadgesData } from "@/utils/community";
+type Badges = {
+    id: number;
+    name: string;
+};
 const CreatePost = () => {
+    const [badges, setBadges] = useState<Badges[]>([]);
+
     const form = useForm({
         resolver: zodResolver(PostSchema),
         defaultValues: {
             title: "",
-            details: "",
-            tags: "",
+            description: "",
+            badge: "",
         },
     });
+
+    useEffect(() => {
+        const fetchBadge = async () => {
+            try {
+                const data = await fetchBadgesData();
+                console.log(data);
+                setBadges(data);
+            } catch (error) {
+                toast.error("Failed to fetch tags");
+                console.log(error);
+            }
+        };
+
+        fetchBadge();
+    }, []);
+
+    useEffect(() => {
+        console.log("Updated badges:", badges);
+    }, [badges]);
+
     const onSubmit = (data: z.infer<typeof PostSchema>) => {
         console.log(data);
     };
@@ -74,7 +100,7 @@ const CreatePost = () => {
 
                             <FormField
                                 control={form.control}
-                                name="details"
+                                name="description"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
@@ -94,7 +120,7 @@ const CreatePost = () => {
 
                             <FormField
                                 control={form.control}
-                                name="tags"
+                                name="badge"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
@@ -106,18 +132,18 @@ const CreatePost = () => {
                                                     <SelectValue placeholder="Select a tag" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="Workout">
-                                                        Workout
-                                                    </SelectItem>
-                                                    <SelectItem value="Food">
-                                                        Food
-                                                    </SelectItem>
-                                                    <SelectItem value="Chloe's Programs">
-                                                        Chloe's Programs
-                                                    </SelectItem>
-                                                    <SelectItem value="Misc">
-                                                        Misc
-                                                    </SelectItem>
+                                                    {badges.map(
+                                                        (badge: Badges) => (
+                                                            <SelectItem
+                                                                key={badge.id}
+                                                                value={
+                                                                    badge.name
+                                                                }
+                                                            >
+                                                                {badge.name}
+                                                            </SelectItem>
+                                                        )
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                         </FormControl>
