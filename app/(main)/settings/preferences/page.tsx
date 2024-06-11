@@ -171,8 +171,9 @@ const PreferencesPage = () => {
                                     name='bio'
                                     render={({ field }) => (
                                         <Textarea
-                                            placeholder={`${user?.bio || "Add your bio..."} `}
+                                            placeholder={`${user?.bio || "Add a bio..."}`}
                                             className='bg-white hover:ring-1 hover:ring-black p-4'
+                                            {...field}
                                         />
                                     )}
                                 ></FormField>
