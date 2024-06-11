@@ -9,6 +9,7 @@ const CreatePostPage = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
+    const categoryId = 4;
     return (
         <div className="w-[828px] mt-[5%]">
             <Link
@@ -18,7 +19,7 @@ const CreatePostPage = () => {
                 <Image src={back_Icon} width={24} height={24} alt="back" />
                 <span className="text-[15px] text-black flex gap-2 ">Back</span>
             </Link>
-            <CreatePost />
+            <CreatePost categoryId={categoryId} />
         </div>
     );
 };

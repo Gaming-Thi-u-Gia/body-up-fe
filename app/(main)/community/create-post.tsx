@@ -1,12 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormMessage,
-} from "@/components/ui/form";
+import React, { useEffect, useState, useTransition } from "react";
+
 import { Input } from "@/components/ui/input";
 import { PostSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +9,13 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormMessage,
+} from "@/components/ui/form";
+import {
     Select,
     SelectContent,
     SelectItem,
@@ -22,20 +23,32 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { fetchBadgesData } from "@/utils/community";
+import { createPostNoImage, fetchBadgesData } from "@/utils/community";
+import { useAuthStore } from "@/components/providers/auth-provider";
+
 type Badges = {
     id: number;
     name: string;
 };
-const CreatePost = () => {
-    const [badges, setBadges] = useState<Badges[]>([]);
+
+type CategoryId = {
+    categoryId: number;
+};
+
+const CreatePost = ({ categoryId }: CategoryId) => {
+    const { sessionToken } = useAuthStore((store) => store);
+    const [badges, setBadges] = useState<Badges[]>([{ id: 0, name: "" }]);
+    const [isPending, startTransition] = useTransition();
 
     const form = useForm({
         resolver: zodResolver(PostSchema),
         defaultValues: {
             title: "",
             description: "",
-            badge: "",
+            badge: {
+                id: 0,
+                name: "",
+            },
         },
     });
 
@@ -53,13 +66,43 @@ const CreatePost = () => {
 
         fetchBadge();
     }, []);
-
     useEffect(() => {
         console.log("Updated badges:", badges);
+        console.log("Updated categoryId:", categoryId);
     }, [badges]);
 
     const onSubmit = (data: z.infer<typeof PostSchema>) => {
-        console.log(data);
+        startTransition(async () => {
+            try {
+                const selectedBadge = badges.find(
+                    (badge) => badge.name === data.badge.name
+                );
+                if (!selectedBadge) {
+                    throw new Error("Selected badge not found");
+                }
+                const response = await createPostNoImage(
+                    data,
+                    sessionToken!,
+                    selectedBadge.id,
+                    categoryId
+                );
+                toast.success("Create Post Successfully!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            } catch (error) {
+                toast.error("Something Went Wrong!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            }
+        });
     };
     return (
         <div className="w-full bg-white rounded-lg py-7">
@@ -125,24 +168,33 @@ const CreatePost = () => {
                                     <FormItem>
                                         <FormControl>
                                             <Select
-                                                onValueChange={field.onChange}
-                                                value={field.value}
+                                                onValueChange={(value) => {
+                                                    const badge = badges.find(
+                                                        (badge) =>
+                                                            badge.name === value
+                                                    );
+                                                    field.onChange(badge);
+                                                }}
+                                                value={field.value.name}
                                             >
                                                 <SelectTrigger className="w-full rounded-lg">
                                                     <SelectValue placeholder="Select a tag" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {badges.map(
-                                                        (badge: Badges) => (
-                                                            <SelectItem
-                                                                key={badge.id}
-                                                                value={
-                                                                    badge.name
-                                                                }
-                                                            >
-                                                                {badge.name}
-                                                            </SelectItem>
-                                                        )
+                                                        (badge: Badges) =>
+                                                            badge.name && (
+                                                                <SelectItem
+                                                                    key={
+                                                                        badge.id
+                                                                    }
+                                                                    value={
+                                                                        badge.name
+                                                                    }
+                                                                >
+                                                                    {badge.name}
+                                                                </SelectItem>
+                                                            )
                                                     )}
                                                 </SelectContent>
                                             </Select>

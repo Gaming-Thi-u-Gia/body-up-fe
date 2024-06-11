@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { number, z } from "zod";
 
 export const LoginSchema = z.object({
     email: z.string().email({ message: "Please enter valid email address!" }),
@@ -68,9 +68,41 @@ export const PostSchema = z.object({
     description: z.string().min(3, {
         message: "Please enter details for your post!",
     }),
-    badge: z.string().min(1, {
-        message: "Please select a tag for your post!",
+
+    badge: z.object({
+        id: z.number(),
+        name: z.string(),
     }),
+});
+export const CommentSchema = z.object({
+    detail: z.string().min(3, {
+        message: "Please enter a comment!",
+    }),
+
+    // user: z.object({
+    //     id: z.number(),
+    //     firstName: z.string(),
+    //     lastName: z.string(),
+    //     username: z.string(),
+    //     email: z.string(),
+    //     avatar: z.string(),
+    //     profile_picture: z.string(),
+    // }),
+    // post: z.object({
+    //     id: z.number(),
+    //     title: z.string(),
+    //     description: z.string(),
+    //     badge: z.object({
+    //         id: z.number(),
+    //         name: z.string(),
+    //     }),
+    //     categoryCommunity: z.object({
+    //         categoryId: z.number(),
+    //         name: z.string(),
+    //     }),
+    //     created_at: z.date(),
+    // }),
+    // upVote: number().optional(),
 });
 
 export const formSchema = z.object({

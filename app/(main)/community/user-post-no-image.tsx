@@ -19,7 +19,10 @@ import {
 } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
 import { Bookmark } from "lucide-react";
-const PostUser = () => {
+import { Posts } from "./fitness/page";
+import { formatDistanceToNow } from "date-fns";
+
+const PostUser = ({ post }: { post: Posts }) => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
@@ -30,36 +33,36 @@ const PostUser = () => {
                     <Sheet>
                         <SheetTrigger>
                             <Image
-                                src={defaultProfile}
+                                src={post.user.avatar || defaultProfile}
                                 alt="logo"
                                 width={32}
                                 height={32}
-                                className="cursor-pointer"
+                                className="cursor-pointer rounded-full"
                             />
                         </SheetTrigger>
                         <SheetContent className="w-[350px]">
                             <SheetHeader>
                                 <SheetTitle className="text-sm font-medium border-b border-gray-200 pb-4">
-                                    User Profile
+                                    {post.user.username}
                                 </SheetTitle>
                             </SheetHeader>
                             <div className="flex flex-col">
                                 <Image
-                                    src={defaultProfile}
+                                    src={post.user.avatar || defaultProfile}
                                     alt="logo"
-                                    width={50}
-                                    height={50}
-                                    className="cursor-pointer py-2"
+                                    width={40}
+                                    height={40}
+                                    className="cursor-pointer mt-2 rounded-full"
                                 />
                                 <label
                                     className="text-[16px] font-semibold mt-2"
                                     htmlFor=""
                                 >
-                                    Destiny
+                                    {post.user.username}
                                 </label>
                                 <div className="flex flex-col gap-2 mt-1">
                                     <span className="text-sm">
-                                        @destinyguillory2000
+                                        {post.user.email}
                                     </span>
 
                                     <div className="flex gap-1">
@@ -124,37 +127,38 @@ const PostUser = () => {
                         className="text-[#303033] text-sm font-bold cursor-pointer"
                         htmlFor=""
                     >
-                        stellaria
+                        {post.user.username}
                     </label>
-                    <span className="text-sm">5 days ago</span>
+                    <span className="text-sm">
+                        {post.created_at instanceof Date &&
+                        !isNaN(post.created_at.getTime())
+                            ? formatDistanceToNow(post.created_at) + " ago"
+                            : "Invalid date"}
+                    </span>
                 </div>
                 <div className="flex gap-2 items-center">
-                    <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] h-7 justify-center items-center">
+                    <div className="flex gap-1 rounded-full bg-[#EFF0F4] px-3 py-2 justify-center items-center">
                         <Image
                             src={fitness_icon}
                             alt="logo"
                             width={13}
                             height={12}
                         />
-                        <span className="text-[12px]">Workout</span>
+                        <span className="text-[12px]">{post.badge.name}</span>
                     </div>
                 </div>
             </div>
             <Link
-                href={`/community/${title}/viewpost`}
+                href={`/community/${title}/${post.id}`}
                 className="text-black text-lg font-medium mt-3"
             >
-                How Was Your Workout Today? | Weekly Thread
+                {post.title}
             </Link>
             <Link
                 href={`/community/${title}/viewpost`}
                 className="text-[#303033] text-[16px] h-[48px] mt-2 line-clamp-2 "
             >
-                Want to share your daily fitness journey with the community and
-                cheer each other on? This is the place to do it! Tell us how
-                your workout went, what program or activity you did, new habits
-                you're working on, and see how others are doing too. Refreshing
-                the workout thread for a new week ahead!
+                {post.description}
             </Link>
             <div className="flex gap-2 items-center mt-3">
                 <Button
@@ -175,13 +179,6 @@ const PostUser = () => {
                     variant="secondary"
                     className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
                 >
-                    {/* <Image
-                        src={saved_icon}
-                        alt="logo"
-                        width={20}
-                        height={20}
-                        className=""
-                    /> */}
                     <Bookmark
                         size={20}
                         // className="text-red-500"
