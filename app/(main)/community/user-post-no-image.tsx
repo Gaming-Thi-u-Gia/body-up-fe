@@ -172,7 +172,7 @@ const PostUser = ({ post }: { post: Posts }) => {
                         height={20}
                     />
                     <Link
-                        href="/community/${title}/${post.id}"
+                        href={`/community/${title}/${post.id}`}
                         className="text-[12px]"
                     >
                         <span>33</span> Replies
