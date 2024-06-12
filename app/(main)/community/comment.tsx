@@ -53,9 +53,9 @@ const Comment = ({ comment }: { comment: Comments }) => {
     };
 
     return (
-        <div className="w-[823px] flex flex-col gap-3 items-center mt-7 justify-between p-3">
+        <div className="flex flex-col gap-3 items-center mt-7 p-3">
             <div className="w-full flex justify-between items-center">
-                <div className="flex gap-2 items-center w-full ">
+                <div className="flex gap-2 items-center w-full">
                     <Sheet>
                         <SheetTrigger>
                             <Image
@@ -202,8 +202,9 @@ const Comment = ({ comment }: { comment: Comments }) => {
                     </div>
                 </div>
             </div>
-            <div className="flex justify-start items-start  ">
-                <div className="flex justify-start">{comment.detail}</div>
+            <div className="w-full flex justify-between items-center break-all ">
+                <div className="w-full">{comment.detail}</div>
+                <div className=""></div>
             </div>
             {isOpennedReply && (
                 <div className="w-full flex flex-col gap-1">

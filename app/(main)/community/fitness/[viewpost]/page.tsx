@@ -122,8 +122,9 @@ const FitnessPost = () => {
                         onClick: () => console.log("Close"),
                     },
                 });
+                window.location.reload();
             } catch (error) {
-                toast.error("Something went wrong", {
+                toast.error("You Need To Sign In To Comment!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
                         label: "Close",
