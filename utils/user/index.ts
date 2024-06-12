@@ -130,6 +130,7 @@ export const getAllProgressPhoto = async (sessionToken:string,photoAngle?:string
 }
 
 export const getAllProgressPhotoByUserId = async (userId:number,photoAngle?:string) => {
+    if(!userId) return;
     let path = photoAngle !== "all" ? `getPhotoByUserIdAndPhotoAngle?userId=${userId}&photoAngle=${photoAngle}` : `getPhotoByUserId?userId=${userId}`
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/${path}`,{
         method: "GET",
@@ -137,9 +138,6 @@ export const getAllProgressPhotoByUserId = async (userId:number,photoAngle?:stri
             "Content-Type": "application/json",
         }
     }) 
-    if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-    }
     const payload = await res.json();
     const result = {
         status: res.status,

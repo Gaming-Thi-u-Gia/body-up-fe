@@ -25,7 +25,7 @@ export const UserProgressPhoto = ({
     const [photo, setPhotos] = useState([]);
     useEffect(() => {
         getAllProgressPhotoByUserId(userId, angle).then((res) => {
-            if (res.status === 200) {
+            if (res?.status) {
                 res.payload.sort((a: PhotoProps, b: PhotoProps) => {
                     return (
                         new Date(b.date).getTime() - new Date(a.date).getTime()
