@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { fetchVideoCategoryData } from "@/utils/video/workoutVideoCollection";
+import {  fetchWorkoutCategoryData } from "@/utils/video/workoutVideoCollection";
 
 interface VideoCategory {
   id: number;
@@ -10,12 +10,12 @@ interface VideoCategory {
   name: string;
 }
 
-const HeaderNavWorkoutVideos = () => {
+const HeaderNavWorkoutPrograms = () => {
   const [titleWorkoutVideos, setTitleWorkoutVideos] = useState<VideoCategory[]>([]);
 
   useEffect(() => {
     const getVideoCategories = async () => {
-      const categories = await fetchVideoCategoryData();
+      const categories = await fetchWorkoutCategoryData();
       setTitleWorkoutVideos(categories);
     };
     getVideoCategories();
@@ -93,4 +93,4 @@ const HeaderNavWorkoutVideos = () => {
   );
 };
 
-export default HeaderNavWorkoutVideos;
+export default HeaderNavWorkoutPrograms;

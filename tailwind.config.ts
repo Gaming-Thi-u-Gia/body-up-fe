@@ -22,6 +22,7 @@ const config = {
                 "login-pattern1": "url('/login-pattern1.png')",
                 "login-pattern2": "url('/login-pattern2.png')",
                 "login-pattern3": "url('/login-pattern3.png')",
+                'bmi-gradient': 'linear-gradient(to right, #fbd3e9, #bb377d)',
             },
 
             colors: {

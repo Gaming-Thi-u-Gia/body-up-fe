@@ -9,7 +9,7 @@ const BmiCaculate = () => {
 
     const { open } = useBmiModal();  
   return (
-    <div className='absolute bottom-2 right-2 w-[50px] h-[50px]'>
+    <div className='fixed bottom-2 right-2 w-[50px] h-[50px] z-[100]'>
         <Button onClick={open} className='animate-bounce p-2 rounded-full w-full h-full' variant='primary'><Weight width={35} height={35}/></Button>
     </div>
   )

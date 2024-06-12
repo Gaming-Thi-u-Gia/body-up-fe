@@ -10,16 +10,20 @@ import {
 } from "@/components/ui/dialog";
 import { useBmiModal } from "@/stores/use-bmi-model";
 import { Button } from "../ui/button";
-import { CardProgram } from "@/app/(main)/my-fitness-journey/card-program";
+import ProgramCard from "@/app/(main)/program/program-card";
+import Link from "next/link";
+import { fetchWorkoutProgramData } from "@/utils/video/workoutVideoCollection";
 
-const data = {
-    title: "2424 Summer Shred Challenge",
-    releaseDate: "May 2424",
-    days: "26",
-    time: "40-60 min/day",
-    type: "Weight Loss, Full Body, Abs & Core",
-    equipment: "Fitness Mat",
-};
+interface WorkoutProgram {
+    id: number;
+    name: string;
+    type: string;
+    equipment: string;
+    detail: string;
+    day: string;
+    time: string;
+    year: string;
+}
 
 export const BmiModal = () => {
     const [checkRadio, setCheckRadio] = useState("1");
@@ -27,12 +31,20 @@ export const BmiModal = () => {
     const [height, setHeight] = useState("");
     const [bmi, setBmi] = useState<number | null>(null);
     const [weightStatus, setWeightStatus] = useState("");
-
+    const [workoutPrograms, setWorkoutPrograms] = useState<WorkoutProgram[]>([]);
     const [isClient, setIsClient] = useState(false);
     const { isOpen, close } = useBmiModal();
 
     useEffect(() => {
         setIsClient(true);
+    }, []);
+
+    useEffect(() => {
+        const getWorkoutProgram = async () => {
+            const workoutProgram = await fetchWorkoutProgramData();
+            setWorkoutPrograms(workoutProgram);
+        };
+        getWorkoutProgram();
     }, []);
 
     if (!isClient) {
@@ -45,6 +57,18 @@ export const BmiModal = () => {
         if (bmiValue < 29.9) return "Overweight";
         return "Obesity";
     };
+
+    const filteredPrograms = workoutPrograms.filter(program => {
+        const weightStatus = getWeightStatus(bmi);
+        if (weightStatus === "Underweight") {
+            return program.id >= 0 && program.id <= 4;
+        } else if (weightStatus === "Normal weight") {
+            return program.id >= 5 && program.id <= 9;
+        } else if (weightStatus === "Overweight") {
+            return program.id >= 10 && program.id <= 12;
+        }
+        return false;
+    });
 
     const calculateBmi = () => {
         let bmiValue = 0;
@@ -72,18 +96,18 @@ export const BmiModal = () => {
                         </h1>
                     </div>
                     <DialogTitle>
-                        <div className="grid grid-cols-2 w-full gap-8 px-7 border border-solid bg-gray-200 rounded-md">
-                            <div className="">
-                                <span className="inline-block text-gray-900 font-semibold text-3xl py-4">
+                        <div className="grid grid-cols-2 w-full gap-8 border border-solid  rounded-lg">
+                            <div className="bg-bmi-gradient rounded-lg px-3">
+                                <span className="inline-block text-black font-semibold text-3xl py-4">
                                     Calculate Your BMI
                                 </span>
-                                <p className="text-[#868a93] font-normal text-[16px] leading-6">
+                                <p className="text-black font-normal text-[16px] leading-6">
                                     Gymatan unknown printer took lle type
                                     anscraey reteabled maketype area facilities
                                     specimen bookayurvived
                                 </p>
                             </div>
-                            <div>
+                            <div className="px-3">
                                 <div className="flex gap-10 py-4">
                                     <label className="inline-flex items-center">
                                         <input
@@ -191,37 +215,37 @@ export const BmiModal = () => {
                 <DialogFooter className="mb-4">
                     <div className="flex flex-col gap-y-4 w-full">
                         {bmi !== null ? (
-                        <div className="transition-all ease-in duration-1000">
-                            <h1 className="inline-block text-gray-900 font-semibold text-2xl py-5 pl-4">The type of workout program which is suitable for you is: {weightStatus}</h1>
-                            <div className="grid grid-cols-4 pl-[20px]">
-                            <CardProgram days={data.days}
-                                                title={data.title}
-                                                releaseDate={data.releaseDate}
-                                                time={data.time}
-                                                type={data.type}
-                                                equipment={data.equipment}/>
-                            <CardProgram days={data.days}
-                                                title={data.title}
-                                                releaseDate={data.releaseDate}
-                                                time={data.time}
-                                                type={data.type}
-                                                equipment={data.equipment}/>
-                            <CardProgram days={data.days}
-                                                title={data.title}
-                                                releaseDate={data.releaseDate}
-                                                time={data.time}
-                                                type={data.type}
-                                                equipment={data.equipment}/>
-                            <CardProgram days={data.days}
-                                                title={data.title}
-                                                releaseDate={data.releaseDate}
-                                                time={data.time}
-                                                type={data.type}
-                                                equipment={data.equipment}/>
+                            <div className="transition-all ease-in duration-1000">
+                                <h1 className="inline-block text-gray-900 font-semibold text-2xl py-5 pl-4">
+                                    The type of workout program which is
+                                    suitable for you is: {weightStatus}
+                                </h1>
+                                <div className="grid grid-cols-4 gap-4 pl-[5px]">
+                                    {filteredPrograms.map((program) => (
+                                            <Link
+                                                href={`/program/${program.id}`}
+                                                key={program.id}
+                                                onClick={close}
+                                            >
+                                                <ProgramCard
+                                                    name={program.name}
+                                                    type={program.type}
+                                                    equipment={
+                                                        program.equipment
+                                                    }
+                                                    detail={program.detail}
+                                                    day={program.day}
+                                                    time={program.time}
+                                                    year={program.year}
+                                                />
+                                            </Link>
+                                        ))}
+                                </div>
                             </div>
-                        </div>
                         ) : (
-                        <h1 className="transition-all ease-in duration-500 inline-block text-gray-900 font-semibold text-2xl py-5 pl-4">There is no suitable workout program for you</h1>
+                            <h1 className="transition-all ease-in duration-500 inline-block text-gray-900 font-semibold text-2xl py-5 pl-4">
+                                There is no suitable workout program for you
+                            </h1>
                         )}
                     </div>
                 </DialogFooter>
