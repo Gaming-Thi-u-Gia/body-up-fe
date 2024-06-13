@@ -14,8 +14,8 @@ type Recipe = {
   id: number;
   name: string;
   avgStar: number;
-  prepTime: number;
-  cookTime: number;
+  prepTime: string;
+  cookTime: string;
   img: string;
   cookDetail: string;
   ingredientRecipes: [
@@ -103,7 +103,7 @@ const CookDetail = () => {
         noteRecipes={recipe.noteRecipes}
         ingredientRecipes={recipe.ingredientRecipes}
         img={recipe.img}
-        totalRating={recipe.ratingRecipes.length}
+        totalRating={recipe.ratingRecipes.length ?? 0}
         bookmarkUsers={recipe.bookmarkUsers}
       />
       <CookInfo

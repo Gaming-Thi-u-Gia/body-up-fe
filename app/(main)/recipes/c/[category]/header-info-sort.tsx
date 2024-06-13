@@ -1,13 +1,8 @@
 "use client";
 import Image from "next/image";
 import React, { useState } from "react";
-const HeaderInfoSort = ({
-  title,
-  detail,
-}: {
-  title: String;
-  detail: String;
-}) => {
+
+const HeaderInfoSort = ({ name }: { name: string }) => {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const handleToggleSort = () => {
     setIsSortOpen(!isSortOpen);
@@ -18,11 +13,11 @@ const HeaderInfoSort = ({
       <div className="flex justify-between items-center py-5">
         <div className="max-w-2xl">
           <text className="text-[#303033] text-[22px] font-semibold leading-[30px]">
-            {title}
+            {name}
           </text>
-          <p className="text-[14px] font-normal leading-[140%] h-[50%]">
+          {/* <p className="text-[14px] font-normal leading-[140%] h-[50%]">
             {detail}
-          </p>
+          </p> */}
         </div>
         <div className="flex flex-col text-[14px] justify-center items-center ">
           <button

@@ -1,9 +1,12 @@
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const HeaderInfoViewAll = ({
   name,
+  id,
 }: {
   name: String;
+  id: number;
   // detail: String;
 }) => {
   return (
@@ -13,13 +16,10 @@ const HeaderInfoViewAll = ({
           <p className="text-[#303033] text-[22px] font-semibold leading-[30px]">
             {name}
           </p>
-          {/* <p className="text-[14px] font-normal leading-[140%] h-[50%]">
-            {detail}
-          </p> */}
         </div>
         <div>
           <Button variant="primaryOutline" size="default">
-            <a href="#">View All</a>
+            <Link href={`/recipes/c/id=${id}`}>View all</Link>
           </Button>
         </div>
       </div>

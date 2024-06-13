@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import HeaderInfoViewAll from "./header-info-viewall";
 import CardRecipe from "./cart-recipe";
-import { listCategoryItems } from "./service/data";
 import {
   fetchListBookMarkRecipeData,
   fetchRecipeData,
@@ -15,7 +14,6 @@ type listRecipes = {
   name: string;
   avgStar: number;
   prepTime: string;
-  cookDetail: string;
   img: string;
   recipeCategories: ListRecipeCategories[];
 };
@@ -66,7 +64,6 @@ const RecipeCategoryList = () => {
         console.log(error);
       }
     };
-    console.log(listBookmarkRecipesForUser);
     fetchBookmarkRecipe();
     fetchRecipes();
   }, [user?.id, sessionToken]);
@@ -75,7 +72,7 @@ const RecipeCategoryList = () => {
     <div>
       {topicRecipes.map((topicRecipe, index) => (
         <div key={topicRecipe.name}>
-          <HeaderInfoViewAll name={topicRecipe.name} />
+          <HeaderInfoViewAll name={topicRecipe.name} id={topicRecipe.id} />
           <div className="grid grid-cols-4 gap-5">
             {topicRecipe.recipes.map((recipe, index) => (
               <CardRecipe

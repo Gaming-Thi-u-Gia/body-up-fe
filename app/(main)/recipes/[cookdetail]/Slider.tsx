@@ -1,8 +1,8 @@
 type Props = {
   img: string;
   name: string;
-  cookTime: number;
-  prepTime: number;
+  cookTime: string;
+  prepTime: string;
 };
 const Slider = ({ img, name, cookTime, prepTime }: Props) => {
   return (

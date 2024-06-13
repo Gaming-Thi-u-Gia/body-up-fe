@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import HeaderInfoSearch from "./header-info-viewall";
 import Star from "./star-rating";
+import { Heart } from "lucide-react";
 const LatestRecipes = () => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
@@ -71,19 +72,11 @@ const LatestRecipes = () => {
               >
                 <a href="#">View Recipe</a>
               </Button>
-              <Image
-                className="cursor-pointer"
-                width={20}
-                height={20}
-                src="/add.svg"
-                alt="add"
-              />
-              <Image
+              <Heart
                 className="text-[#000000] cursor-pointer"
+                strokeWidth={1}
                 width={24}
                 height={25}
-                src="/heart.svg"
-                alt="hert"
               />
             </div>
           </div>
@@ -111,12 +104,12 @@ const LatestRecipes = () => {
             <div className="flex w-full justify-between absolute top-3 px-5">
               <Star avgStar={listLastestRecipes[1].avgStar} />
               <div className="flex">
-                <Button className="mr-4" variant="secondary" size="icon">
-                  <Image width={20} height={20} src="/add.svg" alt="add" />
-                </Button>
-                <Button variant="secondary" size="icon">
-                  <Image width={24} height={25} src="/heart.svg" alt="heart" />
-                </Button>
+                <Heart
+                  className="text-[#000000] cursor-pointer"
+                  strokeWidth={1}
+                  width={24}
+                  height={25}
+                />
               </div>
             </div>
           </div>

@@ -1,37 +1,36 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
-import HeaderInfoSearch from "./header-info-viewall";
-
+"use client";
+import React, { useEffect, useState } from "react";
+import { fetchPopularCategoryData } from "@/utils/recipe";
+type PopularCategories = {
+  id: number;
+  name: string;
+  img: string;
+  totalRecipe: number;
+}[];
 const PopularCategories = () => {
-  const popularCategories = [
-    {
-      title: "Hight protein",
-      imgURL:
-        "https://images.squarespace-cdn.com/content/v1/53883795e4b016c956b8d243/1597821998048-538UNQI253SYL3KE9NGD/chup-anh-mon-an-breakfast-10.jpg",
-      amount: 10,
-    },
-    {
-      title: "Hight protein",
-      imgURL:
-        "https://images.squarespace-cdn.com/content/v1/53883795e4b016c956b8d243/1597821998048-538UNQI253SYL3KE9NGD/chup-anh-mon-an-breakfast-10.jpg",
-      amount: 10,
-    },
-    {
-      title: "Hight protein",
-      imgURL:
-        "https://images.squarespace-cdn.com/content/v1/53883795e4b016c956b8d243/1597821998048-538UNQI253SYL3KE9NGD/chup-anh-mon-an-breakfast-10.jpg",
-      amount: 10,
-    },
-    {
-      title: "Hight protein",
-      imgURL:
-        "https://images.squarespace-cdn.com/content/v1/53883795e4b016c956b8d243/1597821998048-538UNQI253SYL3KE9NGD/chup-anh-mon-an-breakfast-10.jpg",
-      amount: 10,
-    },
-  ];
+  const [popularCategories, setPopularCategories] = useState<PopularCategories>(
+    []
+  );
+  useEffect(() => {
+    const fetchPopularCategory = async () => {
+      try {
+        const data = await fetchPopularCategoryData();
+        setPopularCategories(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchPopularCategory();
+  }, []);
+  console.log(popularCategories);
   return (
     <div>
-      <HeaderInfoSearch title="Popular Categories" detail="" />
+      <div>
+        <p className="text-[#303033] text-[22px] font-semibold leading-[30px] pt-5">
+          Popular Categories
+        </p>
+      </div>
       <div>
         <div className="grid grid-cols-4 gap-5 h-[95px] box-border my-5">
           {popularCategories.map((category, index) => (
@@ -41,15 +40,15 @@ const PopularCategories = () => {
             >
               <img
                 className="h-full w-[95px] rounded-[15px] object-cover"
-                src={category.imgURL}
+                src={category.img!}
                 alt="pupular food"
               />
               <div className="flex-1 pl-2">
                 <p className="text-[#303033] text-[18px] font-medium leading-[140%] pb-1 ">
-                  {category.title}
+                  {category.name}
                 </p>
                 <p className="text-[14px] font-normal leading-[140%]">
-                  {category.amount} recipes
+                  {category.totalRecipe} recipes
                 </p>
               </div>
             </div>
