@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import fitness_icon from "/public/fitness-icon.svg";
@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import back_Icon from "/public/back-icon.svg";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 
 import {
@@ -35,7 +35,6 @@ import {
     fetchCommentData,
     fetchPostById,
 } from "@/utils/community";
-import { Posts } from "../page";
 import { toast } from "sonner";
 import { CommentSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,6 +48,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import { Posts } from "../../user-post-no-image";
 
 export type Comments = {
     id: number;
@@ -63,7 +63,7 @@ export type Comments = {
     };
 };
 
-const FitnessPost = () => {
+const OffTopicPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
@@ -72,8 +72,6 @@ const FitnessPost = () => {
     const { sessionToken } = useAuthStore((store) => store);
     const [isPending, startTransition] = useTransition();
     const [comments, setComments] = useState<Comments[]>([]);
-    const router = useRouter();
-
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -112,7 +110,6 @@ const FitnessPost = () => {
 
         startTransition(async () => {
             try {
-                const { detail } = data;
                 const res = await createComment(
                     sessionToken!,
                     Number(postId),
@@ -125,9 +122,9 @@ const FitnessPost = () => {
                         onClick: () => console.log("Close"),
                     },
                 });
-                setComments((prev) => [...prev, res.payload]);
+                window.location.reload();
             } catch (error) {
-                toast.error("Something went wrong", {
+                toast.error("You Need To Sign In To Comment!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
                         label: "Close",
@@ -401,12 +398,8 @@ const FitnessPost = () => {
                     <Comment comment={comment} />
                 </div>
             ))}
-            {/* <Comment />
-            <Comment />
-            <Comment />
-            <Comment /> */}
         </div>
     );
 };
 
-export default FitnessPost;
+export default OffTopicPost;

@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import fitness_icon from "/public/fitness-icon.svg";
@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import back_Icon from "/public/back-icon.svg";
-import { redirect, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 
 import {
@@ -35,7 +35,6 @@ import {
     fetchCommentData,
     fetchPostById,
 } from "@/utils/community";
-import { Posts } from "../page";
 import { toast } from "sonner";
 import { CommentSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,7 +48,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useAuthStore } from "@/components/providers/auth-provider";
-import { useRouter } from "next/navigation";
+import { Posts } from "../../user-post-no-image";
 
 export type Comments = {
     id: number;
@@ -64,7 +63,7 @@ export type Comments = {
     };
 };
 
-const FitnessPost = () => {
+const LookingForTeamPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
@@ -73,7 +72,6 @@ const FitnessPost = () => {
     const { sessionToken } = useAuthStore((store) => store);
     const [isPending, startTransition] = useTransition();
     const [comments, setComments] = useState<Comments[]>([]);
-    const router = useRouter();
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -124,9 +122,9 @@ const FitnessPost = () => {
                         onClick: () => console.log("Close"),
                     },
                 });
-                // window.location.reload();
+                window.location.reload();
             } catch (error) {
-                toast.error("Something went wrong", {
+                toast.error("You Need To Sign In To Comment!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
                         label: "Close",
@@ -266,7 +264,7 @@ const FitnessPost = () => {
                         <span className="text-sm">5 days ago</span>
                     </div>
                     <div className="flex gap-2 items-center">
-                        <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] p-2 justify-center items-center">
+                        <div className="flex gap-1 rounded-full bg-[#EFF0F4] px-3 py-2 justify-center items-center">
                             <Image
                                 src={fitness_icon}
                                 alt="logo"
@@ -400,12 +398,8 @@ const FitnessPost = () => {
                     <Comment comment={comment} />
                 </div>
             ))}
-            {/* <Comment />
-            <Comment />
-            <Comment />
-            <Comment /> */}
         </div>
     );
 };
 
-export default FitnessPost;
+export default LookingForTeamPost;

@@ -35,7 +35,6 @@ import {
     fetchCommentData,
     fetchPostById,
 } from "@/utils/community";
-import { Posts } from "../page";
 import { toast } from "sonner";
 import { CommentSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,6 +48,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import { Posts } from "../../user-post-no-image";
 
 export type Comments = {
     id: number;
@@ -63,7 +63,7 @@ export type Comments = {
     };
 };
 
-const FitnessPost = () => {
+const FeedbackPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
@@ -122,8 +122,9 @@ const FitnessPost = () => {
                         onClick: () => console.log("Close"),
                     },
                 });
+                window.location.reload();
             } catch (error) {
-                toast.error("Something went wrong", {
+                toast.error("You Need To Sign In To Comment!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
                         label: "Close",
@@ -263,7 +264,7 @@ const FitnessPost = () => {
                         <span className="text-sm">5 days ago</span>
                     </div>
                     <div className="flex gap-2 items-center">
-                        <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] p-2 justify-center items-center">
+                        <div className="flex gap-1 rounded-full bg-[#EFF0F4] px-3 py-2 justify-center items-center">
                             <Image
                                 src={fitness_icon}
                                 alt="logo"
@@ -405,4 +406,4 @@ const FitnessPost = () => {
     );
 };
 
-export default FitnessPost;
+export default FeedbackPost;

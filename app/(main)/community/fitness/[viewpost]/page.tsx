@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import fitness_icon from "/public/fitness-icon.svg";
@@ -35,7 +35,6 @@ import {
     fetchCommentData,
     fetchPostById,
 } from "@/utils/community";
-import { Posts } from "../page";
 import { toast } from "sonner";
 import { CommentSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,6 +48,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import { Posts } from "../../user-post-no-image";
 
 export type Comments = {
     id: number;
@@ -398,10 +398,6 @@ const FitnessPost = () => {
                     <Comment comment={comment} />
                 </div>
             ))}
-            {/* <Comment />
-            <Comment />
-            <Comment />
-            <Comment /> */}
         </div>
     );
 };

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import message_icon from "/public/message-icon.svg";
@@ -29,10 +29,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Comment from "../../comment";
+import { Comments } from "../../fitness/[viewpost]/page";
 const BeforeAfterPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
+    const [comments, setComments] = useState<Comments[]>([]);
+
     return (
         <div className="w-[823px] mt-[5%]">
             <Link
@@ -263,10 +266,11 @@ const BeforeAfterPost = () => {
                 </DropdownMenu>
             </div>
 
-            <Comment />
-            <Comment />
-            <Comment />
-            <Comment />
+            {comments.map((comment: Comments) => (
+                <div key={comment.id}>
+                    <Comment comment={comment} />
+                </div>
+            ))}
         </div>
     );
 };
