@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import before_after from "/public/before-after-icon.svg";
 import challenges_icon from "/public/challenges-icon.svg";
 import {
@@ -17,11 +17,26 @@ import upvote_icon from "/public/upvote-icon.svg";
 import updown_icon from "/public/updown-icon.svg";
 import reply_icon from "/public/reply-icon.svg";
 import { Comments } from "./fitness/[viewpost]/page";
+import { fetchUpvote } from "@/utils/community";
+import { ArrowBigUp, ArrowBigDown } from "lucide-react";
+// import { ArrowBigUp } from 'lucide-react';
 const Comment = ({ comment }: { comment: Comments }) => {
     const [isOpennedReply, setIsOpennedReply] = useState(false);
-    const [countUpvoted, setCountUpvoted] = useState<number>(0);
+    const [countUpvoted, setCountUpvoted] = useState<number>(
+        comment.upVote || 0
+    );
     const [isUpvoted, setIsUpvoted] = useState(false);
     const [isDownvoted, setIsDownvoted] = useState(false);
+
+    // const upvoteCommentData = async (newCount: number) => {
+    //     try {
+    //         const upvoteData = await fetchUpvote(comment.id, newCount);
+    //         setCountUpvoted(upvoteData);
+    //         console.log("Upvote data returned:", upvoteData);
+    //     } catch (error) {
+    //         console.error("Error fetching upvote:", error);
+    //     }
+    // };
     const handleUpvoteClick = () => {
         if (isUpvoted) {
             setCountUpvoted(countUpvoted - 1);
@@ -36,7 +51,6 @@ const Comment = ({ comment }: { comment: Comments }) => {
             setIsUpvoted(true);
         }
     };
-
     const handleDownvoteClick = () => {
         if (isDownvoted) {
             setCountUpvoted(countUpvoted + 1);
@@ -176,20 +190,27 @@ const Comment = ({ comment }: { comment: Comments }) => {
                         <span className="text-[12px]">Reply</span>
                     </Button>
                     <div className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] px-2 py-2  justify-between items-center">
-                        <Image
-                            src={upvote_icon}
-                            alt="logo"
-                            width={18}
-                            height={18}
-                            className={`cursor-pointer ${
-                                isUpvoted ? "bg-blue-500" : ""
-                            }`}
+                        <ArrowBigUp
+                            size={25}
+                            strokeWidth={1}
+                            fill={`${isUpvoted ? "#7065cd" : " transparent"} `}
+                            className="cursor-pointer"
                             onClick={handleUpvoteClick}
                         />
 
                         <span className="text-[14px]">{countUpvoted}</span>
 
-                        <Image
+                        <ArrowBigDown
+                            size={25}
+                            strokeWidth={1}
+                            fill={`${
+                                isDownvoted ? "#7065cd" : " transparent"
+                            } `}
+                            className="cursor-pointer"
+                            onClick={handleDownvoteClick}
+                        />
+
+                        {/* <Image
                             src={updown_icon}
                             alt="logo"
                             width={18}
@@ -198,7 +219,7 @@ const Comment = ({ comment }: { comment: Comments }) => {
                                 isDownvoted ? "bg-red-500" : ""
                             }`}
                             onClick={handleDownvoteClick}
-                        />
+                        /> */}
                     </div>
                 </div>
             </div>

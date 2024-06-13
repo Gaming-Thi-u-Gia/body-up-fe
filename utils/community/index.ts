@@ -152,3 +152,26 @@ export const fetchCommentData = async (postId: number) => {
         throw new Error("Error while fetching comments");
     }
 };
+
+export const fetchUpvote = async (commentId: number, upVote: number) => {
+    try {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/comments/upvoteComment?commentId=${commentId}&upVote=${upVote}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        ).then(async (res) => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            const data = res.json();
+            return data;
+        });
+        return response;
+    } catch (error) {
+        throw new Error("Error while fetching upvote");
+    }
+};
