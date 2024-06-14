@@ -175,3 +175,28 @@ export const fetchUpvote = async (commentId: number, upVote: number) => {
         throw new Error("Error while fetching upvote");
     }
 };
+
+export const fetchBookmarkPost = async (
+    postId: number,
+    sessionToken: string
+) => {
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/bookmarkPosts?postId=${postId}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                    credentials: "include",
+                },
+            }
+        ).then(async (res) => {
+            const data = await res.json();
+            return data;
+        });
+        return res;
+    } catch (error) {
+        throw new Error("Error while fetching bookmark post");
+    }
+};

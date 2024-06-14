@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 import React from "react";
 import {
@@ -7,6 +8,7 @@ import {
     User,
     ChevronDown,
 } from "lucide-react";
+import { Utensils, Calendar } from "lucide-react";
 
 import {
     DropdownMenu,
@@ -44,24 +46,24 @@ const CommunityFilter = () => {
                             </div>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
-                            className="w-40 absolute mt-5 "
+                            className="w-[180px] absolute mt-5"
                             side="left"
                         >
-                            <DropdownMenuLabel className="bg-blue-200">
+                            <DropdownMenuLabel className="bg-[#ebf4ff]">
                                 All
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
+                            <DropdownMenuGroup className="text-sm flex flex-col font-light">
                                 <DropdownMenuItem>
                                     <User className="mr-2 h-4 w-4" />
                                     <span>Workout</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <CreditCard className="mr-2 h-4 w-4" />
+                                    <Utensils className="mr-2 h-4 w-4" />
                                     <span>Food</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <Settings className="mr-2 h-4 w-4" />
+                                    <Calendar className="mr-2 h-4 w-4" />
                                     <span>Chloe's Programs</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
