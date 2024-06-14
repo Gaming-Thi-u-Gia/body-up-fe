@@ -11,7 +11,9 @@ const MarketingPage = () => {
             style={{ height: "calc(100vh - 128px)" }}
         >
             <div className="text-center">
-                <h1 className="text-4xl font-bold text-gray-800">BODY UP!!!</h1>
+                <h1 className="text-4xl font-bold text-black-400 typing">
+                    Ready To Change Your Body
+                </h1>
 
                 <div className="flex justify-center items-center">
                     <Image src={logo_web} width={250} height={250} alt="logo" />
