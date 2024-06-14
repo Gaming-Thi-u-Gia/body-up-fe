@@ -26,7 +26,6 @@ const ListRecipe = ({ recipes }: { recipes: Recipes }) => {
   if (!recipes) {
     return <div>Loading...</div>;
   }
-
   return (
     <div className="max-w-7xl">
       <div className="grid grid-cols-4 gap-5">
@@ -39,7 +38,6 @@ const ListRecipe = ({ recipes }: { recipes: Recipes }) => {
             recipeCategories={recipe.recipeCategories}
             name={recipe.name}
             avgStar={recipe.avgStar}
-            listBookmarkRecipesForUser={null}
           />
         ))}
       </div>

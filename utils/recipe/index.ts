@@ -16,14 +16,18 @@ export const fetchTopicRecipeData = async () => {
     throw new Error(`Error while fetching data recipe collection`);
   }
 };
-export const fetchRecipeData = async () => {
+export const fetchRecipeWithTopicData = async (
+  userId: number,
+  sessionToken: string
+) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topic`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topic${userId ? `?userId=${userId}` : ""}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
         },
       }
     );
@@ -198,4 +202,35 @@ export const fetchPopularCategoryData = async () => {
   } catch (error) {
     throw new Error(`Error while get popular category`);
   }
+};
+export const fetchLatestRecipeData = async (
+  userId: number | undefined,
+  sessionToken: string | undefined
+) => {
+  console.log(
+    `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/latest${userId ? `?userId=${userId}` : ""}`
+  );
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/latest${userId ? `?userId=${userId}` : ""}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get latest recipes`);
+  }
+};
+export const initialName = (name = "") => {
+  const words = name.trim().split(" ");
+  if (words.length === 1) {
+    return words[0].substring(0, 2);
+  }
+  const initials = words.map((word) => word.charAt(0));
+  return initials.join("").substring(0, 2);
 };

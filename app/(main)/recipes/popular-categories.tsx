@@ -17,13 +17,10 @@ const PopularCategories = () => {
       try {
         const data = await fetchPopularCategoryData();
         setPopularCategories(data);
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     };
     fetchPopularCategory();
   }, []);
-  console.log(popularCategories);
   return (
     <div>
       <div>

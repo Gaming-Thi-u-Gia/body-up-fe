@@ -1,123 +1,168 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import HeaderInfoSearch from "./header-info-viewall";
 import Star from "./star-rating";
 import { Heart } from "lucide-react";
+import { fetchLatestRecipeData } from "@/utils/recipe";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import { initialName } from "@/utils/recipe";
+import Link from "next/link";
+type Recipe = {
+  id: number;
+  name: string;
+  detail: string;
+  avgStar: number;
+  img: string;
+  bookmarked: boolean;
+  recipeCategories: RecipeCategories[];
+};
+
+type RecipeCategories = {
+  id: number;
+  name: string;
+};
+
 const LatestRecipes = () => {
-  const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(0);
-  const listLastestRecipes = [
-    {
-      id_food: 1,
-      title: "One Pot Rice Cooker Fried Rice",
-      avgStar: 4,
-      details:
-        "Who says sweet potato is only for Autumn? Boost your breakfast nutrition with these delicious sweet potato pancakes, topped with crunchy roasted pecans, banana and a healthier chocolate syrup. You’d think you’re having dessert for breakfast!",
-      dietary: ["Vg", "DF", "LF"],
-      img: "/recipe1.png",
-    },
-    {
-      id_food: 2,
-      title: "Once pot rice Cooker Fried Rice",
-      avgStar: 4.2,
-      details:
-        "Who says sweet potato is only for Autumn? Boost your breakfast nutrition with these delicious sweet potato pancakes, topped with crunchy roasted pecans, banana and a healthier chocolate syrup. You’d think you’re having dessert for breakfast!",
-      dietary: ["LF"],
-      img: "https://chloeting.com/_next/image?url=https%3A%2F%2Fstatic.chloeting.com%2Frecipes%2F6200d5a52e702a81e5803c59%2Fimages%2Fbaked-avocado-eggs-1675831846729-cover.jpeg&w=1920&q=90",
-    },
-  ];
+  const [listLatestRecipes, setListLatestRecipes] = useState<Recipe[]>([]);
+  const { user, sessionToken } = useAuthStore((store) => store);
+
+  useEffect(() => {
+    const fetchRecipeLatest = async () => {
+      try {
+        if (user?.id && sessionToken) {
+          const data = await fetchLatestRecipeData(user.id, sessionToken);
+          setListLatestRecipes(data);
+          console.log("Fetched recipes:", data);
+        }
+      } catch (error) {
+        console.error("Error while fetching latest recipe:", error);
+      }
+    };
+    fetchRecipeLatest();
+  }, [user?.id, sessionToken]);
   return (
     <div className=" h-full mx-auto">
-      <HeaderInfoSearch name="Latest Recipes" />
-      <div className="flex gap-5 ">
-        {/* Recipe1 */}
-        <div className="flex relative gap-5 w-[75%] h-[450px] bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px] box-border py-5 px-4">
-          <div className="relative">
-            <img
-              className="h-[90%] cursor-pointer object-cover"
-              src="/recipe1.png"
-              alt="Recipe image"
-            />
-            <div className="absolute bottom-[calc(10%+12px)] left-3 flex-wrap-reverse w-[32px]">
-              {listLastestRecipes[0].dietary.map((dietary, index) => (
+      <HeaderInfoSearch name="Latest Recipes" description="" id={1} />
+      {listLatestRecipes.length === 2 && (
+        <div className="flex gap-5 ">
+          {/* Recipe1 */}
+          <div className="flex relative gap-5 w-[75%] h-[450px] bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px] box-border py-5 px-4">
+            <div className="relative">
+              <Link href={`/recipes/${listLatestRecipes[0].id}`}>
+                <img
+                  className="h-[90%] w-[700px] cursor-pointer object-cover rounded-2xl"
+                  src={listLatestRecipes[0].img}
+                  alt="Recipe image"
+                />
+              </Link>
+              <div className="absolute bottom-[calc(10%+12px)] left-3 flex-wrap-reverse w-[32px]">
+                {listLatestRecipes[0].recipeCategories.map(
+                  (recipeCategory, index) => (
+                    <div className="group" key={index}>
+                      <Button
+                        className=" my-1 group-hover:hidden visible"
+                        variant="secondary"
+                        size="icon"
+                      >
+                        <a href="#">{initialName(recipeCategory.name)}</a>
+                      </Button>
+                      <Button
+                        className=" my-1 group-hover:flex hidden"
+                        variant="secondary"
+                        size="default"
+                      >
+                        <a href="#">{recipeCategory.name}</a>
+                      </Button>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+            <div className="flex-1 ml-10px relative h-[90%]">
+              <p className="text-[18px] font-medium leading-[150%] tracking-wide h-[15%] text-[#303033] cursor-pointer">
+                <a href="#">{listLatestRecipes[0].name}</a>
+              </p>
+              <div className="h-[10%] ">
+                <Star avgStar={listLatestRecipes[0].avgStar} />
+              </div>
+              <p className="text-[14px] font-normal leading-[140%] h-[65%] ">
+                {listLatestRecipes[0].detail}
+              </p>
+              <div className="absolute bottom-0 flex h-[10%]  w-full justify-between items-center">
                 <Button
-                  className="my-1"
-                  key={index}
-                  variant="secondary"
-                  size="icon"
+                  className="cursor-pointer"
+                  variant="primaryOutline"
+                  size="default"
                 >
-                  <a href="#">{dietary}</a>
+                  <a href="#">View Recipe</a>
                 </Button>
-              ))}
-            </div>
-          </div>
-          <div className="flex-1 ml-10px relative h-[90%]">
-            <p className="text-[18px] font-medium leading-[150%] tracking-wide h-[15%] text-[#303033] cursor-pointer">
-              <a href="#">{listLastestRecipes[0].title}</a>
-            </p>
-            <div className="h-[10%] ">
-              <Star avgStar={listLastestRecipes[0].avgStar} />
-            </div>
-            <p className="text-[14px] font-normal leading-[140%] h-[65%]">
-              {listLastestRecipes[0].details}
-            </p>
-            <div className="absolute bottom-0 flex h-[10%]  w-full justify-between items-center">
-              <Button
-                className="cursor-pointer"
-                variant="primaryOutline"
-                size="default"
-              >
-                <a href="#">View Recipe</a>
-              </Button>
-              <Heart
-                className="text-[#000000] cursor-pointer"
-                strokeWidth={1}
-                width={24}
-                height={25}
-              />
-            </div>
-          </div>
-        </div>
-        {/* Recipe2 */}
-        <div className="flex-1 h-[450px] relative bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px] cursor-pointer box-border">
-          <div className="relative">
-            <img
-              className="h-[calc(450px*0.9-24px)] object-cover"
-              src="/recipe1.png"
-              alt="Recipe image"
-            />
-            <div className="absolute bottom-3 left-3 flex-wrap-reverse w-[32px]">
-              {listLastestRecipes[1].dietary.map((dietary, index) => (
-                <Button
-                  className="my-1"
-                  key={index}
-                  variant="secondary"
-                  size="icon"
-                >
-                  <a href="#">{dietary}</a>
-                </Button>
-              ))}
-            </div>
-            <div className="flex w-full justify-between absolute top-3 px-5">
-              <Star avgStar={listLastestRecipes[1].avgStar} />
-              <div className="flex">
                 <Heart
                   className="text-[#000000] cursor-pointer"
                   strokeWidth={1}
+                  fill={`${listLatestRecipes[0].bookmarked ? "#FF0000" : "#D5D5D5"}`}
                   width={24}
                   height={25}
                 />
               </div>
             </div>
           </div>
-          <p className="flex h-[calc(450px*0.1+24px)] items-center pl-3 text-[18px] font-medium text-[#303033]">
-            {listLastestRecipes[0].title}
-          </p>
+          {/* Recipe2 */}
+          <div className="flex-1 h-[450px] relative bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px] cursor-pointer box-border">
+            <div className="relative">
+              <Link href={`/recipes/${listLatestRecipes[1].id}`}>
+                <img
+                  className="h-[calc(450px*0.9-24px)] object-cover"
+                  src={listLatestRecipes[1].img}
+                  alt="Recipe image"
+                />
+              </Link>
+              <div className="absolute bottom-3 left-3 flex-wrap-reverse w-[32px]">
+                {listLatestRecipes[1].recipeCategories.map(
+                  (recipeCategory, index) => (
+                    <div className="group" key={index}>
+                      <Button
+                        className=" my-1 group-hover:hidden visible"
+                        variant="secondary"
+                        size="icon"
+                      >
+                        <a href="#">{initialName(recipeCategory.name)}</a>
+                      </Button>
+                      <Button
+                        className=" my-1 group-hover:flex hidden"
+                        variant="secondary"
+                        size="default"
+                      >
+                        <a href="#">{recipeCategory.name}</a>
+                      </Button>
+                    </div>
+                  )
+                )}
+              </div>
+              <div className="flex w-full justify-between absolute top-3 px-5">
+                <Star avgStar={listLatestRecipes[1].avgStar} />
+                <div className="flex">
+                  <Heart
+                    className="text-[#000000] cursor-pointer"
+                    strokeWidth={1}
+                    width={24}
+                    height={25}
+                    fill={`${listLatestRecipes[0].bookmarked === false ? "#D5D5D5" : "#FF0000"}`}
+                  />
+                </div>
+              </div>
+            </div>
+            <Link
+              href={`/recipes/${listLatestRecipes[1].id}`}
+              className="flex h-[calc(450px*0.1+24px)] items-center pl-3 text-[18px] font-medium text-[#303033]"
+            >
+              {listLatestRecipes[1].name}
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

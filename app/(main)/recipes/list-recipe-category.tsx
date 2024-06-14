@@ -5,7 +5,7 @@ import HeaderInfoViewAll from "./header-info-viewall";
 import CardRecipe from "./cart-recipe";
 import {
   fetchListBookMarkRecipeData,
-  fetchRecipeData,
+  fetchRecipeWithTopicData,
 } from "@/utils/recipe/index";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
@@ -13,8 +13,8 @@ type listRecipes = {
   id: number;
   name: string;
   avgStar: number;
-  prepTime: string;
   img: string;
+  bookmarked: boolean;
   recipeCategories: ListRecipeCategories[];
 };
 type ListRecipeCategories = {
@@ -24,8 +24,8 @@ type ListRecipeCategories = {
 };
 type TopicRecipes = {
   id: number;
-  topic: string;
   name: string;
+  description: string;
   recipes: listRecipes[];
 };
 type ListBookmarkRecipeForUser = {
@@ -43,11 +43,13 @@ const RecipeCategoryList = () => {
     ListBookmarkRecipeForUser[]
   >([]);
 
-  console.log(sessionToken);
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const data = await fetchRecipeData();
+        const data = await fetchRecipeWithTopicData(
+          user?.id as number,
+          sessionToken as string
+        );
         setTopicRecipes(data);
       } catch (error) {
         console.log(error);
@@ -72,7 +74,11 @@ const RecipeCategoryList = () => {
     <div>
       {topicRecipes.map((topicRecipe, index) => (
         <div key={topicRecipe.name}>
-          <HeaderInfoViewAll name={topicRecipe.name} id={topicRecipe.id} />
+          <HeaderInfoViewAll
+            name={topicRecipe.name}
+            description={topicRecipe.description}
+            id={topicRecipe.id}
+          />
           <div className="grid grid-cols-4 gap-5">
             {topicRecipe.recipes.map((recipe, index) => (
               <CardRecipe
@@ -83,7 +89,7 @@ const RecipeCategoryList = () => {
                 recipeCategories={recipe.recipeCategories as []}
                 name={recipe.name}
                 avgStar={recipe.avgStar}
-                listBookmarkRecipesForUser={listBookmarkRecipesForUser}
+                bookmarked={recipe.bookmarked}
               />
             ))}
           </div>
@@ -92,5 +98,4 @@ const RecipeCategoryList = () => {
     </div>
   );
 };
-
 export default RecipeCategoryList;

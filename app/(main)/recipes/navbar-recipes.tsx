@@ -14,7 +14,6 @@ const NavbarRecipes = () => {
   const [topicRecipes, setTopicRecipes] = React.useState<TopicRecipes[]>([]);
   useEffect(() => {
     const fetchTopicRecipes = async () => {
-      console.log("hi");
       try {
         const data = await fetchTopicRecipeData();
         setTopicRecipes(data);

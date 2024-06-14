@@ -3,9 +3,11 @@ import Link from "next/link";
 
 const HeaderInfoViewAll = ({
   name,
+  description,
   id,
 }: {
-  name: String;
+  name: string;
+  description: string;
   id: number;
   // detail: String;
 }) => {
@@ -16,6 +18,7 @@ const HeaderInfoViewAll = ({
           <p className="text-[#303033] text-[22px] font-semibold leading-[30px]">
             {name}
           </p>
+          <p className="text-[14px] text-[#303033]">{description}</p>
         </div>
         <div>
           <Button variant="primaryOutline" size="default">

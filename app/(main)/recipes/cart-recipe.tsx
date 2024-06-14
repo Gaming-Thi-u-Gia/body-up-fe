@@ -5,6 +5,7 @@ import Star from "./star-rating";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { initialName } from "@/utils/recipe";
 
 export type Props = {
   userId: number;
@@ -13,7 +14,7 @@ export type Props = {
   recipeCategories: RecipeCategories[];
   name: string;
   avgStar: number;
-  listBookmarkRecipesForUser: any;
+  bookmarked: boolean;
 };
 type RecipeCategories = {
   id: number;
@@ -27,16 +28,8 @@ const CardRecipe = ({
   recipeCategories,
   name,
   avgStar,
-  listBookmarkRecipesForUser,
+  bookmarked,
 }: Props) => {
-  const initialName = (recipeCategory: string) => {
-    const words = recipeCategory.trim().split(" ");
-    if (words.length === 1) {
-      return words[0].substring(0, 2);
-    } else {
-      return words.slice(0, 2).join("");
-    }
-  };
   return (
     <>
       <div
@@ -76,7 +69,13 @@ const CardRecipe = ({
             <Star avgStar={avgStar} />
             <div className="flex">
               <Button variant="secondary" size="icon">
-                <Heart width={20} strokeWidth={1} />
+                <Heart
+                  className="text-[#000000] cursor-pointer"
+                  strokeWidth={1}
+                  width={24}
+                  height={25}
+                  fill={`${bookmarked === false ? "#D5D5D5" : "#FF0000"}`}
+                />
               </Button>
             </div>
           </div>

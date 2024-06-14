@@ -13,11 +13,12 @@ import { toast } from "sonner";
 type Recipe = {
   id: number;
   name: string;
+  detail: string;
   avgStar: number;
   prepTime: string;
   cookTime: string;
   img: string;
-  cookDetail: string;
+  cookingInstruction: string;
   ingredientRecipes: [
     {
       id: number;
@@ -99,6 +100,7 @@ const CookDetail = () => {
         recipeId={recipeId}
         avgStar={recipe.avgStar}
         name={recipe.name}
+        detail={recipe.detail}
         recipeCategories={recipe.recipeCategories}
         noteRecipes={recipe.noteRecipes}
         ingredientRecipes={recipe.ingredientRecipes}
@@ -107,7 +109,7 @@ const CookDetail = () => {
         bookmarkUsers={recipe.bookmarkUsers}
       />
       <CookInfo
-        cookDetail={recipe.cookDetail}
+        cookingInstruction={recipe.cookingInstruction}
         noteRecipes={recipe.noteRecipes}
       />
       <ImageSwipe otherImageRecipes={recipe.otherImageRecipes} />

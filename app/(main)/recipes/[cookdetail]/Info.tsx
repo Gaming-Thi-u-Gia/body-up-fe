@@ -15,6 +15,7 @@ import { toast } from "sonner";
 type Props = {
   recipeId: number;
   name: string;
+  detail: string;
   avgStar: number;
   ingredientRecipes: {
     id: number;
@@ -42,6 +43,7 @@ const Info = ({
   recipeCategories,
   ingredientRecipes,
   name,
+  detail,
   img,
   totalRating,
   bookmarkUsers,
@@ -119,7 +121,7 @@ const Info = ({
               ))}
             </div>
             <p className="text-[32px] leading-[45px] text-[#303033] my-10">
-              {name}
+              {detail}
             </p>
             <div>
               <div className="flex text-[#868A93] text-[13px] items-stretch">
@@ -174,11 +176,13 @@ const Info = ({
             <div className="pl-[15%] pt-[10%]">
               <div>
                 <p className="text-[25px] font-bold mb-5">Ingredients</p>
-                <div className="text-[18px]">
+                <div>
                   {ingredientRecipes.map((ing) => (
                     <div key={ing.id} className="flex py-1">
-                      <p className="min-w-20">{ing.amount}</p>
-                      <p className="flex-1">{ing.name}</p>
+                      <p className="min-w-20 text-[20px] font-semibold pr-5">
+                        {ing.amount}
+                      </p>
+                      <p className="flex-1 text-[20px]">{ing.name}</p>
                     </div>
                   ))}
                 </div>
