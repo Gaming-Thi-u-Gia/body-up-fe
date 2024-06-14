@@ -1,7 +1,7 @@
 "use client";
 import { title } from "process";
 import Slider from "./slider";
-import Info from "./Info";
+import BodyRecipe from "./body-recipe";
 import CookInfo from "./cook-info";
 import ImageSwipe from "./image-swipe";
 import { use, useEffect, useState } from "react";
@@ -19,6 +19,9 @@ type Recipe = {
   cookTime: string;
   img: string;
   cookingInstruction: string;
+  currentRating: number;
+  totalRating: number;
+  bookmarked: boolean;
   ingredientRecipes: [
     {
       id: number;
@@ -38,12 +41,6 @@ type Recipe = {
       detail: string;
     },
   ];
-  topics: [
-    {
-      id: number;
-      topic: string;
-    },
-  ];
   recipeCategories: [
     {
       id: number;
@@ -54,9 +51,6 @@ type Recipe = {
     id: number;
     star: number;
   };
-  bookmarkUsers: {
-    id: number;
-  }[];
 };
 
 const CookDetail = () => {
@@ -64,19 +58,15 @@ const CookDetail = () => {
   const parts = usePathName.split("/");
   const recipeId = Number(parts[parts.length - 1]);
   const [recipe, setRecipe] = useState<Recipe>();
-  console.log(recipe);
-  console.log(recipeId);
-  const images = [
-    "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/07/hinh-dep.jpg",
-    "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/07/hinh-dep.jpg",
-    "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/07/hinh-dep.jpg",
-  ];
-
-  const { sessionToken } = useAuthStore((store) => store);
+  const { sessionToken, user } = useAuthStore((store) => store);
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
-        const data = await fetchRecipeByIdData(recipeId, sessionToken!);
+        const data = await fetchRecipeByIdData(
+          recipeId!,
+          user?.id,
+          sessionToken!
+        );
         setRecipe(data);
       } catch (error) {
         toast.error("Failed to fetch recipe");
@@ -96,17 +86,18 @@ const CookDetail = () => {
         cookTime={recipe.cookTime}
         prepTime={recipe.prepTime}
       />
-      <Info
+      <BodyRecipe
         recipeId={recipeId}
         avgStar={recipe.avgStar}
         name={recipe.name}
         detail={recipe.detail}
+        currentRating={recipe.currentRating}
         recipeCategories={recipe.recipeCategories}
         noteRecipes={recipe.noteRecipes}
         ingredientRecipes={recipe.ingredientRecipes}
         img={recipe.img}
-        totalRating={recipe.ratingRecipes.length ?? 0}
-        bookmarkUsers={recipe.bookmarkUsers}
+        totalRating={recipe.totalRating}
+        bookmarked={recipe.bookmarked}
       />
       <CookInfo
         cookingInstruction={recipe.cookingInstruction}

@@ -15,6 +15,7 @@ type Recipe = {
   prepTime: string;
   cookDetail: string;
   img: string;
+  bookmarked: boolean;
   recipeCategories: RecipeCategories[];
 };
 
@@ -38,6 +39,7 @@ const ListRecipe = ({ recipes }: { recipes: Recipes }) => {
             recipeCategories={recipe.recipeCategories}
             name={recipe.name}
             avgStar={recipe.avgStar}
+            bookmarked={recipe.bookmarked}
           />
         ))}
       </div>

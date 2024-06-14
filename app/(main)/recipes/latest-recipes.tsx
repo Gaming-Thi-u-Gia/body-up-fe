@@ -32,17 +32,19 @@ const LatestRecipes = () => {
   useEffect(() => {
     const fetchRecipeLatest = async () => {
       try {
-        if (user?.id && sessionToken) {
-          const data = await fetchLatestRecipeData(user.id, sessionToken);
-          setListLatestRecipes(data);
-          console.log("Fetched recipes:", data);
-        }
+        const data = await fetchLatestRecipeData(user?.id, sessionToken!);
+        setListLatestRecipes(data);
+        console.log("Fetched recipes:", data);
       } catch (error) {
         console.error("Error while fetching latest recipe:", error);
       }
     };
     fetchRecipeLatest();
   }, [user?.id, sessionToken]);
+  console.log(
+    "List latest recipes:",
+    JSON.stringify(listLatestRecipes, null, 2)
+  );
   return (
     <div className=" h-full mx-auto">
       <HeaderInfoSearch name="Latest Recipes" description="" id={1} />
@@ -102,7 +104,7 @@ const LatestRecipes = () => {
                 <Heart
                   className="text-[#000000] cursor-pointer"
                   strokeWidth={1}
-                  fill={`${listLatestRecipes[0].bookmarked ? "#FF0000" : "#D5D5D5"}`}
+                  fill={`${listLatestRecipes[0].bookmarked === false ? "#D5D5D5" : "#FF0000"}`}
                   width={24}
                   height={25}
                 />
@@ -149,7 +151,7 @@ const LatestRecipes = () => {
                     strokeWidth={1}
                     width={24}
                     height={25}
-                    fill={`${listLatestRecipes[0].bookmarked === false ? "#D5D5D5" : "#FF0000"}`}
+                    fill={`${listLatestRecipes[1].bookmarked === false ? "#D5D5D5" : "#FF0000"}`}
                   />
                 </div>
               </div>

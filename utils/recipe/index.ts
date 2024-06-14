@@ -20,15 +20,16 @@ export const fetchRecipeWithTopicData = async (
   userId: number,
   sessionToken: string
 ) => {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(userId && sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+  };
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topic${userId ? `?userId=${userId}` : ""}`,
       {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionToken}`,
-        },
+        headers: headers,
       }
     );
     const data = await response.json();
@@ -81,24 +82,32 @@ export const fetchListBookMarkRecipeData = async (
   }
 };
 export const fetchRecipeByIdData = async (
-  userId: number,
-  sessionToken: string
+  recipeId: number,
+  userId: number | undefined,
+  sessionToken: string | undefined
 ) => {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/id?recipeId=${userId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      }
-    );
+    const url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/id?recipeId=${recipeId}${userId ? `&userId=${userId}` : ""}`;
+
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+      ...(userId &&
+        sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    };
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
     const data = await response.json();
     return data;
   } catch (error) {
-    throw new Error(`Error while get bookmark recipe for user`);
+    throw new Error(`Error while getting bookmark recipe for user: ${error}`);
   }
 };
 export const fetchRatingRecipeData = async (
@@ -126,8 +135,8 @@ export const fetchRatingRecipeData = async (
 export const fetchSendRatingRecipe = async (
   recipeId: number,
   userId: number,
-  rating: number,
-  sessionToken: string
+  sessionToken: string,
+  rating: number
 ) => {
   try {
     const response = await fetch(
@@ -207,17 +216,16 @@ export const fetchLatestRecipeData = async (
   userId: number | undefined,
   sessionToken: string | undefined
 ) => {
-  console.log(
-    `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/latest${userId ? `?userId=${userId}` : ""}`
-  );
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(userId && sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+  };
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/latest${userId ? `?userId=${userId}` : ""}`,
       {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: headers,
       }
     );
     const data = await response.json();
