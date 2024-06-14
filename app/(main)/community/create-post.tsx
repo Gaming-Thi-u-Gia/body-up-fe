@@ -70,11 +70,6 @@ const CreatePost = ({ categoryId }: CategoryId) => {
 
         fetchBadge();
     }, []);
-    useEffect(() => {
-        console.log("Updated badges:", badges);
-        console.log("Updated categoryId:", categoryId);
-    }, [badges]);
-
     const onSubmit = (data: z.infer<typeof PostSchema>) => {
         startTransition(async () => {
             try {
