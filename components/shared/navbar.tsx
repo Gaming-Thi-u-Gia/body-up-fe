@@ -38,15 +38,17 @@ export const Navbar = () => {
         });
     };
     return (
-        <nav className='bg-[#F7F7F7] border-b border-[#C4C4C4] fixed w-full z-50'>
-            <div className='max-w-7xl px-2 sm:px-6 lg:px-8 mx-auto '>
-                <div className='h-[56px] flex justify-between items-center font-medium'>
-                    <h3 className='font-bold text-[20px]'>BODY UP!!!</h3>
-                    <ul className='flex justify-between items-center sm:items-stretch text-sm gap-6 h-full'>
+        <nav className="bg-[#F7F7F7] border-b border-[#C4C4C4] fixed w-full z-50">
+            <div className="max-w-7xl px-2 sm:px-6 lg:px-8 mx-auto ">
+                <div className="h-[56px] flex justify-between items-center font-medium">
+                    <Link href="/" className="font-bold text-[20px]">
+                        BODY UP!!!
+                    </Link>
+                    <ul className="flex justify-between items-center sm:items-stretch text-sm gap-6 h-full">
                         {category.map((item) => (
                             <li
                                 key={item.category}
-                                className='flex flex-col items-center justify-center leading-[54px] relative'
+                                className="flex flex-col items-center justify-center leading-[54px] relative"
                             >
                                 <Link href={item.url}>{item.category}</Link>
                                 <hr
@@ -59,35 +61,35 @@ export const Navbar = () => {
                         ))}
                     </ul>
                     {!isLoggedIn ? (
-                        <div className='flex gap-2'>
-                            <Button variant='default' size='sm' asChild>
-                                <Link href='/signup'>Sign up</Link>
+                        <div className="flex gap-2">
+                            <Button variant="default" size="sm" asChild>
+                                <Link href="/signup">Sign up</Link>
                             </Button>
-                            <Button variant='primary' size='sm' asChild>
-                                <Link href='/login'>Log in</Link>
+                            <Button variant="primary" size="sm" asChild>
+                                <Link href="/login">Log in</Link>
                             </Button>
                         </div>
                     ) : (
-                        <div className='absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 gap-4'>
-                            <div className='relative'>
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 gap-4">
+                            <div className="relative">
                                 <button
-                                    type='button'
-                                    className='relative rounded-full p-1 text-gray-400 hover:text-white'
+                                    type="button"
+                                    className="relative rounded-full p-1 text-gray-400 hover:text-white"
                                 >
-                                    <Image src={message} alt='message'></Image>
+                                    <Image src={message} alt="message"></Image>
                                 </button>
-                                <span className='absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full'>
+                                <span className="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
                                     3
                                 </span>
                             </div>
-                            <div className='relative'>
+                            <div className="relative">
                                 <button
-                                    type='button'
-                                    className='relative rounded-full p-1 text-gray-400 hover:text-white'
+                                    type="button"
+                                    className="relative rounded-full p-1 text-gray-400 hover:text-white"
                                 >
-                                    <Image src={notifications} alt='message' />
+                                    <Image src={notifications} alt="message" />
                                 </button>
-                                <span className='absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full'>
+                                <span className="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
                                     3
                                 </span>
                             </div>
@@ -95,13 +97,13 @@ export const Navbar = () => {
                                 <DropdownMenuTrigger asChild>
                                     <Image
                                         src={user?.avatar || defaultProfile}
-                                        alt='Profile'
+                                        alt="Profile"
                                         width={40}
                                         height={40}
-                                        className='rounded-full cursor-pointer'
+                                        className="rounded-full cursor-pointer"
                                     />
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className='w-56'>
+                                <DropdownMenuContent className="w-56">
                                     <DropdownMenuLabel>
                                         My Account
                                     </DropdownMenuLabel>
@@ -109,19 +111,19 @@ export const Navbar = () => {
                                     <DropdownMenuGroup>
                                         <DropdownMenuItem>
                                             <Link
-                                                href='/profile'
-                                                className='w-full flex items-center'
+                                                href="/profile"
+                                                className="w-full flex items-center"
                                             >
-                                                <User className='mr-2 h-4 w-4' />
+                                                <User className="mr-2 h-4 w-4" />
                                                 Profile
                                             </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem>
                                             <Link
-                                                href='/settings/preferences '
-                                                className='w-full flex items-center'
+                                                href="/settings/preferences "
+                                                className="w-full flex items-center"
                                             >
-                                                <Settings className='mr-2 h-4 w-4' />
+                                                <Settings className="mr-2 h-4 w-4" />
                                                 Settings
                                             </Link>
                                         </DropdownMenuItem>
@@ -139,8 +141,8 @@ export const Navbar = () => {
                                             onClick(e);
                                         }}
                                     >
-                                        <span className='w-full flex items-center cursor-pointer'>
-                                            <LogOut className='mr-2 h-4 w-4' />
+                                        <span className="w-full flex items-center cursor-pointer">
+                                            <LogOut className="mr-2 h-4 w-4" />
                                             Log out
                                         </span>
                                     </DropdownMenuItem>
