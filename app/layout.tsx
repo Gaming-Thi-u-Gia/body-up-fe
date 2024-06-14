@@ -12,6 +12,7 @@ import { DeleteAvatarModal } from "@/components/modals/delete-avatar-modal";
 import { Toaster } from "@/components/ui/sonner";
 import { VerifyCodeModel } from "@/components/modals/verify-code-modal";
 import { VerifyResetCodeModel } from "@/components/modals/verify-reset-code-modal";
+import "photoswipe/dist/photoswipe.css";
 const font = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

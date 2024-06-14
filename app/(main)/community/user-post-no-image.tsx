@@ -67,7 +67,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
             }
         };
         getPostsByCategory();
-    }, []);
+    }, [categoryId]);
 
     const pathname = usePathname();
     const pathParts = pathname.split("/");
