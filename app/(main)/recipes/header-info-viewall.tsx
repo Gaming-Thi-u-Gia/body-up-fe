@@ -2,14 +2,13 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const HeaderInfoViewAll = ({
+  id,
   name,
   description,
-  id,
 }: {
   name: string;
   description: string;
   id: number;
-  // detail: String;
 }) => {
   return (
     <>

@@ -1,5 +1,5 @@
 import React from "react";
-import CardRecipe from "../../cart-recipe";
+import CardRecipe from "../../card-recipe";
 import { useAuthStore } from "@/components/providers/auth-provider";
 
 type RecipeCategories = {

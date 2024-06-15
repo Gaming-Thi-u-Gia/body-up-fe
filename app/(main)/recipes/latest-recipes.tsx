@@ -2,20 +2,21 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import HeaderInfoSearch from "./header-info-viewall";
 import Star from "./star-rating";
 import { Heart } from "lucide-react";
-import { fetchLatestRecipeData } from "@/utils/recipe";
+import { fetchLatestRecipeData, fetchSendBookmarkRecipe } from "@/utils/recipe";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { initialName } from "@/utils/recipe";
 import Link from "next/link";
+import { toast } from "sonner";
 type Recipe = {
   id: number;
   name: string;
   detail: string;
   avgStar: number;
   img: string;
+  currentRating: number;
   bookmarked: boolean;
   recipeCategories: RecipeCategories[];
 };
@@ -28,23 +29,43 @@ type RecipeCategories = {
 const LatestRecipes = () => {
   const [listLatestRecipes, setListLatestRecipes] = useState<Recipe[]>([]);
   const { user, sessionToken } = useAuthStore((store) => store);
-
+  const [bookmarks, setBookmarks] = useState<{ [key: number]: boolean }>({});
   useEffect(() => {
     const fetchRecipeLatest = async () => {
       try {
-        const data = await fetchLatestRecipeData(user?.id, sessionToken!);
+        const data = await fetchLatestRecipeData(sessionToken!);
         setListLatestRecipes(data);
-        console.log("Fetched recipes:", data);
+        setBookmarks({
+          [data[0].id]: data[0].bookmarked,
+          [data[1].id]: data[1].bookmarked,
+        });
       } catch (error) {
         console.error("Error while fetching latest recipe:", error);
       }
     };
     fetchRecipeLatest();
   }, [user?.id, sessionToken]);
-  console.log(
-    "List latest recipes:",
-    JSON.stringify(listLatestRecipes, null, 2)
-  );
+  const handleBookmark = async (id: number) => {
+    try {
+      const currentBookmark = bookmarks[id];
+      await fetchSendBookmarkRecipe(id, sessionToken!);
+      setBookmarks((prevBookmarks) => ({
+        ...prevBookmarks,
+        [id]: !currentBookmark,
+      }));
+      toast.success(
+        `${!currentBookmark ? "Bookmark success fully" : "Delete Bookmark Successfully"} `
+      );
+    } catch (error) {
+      toast.error("Please login account", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
+    }
+  };
   return (
     <div className=" h-full mx-auto">
       <HeaderInfoSearch name="Latest Recipes" description="" id={1} />
@@ -85,10 +106,16 @@ const LatestRecipes = () => {
             </div>
             <div className="flex-1 ml-10px relative h-[90%]">
               <p className="text-[18px] font-medium leading-[150%] tracking-wide h-[15%] text-[#303033] cursor-pointer">
-                <a href="#">{listLatestRecipes[0].name}</a>
+                <Link href={`/recipes/${listLatestRecipes[0].id}`}>
+                  {listLatestRecipes[0].name}
+                </Link>
               </p>
               <div className="h-[10%] ">
-                <Star avgStar={listLatestRecipes[0].avgStar} />
+                <Star
+                  id={listLatestRecipes[0].id}
+                  avgStar={listLatestRecipes[0].avgStar}
+                  currentRating={listLatestRecipes[0].currentRating}
+                />
               </div>
               <p className="text-[14px] font-normal leading-[140%] h-[65%] ">
                 {listLatestRecipes[0].detail}
@@ -99,14 +126,17 @@ const LatestRecipes = () => {
                   variant="primaryOutline"
                   size="default"
                 >
-                  <a href="#">View Recipe</a>
+                  <Link href={`/recipes/${listLatestRecipes[0].id}`}>
+                    View Recipe
+                  </Link>
                 </Button>
                 <Heart
                   className="text-[#000000] cursor-pointer"
                   strokeWidth={1}
-                  fill={`${listLatestRecipes[0].bookmarked === false ? "#D5D5D5" : "#FF0000"}`}
+                  fill={`${bookmarks[listLatestRecipes[0].id] === false ? "#D5D5D5" : "#FF0000"}`}
                   width={24}
                   height={25}
+                  onClick={() => handleBookmark(listLatestRecipes[0].id)}
                 />
               </div>
             </div>
@@ -144,14 +174,19 @@ const LatestRecipes = () => {
                 )}
               </div>
               <div className="flex w-full justify-between absolute top-3 px-5">
-                <Star avgStar={listLatestRecipes[1].avgStar} />
+                <Star
+                  id={listLatestRecipes[1].id}
+                  avgStar={listLatestRecipes[1].avgStar}
+                  currentRating={listLatestRecipes[1].currentRating}
+                />
                 <div className="flex">
                   <Heart
                     className="text-[#000000] cursor-pointer"
                     strokeWidth={1}
                     width={24}
                     height={25}
-                    fill={`${listLatestRecipes[1].bookmarked === false ? "#D5D5D5" : "#FF0000"}`}
+                    fill={`${bookmarks[listLatestRecipes[1].id] === false ? "#D5D5D5" : "#FF0000"}`}
+                    onClick={() => handleBookmark(listLatestRecipes[1].id)}
                   />
                 </div>
               </div>

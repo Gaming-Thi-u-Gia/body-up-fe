@@ -1,8 +1,8 @@
 type Props = {
   img: string;
   name: string;
-  cookTime: string;
-  prepTime: string;
+  cookTime: number;
+  prepTime: number;
 };
 const Slider = ({ img, name, cookTime, prepTime }: Props) => {
   return (
@@ -38,7 +38,7 @@ const Slider = ({ img, name, cookTime, prepTime }: Props) => {
               </div>
               <div>
                 <div className="w-[50px] h-[50px] rounded-full bg-[#AFB4B8] mb-1 text-[14px] font-semibold border-white border-[2px]">
-                  <div>{parseInt(prepTime) + parseInt(cookTime)}</div>
+                  <div>{prepTime + cookTime}</div>
                   <div>min</div>
                 </div>
                 <text className="text-[11px] ">Total</text>

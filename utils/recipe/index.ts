@@ -1,4 +1,3 @@
-import { use } from "react";
 export const fetchTopicRecipeData = async () => {
   try {
     const response = await fetch(
@@ -16,17 +15,14 @@ export const fetchTopicRecipeData = async () => {
     throw new Error(`Error while fetching data recipe collection`);
   }
 };
-export const fetchRecipeWithTopicData = async (
-  userId: number,
-  sessionToken: string
-) => {
+export const fetchRecipeWithTopicData = async (sessionToken: string) => {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    ...(userId && sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
   };
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topic${userId ? `?userId=${userId}` : ""}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topic`,
       {
         method: "GET",
         headers: headers,
@@ -39,13 +35,12 @@ export const fetchRecipeWithTopicData = async (
   }
 };
 export const fetchToggleRecipe = async (
-  userId: number,
   recipeId: number,
   sessionToken: string
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/bookmark-recipe/toggle?recipeId=${userId}&userId=${recipeId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/bookmark-recipe/toggle?recipeId=${recipeId}`,
       {
         method: "POST",
         headers: {
@@ -60,13 +55,10 @@ export const fetchToggleRecipe = async (
     throw new Error(`Error while toggle recipe`);
   }
 };
-export const fetchListBookMarkRecipeData = async (
-  userId: number,
-  sessionToken: string
-) => {
+export const fetchListBookMarkRecipeData = async (sessionToken: string) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/bookmark-recipe?userId=${userId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/bookmark-recipe`,
       {
         method: "GET",
         headers: {
@@ -83,16 +75,14 @@ export const fetchListBookMarkRecipeData = async (
 };
 export const fetchRecipeByIdData = async (
   recipeId: number,
-  userId: number | undefined,
   sessionToken: string | undefined
 ) => {
   try {
-    const url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/id?recipeId=${recipeId}${userId ? `&userId=${userId}` : ""}`;
+    const url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/id?recipeId=${recipeId}`;
 
     const headers: HeadersInit = {
       "Content-Type": "application/json",
-      ...(userId &&
-        sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+      ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
     };
 
     const response = await fetch(url, {
@@ -111,13 +101,12 @@ export const fetchRecipeByIdData = async (
   }
 };
 export const fetchRatingRecipeData = async (
-  userId: number,
   recipeId: number,
   sessionToken: string
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/recipe-rating?recipeId=${recipeId}&userId=${userId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/recipe-rating?recipeId=${recipeId}`,
       {
         method: "GET",
         headers: {
@@ -134,13 +123,12 @@ export const fetchRatingRecipeData = async (
 };
 export const fetchSendRatingRecipe = async (
   recipeId: number,
-  userId: number,
   sessionToken: string,
   rating: number
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/recipe-rating/rating?recipeId=${recipeId}&userId=${userId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/recipe-rating/rating?recipeId=${recipeId}`,
       {
         method: "POST",
         headers: {
@@ -158,12 +146,11 @@ export const fetchSendRatingRecipe = async (
 };
 export const fetchSendBookmarkRecipe = async (
   recipeId: number,
-  userId: number,
   sessionToken: string
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/bookmark-recipe/toggle?recipeId=${recipeId}&userId=${userId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/bookmark-recipe/toggle?recipeId=${recipeId}`,
       {
         method: "POST",
         headers: {
@@ -213,16 +200,15 @@ export const fetchPopularCategoryData = async () => {
   }
 };
 export const fetchLatestRecipeData = async (
-  userId: number | undefined,
   sessionToken: string | undefined
 ) => {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    ...(userId && sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
   };
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/latest${userId ? `?userId=${userId}` : ""}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/latest`,
       {
         method: "GET",
         headers: headers,

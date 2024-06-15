@@ -1,5 +1,4 @@
 "use client";
-import { title } from "process";
 import Slider from "./slider";
 import BodyRecipe from "./body-recipe";
 import CookInfo from "./cook-info";
@@ -10,13 +9,13 @@ import { useAuthStore } from "@/components/providers/auth-provider";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 /* eslint-disable @next/next/no-img-element */
-type Recipe = {
+export type RecipeDetailType = {
   id: number;
   name: string;
   detail: string;
   avgStar: number;
-  prepTime: string;
-  cookTime: string;
+  prepTime: number;
+  cookTime: number;
   img: string;
   cookingInstruction: string;
   currentRating: number;
@@ -57,16 +56,12 @@ const CookDetail = () => {
   const usePathName = usePathname();
   const parts = usePathName.split("/");
   const recipeId = Number(parts[parts.length - 1]);
-  const [recipe, setRecipe] = useState<Recipe>();
+  const [recipe, setRecipe] = useState<RecipeDetailType>();
   const { sessionToken, user } = useAuthStore((store) => store);
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
-        const data = await fetchRecipeByIdData(
-          recipeId!,
-          user?.id,
-          sessionToken!
-        );
+        const data = await fetchRecipeByIdData(recipeId!, sessionToken!);
         setRecipe(data);
       } catch (error) {
         toast.error("Failed to fetch recipe");
@@ -86,19 +81,7 @@ const CookDetail = () => {
         cookTime={recipe.cookTime}
         prepTime={recipe.prepTime}
       />
-      <BodyRecipe
-        recipeId={recipeId}
-        avgStar={recipe.avgStar}
-        name={recipe.name}
-        detail={recipe.detail}
-        currentRating={recipe.currentRating}
-        recipeCategories={recipe.recipeCategories}
-        noteRecipes={recipe.noteRecipes}
-        ingredientRecipes={recipe.ingredientRecipes}
-        img={recipe.img}
-        totalRating={recipe.totalRating}
-        bookmarked={recipe.bookmarked}
-      />
+      <BodyRecipe recipebody={recipe} />
       <CookInfo
         cookingInstruction={recipe.cookingInstruction}
         noteRecipes={recipe.noteRecipes}

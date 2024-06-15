@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { fetchTopicRecipeData } from "@/utils/recipe";
+import Link from "next/link";
 type TopicRecipes = {
   id: number;
   topic: string;
@@ -56,7 +57,9 @@ const NavbarRecipes = () => {
                   className=" py-[5px] px-5 hover:text-[#000000d9] hover:bg-[#F7F7F7] cursor-pointer whitespace-nowrap text-[14px]"
                   key={index}
                 >
-                  {topicRecipe.name}
+                  <Link href={`/recipes/c/id=${topicRecipe.id}`}>
+                    {topicRecipe.name}
+                  </Link>
                 </li>
               );
             })}

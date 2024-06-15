@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
-import CookDetail from "./page";
-type Props = {
+type CookInfoType = {
   cookingInstruction: string;
   noteRecipes: [
     {
@@ -10,7 +9,7 @@ type Props = {
     },
   ];
 };
-const CookInfo = ({ cookingInstruction, noteRecipes }: Props) => {
+const CookInfo = ({ cookingInstruction, noteRecipes }: CookInfoType) => {
   return (
     <div className="flex max-w-7xl text-[22px] m-auto my-20 items-center">
       <div className="w-[60%] pr-20 leading-10">

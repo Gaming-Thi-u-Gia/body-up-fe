@@ -7,75 +7,58 @@ import {
   fetchSendRatingRecipe,
 } from "@/utils/recipe";
 import { Heart, Star } from "lucide-react";
-import Image from "next/image";
-import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
+import { RecipeDetailType } from "./page";
 
-type Props = {
-  recipeId: number;
-  name: string;
-  detail: string;
-  bookmarked: boolean;
-  avgStar: number;
-  totalRating: number;
-  currentRating: number;
-  ingredientRecipes: {
-    id: number;
-    amount: string;
-    name: string;
-  }[];
-  recipeCategories: {
-    id: number;
-    name: string;
-  }[];
-  img: string;
-  noteRecipes: {
-    id: number;
-    detail: string;
-  }[];
-};
-
-const BodyRecipe = ({
-  recipeId,
-  avgStar,
-  recipeCategories,
-  ingredientRecipes,
-  currentRating,
-  name,
-  detail,
-  img,
-  totalRating,
-  bookmarked,
-}: Props) => {
+const BodyRecipe = ({ recipebody }: { recipebody: RecipeDetailType }) => {
   const [hover, setHover] = useState<null | number>(null);
-  const [bookmark, setBookmark] = useState<boolean>(bookmarked);
-  const [rating, setRating] = useState<number>(currentRating);
-  const { user, sessionToken } = useAuthStore((store) => store);
-  console.log(currentRating);
+  const [bookmark, setBookmark] = useState<boolean>(recipebody.bookmarked);
+  const [rating, setRating] = useState<number>(recipebody.currentRating);
+  const { sessionToken } = useAuthStore((store) => store);
   const handleBookmark = async () => {
     try {
-      await fetchSendBookmarkRecipe(recipeId, user?.id!, sessionToken!);
-      setBookmark(!bookmark);
-      toast.success(
-        `${!bookmark ? "Book mark success fully" : "Delete Bookmark Successfully"} `
+      const response = await fetchSendBookmarkRecipe(
+        recipebody.id,
+        sessionToken!
       );
+      setBookmark(response.bookmarked);
+      toast.success("Bookmark Recipe Successfully", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     } catch (error) {
-      console.log("Loi SendFeedbback");
+      toast.error("Please login account", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
   const handleRating = async (numberStar: number) => {
     try {
-      await fetchSendRatingRecipe(
-        recipeId,
-        user?.id!,
-        sessionToken!,
-        numberStar
-      );
+      await fetchSendRatingRecipe(recipebody.id, sessionToken!, numberStar);
       setRating(numberStar);
-      toast.success("Rating Successfully");
+      toast.success("Bookmark Recipe Successfully", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     } catch (error) {
-      console.log("Loi SendFeedbback");
+      toast.error("Please login account", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
   return (
@@ -84,7 +67,7 @@ const BodyRecipe = ({
         <div className="grid grid-cols-2 w-full h-full items-center">
           <div className="w-full h-full border-r-2 border-[#C4C4C4]">
             <div className="mt-[10%]">
-              {recipeCategories.map((category) => (
+              {recipebody.recipeCategories.map((category) => (
                 <a
                   key={category.id}
                   href="#"
@@ -95,7 +78,7 @@ const BodyRecipe = ({
               ))}
             </div>
             <p className="text-[32px] leading-[45px] text-[#303033] my-10">
-              {detail}
+              {recipebody.detail}
             </p>
             <div>
               <div className="flex text-[#868A93] text-[13px] items-stretch">
@@ -116,7 +99,7 @@ const BodyRecipe = ({
                   </span>
                   <div className="pl-5">
                     <p>
-                      Avg {avgStar} stars ({totalRating})
+                      Avg {recipebody.avgStar} stars ({recipebody.totalRating})
                     </p>
                   </div>
                 </div>
@@ -138,8 +121,8 @@ const BodyRecipe = ({
             </div>
             <img
               className="w-[90%] h-[700px] object-cover mb-[10%]"
-              src={img}
-              alt={name}
+              src={recipebody.img}
+              alt={recipebody.name}
             />
           </div>
           <div className="flex w-full h-full items-center">
@@ -147,7 +130,7 @@ const BodyRecipe = ({
               <div>
                 <p className="text-[25px] font-bold mb-5">Ingredients</p>
                 <div>
-                  {ingredientRecipes.map((ing) => (
+                  {recipebody.ingredientRecipes.map((ing) => (
                     <div key={ing.id} className="flex py-1">
                       <p className="min-w-20 text-[20px] font-semibold pr-5">
                         {ing.amount}

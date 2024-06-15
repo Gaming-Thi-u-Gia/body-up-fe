@@ -2,74 +2,46 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import HeaderInfoViewAll from "./header-info-viewall";
-import CardRecipe from "./cart-recipe";
-import {
-  fetchListBookMarkRecipeData,
-  fetchRecipeWithTopicData,
-} from "@/utils/recipe/index";
+import CardRecipe from "./card-recipe";
+import { fetchRecipeWithTopicData } from "@/utils/recipe/index";
 import { useAuthStore } from "@/components/providers/auth-provider";
-import { toast } from "sonner";
-type listRecipes = {
-  id: number;
-  name: string;
-  avgStar: number;
-  img: string;
-  bookmarked: boolean;
-  recipeCategories: ListRecipeCategories[];
-};
-type ListRecipeCategories = {
-  id: number;
-  name: string;
-  type: string;
-};
+
 type TopicRecipes = {
   id: number;
   name: string;
   description: string;
-  recipes: listRecipes[];
+  recipes: Recipe[];
 };
-type ListBookmarkRecipeForUser = {
+export type Recipe = {
   id: number;
-  bookmarkRecipes: bookmarkRecipes[];
-};
-type bookmarkRecipes = {
-  id: number;
+  name: string;
+  detail: string;
+  avgStar: number;
+  img: string;
+  currentRating: number;
+  bookmarked: boolean;
+  recipeCategories: [
+    {
+      id: number;
+      name: string;
+    },
+  ];
 };
 
 const RecipeCategoryList = () => {
-  const { user, sessionToken } = useAuthStore((store) => store);
+  const { sessionToken } = useAuthStore((store) => store);
   const [topicRecipes, setTopicRecipes] = useState<TopicRecipes[]>([]);
-  const [listBookmarkRecipesForUser, setListBookmarkRecipesForUser] = useState<
-    ListBookmarkRecipeForUser[]
-  >([]);
-
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const data = await fetchRecipeWithTopicData(
-          user?.id as number,
-          sessionToken as string
-        );
+        const data = await fetchRecipeWithTopicData(sessionToken as string);
         setTopicRecipes(data);
       } catch (error) {
         console.log(error);
       }
     };
-    const fetchBookmarkRecipe = async () => {
-      try {
-        const data = await fetchListBookMarkRecipeData(
-          user?.id as number,
-          sessionToken as string
-        );
-        setListBookmarkRecipesForUser(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchBookmarkRecipe();
     fetchRecipes();
-  }, [user?.id, sessionToken]);
-
+  }, [sessionToken]);
   return (
     <div>
       {topicRecipes.map((topicRecipe, index) => (
@@ -81,16 +53,7 @@ const RecipeCategoryList = () => {
           />
           <div className="grid grid-cols-4 gap-5">
             {topicRecipe.recipes.map((recipe, index) => (
-              <CardRecipe
-                key={recipe.id}
-                userId={user?.id as number}
-                id={recipe.id}
-                img={recipe.img}
-                recipeCategories={recipe.recipeCategories as []}
-                name={recipe.name}
-                avgStar={recipe.avgStar}
-                bookmarked={recipe.bookmarked}
-              />
+              <CardRecipe recipe={recipe} />
             ))}
           </div>
         </div>
