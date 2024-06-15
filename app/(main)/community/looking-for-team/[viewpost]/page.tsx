@@ -20,7 +20,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import back_Icon from "/public/back-icon.svg";
 import { usePathname } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { Bookmark, ChevronDown } from "lucide-react";
 
 import {
     DropdownMenu,
@@ -32,6 +32,7 @@ import {
 import Comment from "../../comment";
 import {
     createComment,
+    fetchBookmarkPost,
     fetchCommentData,
     fetchPostById,
 } from "@/utils/community";
@@ -63,7 +64,7 @@ export type Comments = {
     };
 };
 
-const LookingForTeamPost = () => {
+const Post = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
@@ -78,6 +79,7 @@ const LookingForTeamPost = () => {
             detail: "",
         },
     });
+    const [isBookmarked, setIsBookmarked] = useState(false);
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -96,15 +98,61 @@ const LookingForTeamPost = () => {
     useEffect(() => {
         const fetchFullPost = async () => {
             try {
-                const data = await fetchPostById(Number(postId));
+                const data = await fetchPostById(Number(postId), sessionToken!);
                 console.log(data);
+                setIsBookmarked(data.bookmarked);
                 setPosts(data);
             } catch (error) {
                 toast.error("Something went wrong");
             }
         };
         fetchFullPost();
-    }, [postId]);
+    }, [sessionToken, postId]);
+
+    const handleBookmark = async () => {
+        try {
+            if (!sessionToken)
+                return toast.error("You Need To Sign In To Bookmark!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+
+            const data = await fetchBookmarkPost(Number(postId), sessionToken!);
+            console.log(data);
+            setIsBookmarked(data.bookmarked);
+            console.log(data.bookmarked);
+            if (data.bookmarked === true) {
+                toast.success("Post Bookmarked Successfully!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            } else {
+                toast.success("Post Removed Bookmark Successfully!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            }
+        } catch (error) {
+            console.error("Error during API call:", error);
+            toast.error("Something Went Wrong!.", {
+                description: `${new Date().toLocaleString()}`,
+                action: {
+                    label: "Close",
+                    onClick: () => console.log("Close"),
+                },
+            });
+        }
+    };
+
     const onSubmit = (data: z.infer<typeof CommentSchema>) => {
         console.log(data);
 
@@ -304,12 +352,12 @@ const LookingForTeamPost = () => {
                     <Button
                         variant="secondary"
                         className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
+                        onClick={() => handleBookmark()}
                     >
-                        <Image
-                            src={saved_icon}
-                            alt="logo"
-                            width={20}
-                            height={20}
+                        <Bookmark
+                            size={20}
+                            fill={isBookmarked ? "#7065cd" : "transparent"}
+                            strokeWidth={1}
                         />
                         <span className="text-[12px]">Saved</span>
                     </Button>
@@ -402,4 +450,4 @@ const LookingForTeamPost = () => {
     );
 };
 
-export default LookingForTeamPost;
+export default Post;

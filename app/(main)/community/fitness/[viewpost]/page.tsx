@@ -64,7 +64,7 @@ export type Comments = {
     };
 };
 
-const FitnessPost = () => {
+const Post = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
@@ -450,4 +450,4 @@ const FitnessPost = () => {
     );
 };
 
-export default FitnessPost;
+export default Post;
