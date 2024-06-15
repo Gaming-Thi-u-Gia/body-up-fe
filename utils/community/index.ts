@@ -49,15 +49,20 @@ export const createPostNoImage = async (
     }
 };
 
-export const fetchPostData = async (categoryId: number) => {
+export const fetchPostData = async (
+    categoryId: number,
+    sessionToken: string
+) => {
+    const headers: HeadersInit = {
+        "Content-Type": "application/json",
+        ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    };
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/getAllPostByCategory?categoryId=${categoryId}`,
             {
                 method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: headers,
             }
         ).then(async (res) => {
             if (!res.ok) {
@@ -74,15 +79,17 @@ export const fetchPostData = async (categoryId: number) => {
     }
 };
 
-export const fetchPostById = async (postId: number) => {
+export const fetchPostById = async (postId: number, sessionToken: string) => {
+    const headers: HeadersInit = {
+        "Content-Type": "application/json",
+        ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    };
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/getPostById?postId=${postId}`,
             {
                 method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: headers,
             }
         ).then(async (res) => {
             if (!res.ok) {
@@ -181,21 +188,21 @@ export const fetchBookmarkPost = async (
     sessionToken: string
 ) => {
     try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/bookmarkPosts?postId=${postId}`,
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/bookmarkPosts?postId=${postId}`,
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${sessionToken}`,
-                    credentials: "include",
                 },
             }
-        ).then(async (res) => {
-            const data = await res.json();
-            return data;
-        });
-        return res;
+        );
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
     } catch (error) {
         throw new Error("Error while fetching bookmark post");
     }

@@ -4,7 +4,6 @@ import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import fitness_icon from "/public/fitness-icon.svg";
 import message_icon from "/public/message-icon.svg";
-import saved_icon from "/public/saved-posts-icon.svg";
 import share_icon from "/public/share-icon.svg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -19,12 +18,15 @@ import {
 } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
 import { Bookmark } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { fetchPostData } from "@/utils/community";
+import { formatDistanceToNow, set } from "date-fns";
+import { fetchBookmarkPost, fetchPostData } from "@/utils/community";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import { toast } from "sonner";
 export type Posts = {
     id: number;
     title: string;
     description: string;
+    bookmarked: boolean;
     user: {
         id: number;
         firstName: string;
@@ -47,19 +49,30 @@ export type Posts = {
 type CategoryId = {
     categoryId: number;
 };
+type BookmarkStatus = {
+    [key: number]: boolean;
+};
+
 const PostUser = ({ categoryId }: CategoryId) => {
     const [posts, setPosts] = useState<Posts[]>([]);
-
+    const { sessionToken } = useAuthStore((store) => store);
+    const [isBookmarked, setIsBookmarked] = useState<{
+        [key: number]: boolean;
+    }>({});
     useEffect(() => {
         const getPostsByCategory = async () => {
             try {
-                const data = await fetchPostData(categoryId);
-                const formattedData = data.map((post: Posts) => ({
-                    ...post,
-                    created_at: new Date(post.created_at),
-                }));
-
-                setPosts(formattedData);
+                const data = await fetchPostData(categoryId, sessionToken!);
+                // const formattedData = data.map((post: Posts) => ({
+                //     ...post,
+                //     created_at: new Date(post.created_at),
+                // }));
+                setPosts(data);
+                const bookmarkStatus: BookmarkStatus = {};
+                data.forEach((post: Posts) => {
+                    bookmarkStatus[post.id] = post.bookmarked;
+                });
+                setIsBookmarked(bookmarkStatus);
                 console.log(data);
                 console.log("hello");
             } catch (error) {
@@ -67,7 +80,59 @@ const PostUser = ({ categoryId }: CategoryId) => {
             }
         };
         getPostsByCategory();
-    }, [categoryId]);
+    }, [categoryId, sessionToken]);
+
+    const handleBookmark = async (id: number) => {
+        try {
+            if (!sessionToken) {
+                toast.error("You Need To Sign In To Bookmark!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+                return;
+            }
+
+            const response = await fetchBookmarkPost(id, sessionToken!);
+            console.log(response);
+            if (response && response.bookmarked !== undefined) {
+                const updatedPosts = posts.map((post) =>
+                    post.id === id
+                        ? { ...post, bookmarked: response.bookmarked }
+                        : post
+                );
+                setPosts(updatedPosts);
+                setIsBookmarked({
+                    ...isBookmarked,
+                    [id]: response.bookmarked,
+                });
+                console.log(isBookmarked);
+                if (response.bookmarked) {
+                    toast.success("Post Bookmarked!", {
+                        description: `${new Date().toLocaleString()}`,
+                        action: {
+                            label: "Close",
+                            onClick: () => console.log("Close"),
+                        },
+                    });
+                } else {
+                    toast.success("Post Unbookmarked!", {
+                        description: `${new Date().toLocaleString()}`,
+                        action: {
+                            label: "Close",
+                            onClick: () => console.log("Close"),
+                        },
+                    });
+                }
+            } else {
+                throw new Error("Invalid response structure from backend");
+            }
+        } catch (error) {
+            toast.error("Error while bookmarking post!");
+        }
+    };
 
     const pathname = usePathname();
     const pathParts = pathname.split("/");
@@ -248,12 +313,16 @@ const PostUser = ({ categoryId }: CategoryId) => {
                         <Button
                             variant="secondary"
                             className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
+                            onClick={() => handleBookmark(post.id)}
                         >
                             <Bookmark
                                 size={20}
-                                // className="text-red-500"
-                                // fill="red"
-                                // strokeWidth="0"
+                                fill={
+                                    isBookmarked[post.id]
+                                        ? "#7065cd"
+                                        : "transparent"
+                                }
+                                strokeWidth={1}
                             />
                             <span className="text-[12px]">Saved</span>
                         </Button>
