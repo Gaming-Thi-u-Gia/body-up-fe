@@ -12,10 +12,14 @@ import { toast } from "sonner";
 import { RecipeDetailType } from "./page";
 
 const BodyRecipe = ({ recipebody }: { recipebody: RecipeDetailType }) => {
-  const [hover, setHover] = useState<null | number>(null);
-  const [bookmark, setBookmark] = useState<boolean>(recipebody.bookmarked);
-  const [rating, setRating] = useState<number>(recipebody.currentRating);
   const { sessionToken } = useAuthStore((store) => store);
+  const [hover, setHover] = useState<null | number>(null);
+  const [rating, setRating] = useState<number>(recipebody.currentRating);
+  const [bookmark, setBookmark] = useState<boolean>(recipebody.bookmarked);
+  const [averageStar, setAverageStar] = useState<number>(recipebody.avgStar);
+  const [totalRating, setTotalRating] = useState<number>(
+    recipebody.totalRating
+  );
   const handleBookmark = async () => {
     try {
       const response = await fetchSendBookmarkRecipe(
@@ -42,9 +46,16 @@ const BodyRecipe = ({ recipebody }: { recipebody: RecipeDetailType }) => {
   };
   const handleRating = async (numberStar: number) => {
     try {
-      await fetchSendRatingRecipe(recipebody.id, sessionToken!, numberStar);
-      setRating(numberStar);
-      toast.success("Bookmark Recipe Successfully", {
+      const response = await fetchSendRatingRecipe(
+        recipebody.id,
+        sessionToken!,
+        numberStar
+      );
+      console.log("Response from API:", response);
+      setRating(response.star);
+      setAverageStar(response.avgStar);
+      setTotalRating(response.totalRating);
+      toast.success("Rating Recipe Successfully", {
         description: `${new Date().toLocaleString()}`,
         action: {
           label: "Close",
@@ -52,6 +63,7 @@ const BodyRecipe = ({ recipebody }: { recipebody: RecipeDetailType }) => {
         },
       });
     } catch (error) {
+      console.error("Error sending rating:", error);
       toast.error("Please login account", {
         description: `${new Date().toLocaleString()}`,
         action: {
@@ -61,6 +73,7 @@ const BodyRecipe = ({ recipebody }: { recipebody: RecipeDetailType }) => {
       });
     }
   };
+
   return (
     <div className="border-b-2 border-[#C4C4C4]">
       <div className="flex m-auto max-w-7xl h-auto box-border">
@@ -99,7 +112,8 @@ const BodyRecipe = ({ recipebody }: { recipebody: RecipeDetailType }) => {
                   </span>
                   <div className="pl-5">
                     <p>
-                      Avg {recipebody.avgStar} stars ({recipebody.totalRating})
+                      Avg {parseFloat(averageStar.toFixed(2))} stars (
+                      {totalRating})
                     </p>
                   </div>
                 </div>

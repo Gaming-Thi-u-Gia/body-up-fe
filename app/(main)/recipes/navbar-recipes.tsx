@@ -6,20 +6,22 @@ import { toast } from "sonner";
 import { fetchTopicRecipeData } from "@/utils/recipe";
 import Link from "next/link";
 import { useAuthStore } from "@/components/providers/auth-provider";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 type TopicRecipe = {
   id: number;
   topic: string;
   name: string;
 };
+
 const NavbarRecipes = () => {
   const { sessionToken } = useAuthStore((store) => store);
-
+  const [search, setSearch] = useState<string>("");
   const [topicRecipes, setTopicRecipes] = useState<TopicRecipe[]>([
     { id: -1, topic: "View All Collection", name: "View All Collection" },
     { id: 0, topic: "Latest Recipes", name: "Latest Recipes" },
   ]);
+
   useEffect(() => {
     const fetchTopicRecipes = async () => {
       try {
@@ -31,9 +33,12 @@ const NavbarRecipes = () => {
     };
     fetchTopicRecipes();
   }, []);
+  const router = useRouter();
+
   const [showCollection, setShowCollection] = useState<boolean>(false);
+
   return (
-    <div className="  h-full mx-auto flex py-[20px] justify-between items-center border-b border-gray-300">
+    <div className="h-full mx-auto flex py-[20px] justify-between items-center border-b border-gray-300">
       <div className="h-full relative">
         <Button
           color="bg-black"
@@ -48,13 +53,13 @@ const NavbarRecipes = () => {
         </Button>
         <div
           id="list__cate"
-          className=" mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px]"
+          className="mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px]"
         >
           <ul>
             {showCollection &&
               topicRecipes.map((topicRecipe, index) => (
                 <li
-                  className=" py-[5px] px-5 hover:text-[#000000d9] hover:bg-[#F7F7F7] cursor-pointer whitespace-nowrap text-[14px]"
+                  className="py-[5px] px-5 hover:text-[#000000d9] hover:bg-[#F7F7F7] cursor-pointer whitespace-nowrap text-[14px]"
                   key={index}
                 >
                   <Link href={`/recipes/c/id=${topicRecipe.id}`}>
@@ -66,7 +71,7 @@ const NavbarRecipes = () => {
         </div>
       </div>
       <div className="flex h-8">
-        <div className="group inline-flex h-full ">
+        <div className="group inline-flex h-full">
           <span className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out h-full">
             <Button variant="defaultOutline" size="default">
               <Image width={20} height={20} src="/search.svg" alt="More" />
@@ -80,10 +85,14 @@ const NavbarRecipes = () => {
               height={20}
               src="/search.svg"
               alt="More"
+              onClick={() =>
+                router.push(`/recipes/search/recipeName=${search}`)
+              }
             />
             <input
               className="pl-5 w-full rounded-[15px] border-2 border-black"
               placeholder="Search"
+              onChange={(e) => setSearch(e.target.value)}
             />
           </span>
         </div>
@@ -102,7 +111,7 @@ const NavbarRecipes = () => {
           ) : (
             <div className="group relative cursor-not-allowed">
               <Button
-                className="bg-transparent mr-1 "
+                className="bg-transparent mr-1"
                 variant="disabled"
                 size="default"
                 disabled
@@ -125,5 +134,4 @@ const NavbarRecipes = () => {
     </div>
   );
 };
-
 export default NavbarRecipes;

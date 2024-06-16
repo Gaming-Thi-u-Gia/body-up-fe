@@ -7,14 +7,14 @@ import { toast } from "sonner";
 
 type StarRatingType = {
   id: number;
-  avgStar: Number;
+  avgStar: number;
   currentRating: number;
 };
 const StarRating = ({ id, avgStar, currentRating }: StarRatingType) => {
   const { sessionToken } = useAuthStore((store) => store);
-  const [rating, setRating] = useState<number>(currentRating);
-  const [averageStar, setAverageStar] = useState<Number>(avgStar);
   const [hover, setHover] = useState<null | number>(null);
+  const [rating, setRating] = useState<number>(currentRating);
+  const [averageStar, setAverageStar] = useState<number>(avgStar);
   const handleRating = async (numberStar: number) => {
     try {
       const response = await fetchSendRatingRecipe(

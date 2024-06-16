@@ -74,7 +74,7 @@ const CardRecipe = ({ recipe }: { recipe: RecipeCard }) => {
           <div className="flex w-full justify-between items-center absolute top-3 px-5">
             <StarRating
               id={recipe.id}
-              avgStar={recipe.avgStar}
+              avgStar={parseFloat(recipe.avgStar.toFixed(2))}
               currentRating={recipe.currentRating}
             />
             <div className="flex">

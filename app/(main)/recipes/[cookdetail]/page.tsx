@@ -63,6 +63,7 @@ const CookDetail = () => {
       try {
         const data = await fetchRecipeByIdData(recipeId!, sessionToken!);
         setRecipe(data);
+        console.log(data);
       } catch (error) {
         toast.error("Failed to fetch recipe");
         console.log(error);

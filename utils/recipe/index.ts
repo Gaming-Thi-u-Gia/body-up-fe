@@ -1,3 +1,6 @@
+import { create } from "zustand";
+import { RecipeCard } from "@/app/(main)/recipes/latest-recipes";
+
 export const fetchTopicRecipeData = async () => {
   try {
     const response = await fetch(
@@ -89,11 +92,6 @@ export const fetchRecipeByIdData = async (
       method: "GET",
       headers: headers,
     });
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
     const data = await response.json();
     return data;
   } catch (error) {
@@ -248,4 +246,41 @@ export const initialName = (name = "") => {
   }
   const initials = words.map((word) => word.charAt(0));
   return initials.join("").substring(0, 2);
+};
+export const handleSort = (recipes: RecipeCard[], sort: string) => {
+  switch (sort) {
+    case "Most current":
+      return recipes.sort(
+        (a, b) =>
+          new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
+      );
+    case "Rating":
+      return recipes.sort((a, b) => b.avgStar - a.avgStar);
+    case "A to Z":
+      return recipes.sort((a, b) => a.name.localeCompare(b.name));
+    case "Z to A":
+      return recipes.sort((a, b) => b.name.localeCompare(a.name));
+    default:
+      return recipes;
+  }
+};
+export const fetchGetSearchByNameData = async (
+  recipeName: string,
+  sessionToken: string | undefined
+) => {
+  try {
+    const url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/name?recipeName=${recipeName}`;
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+      ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    };
+    const response = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error when get search by name`);
+  }
 };

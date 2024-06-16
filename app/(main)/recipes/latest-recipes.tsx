@@ -18,6 +18,7 @@ export type RecipeCard = {
   img: string;
   currentRating: number;
   bookmarked: boolean;
+  createAt: Date;
   recipeCategories: RecipeCategories[];
 };
 
