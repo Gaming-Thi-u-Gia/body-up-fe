@@ -2,18 +2,19 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
 
-const ProgramTitle = () => {
+type  WorkoutProgramByTopic = {
+    name: string;
+    description: string;
+}
+
+const ProgramTitle = ({ name, description} : WorkoutProgramByTopic) => {
     return (
         <div className="flex w-full justify-between py-7 items-center">
             <div>
                 <span className="leading-loose font-semibold text-2xl text-black">
-                    Moderate to Advanced
+                    {name}
                 </span>
-                <p className="max-w-[1000px] text-sm">
-                    If you&apos;re looking for something that pushes you a
-                    little harder, try any of these moderate to advanced
-                    challenges to help you progress further.
-                </p>
+                <p className="max-w-[1000px] text-sm">{description}</p>
             </div>
             <div>
                 <Button variant="primaryOutline" size="lg">

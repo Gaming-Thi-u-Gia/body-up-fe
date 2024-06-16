@@ -1,7 +1,10 @@
 import { Calendar, CalendarCheck, Clock4, Ellipsis } from "lucide-react";
+import { release } from "os";
 import React from "react";
 
 interface ProgramCardProps {
+    id: number;
+    key: number;
     name: string;
     type: string;
     equipment: string;
@@ -9,15 +12,18 @@ interface ProgramCardProps {
     day: string;
     time: string;
     year: string;
+    img: string;
+    releaseDATE: string;
 }
 
-const ProgramCard: React.FC<ProgramCardProps> = ({ name, type, equipment, detail, day, time, year }) => {
+const ProgramCard: React.FC<ProgramCardProps> = ({ id, key, name, type, equipment, day, time, year, img, releaseDATE }) => {
+    console.log(img);
     return (
         <div className="flex-col bg-white rounded-2xl">
             <div className="relative overflow-hidden">
                 <img
-                    src="https://chloeting.com/_next/image?url=https%3A%2F%2Fstatic.chloeting.com%2Fprograms%2F661d703c4fa2abb50050cc5c%2Fbanner%2F06267680-fb55-11ee-ae75-d516ffaa27e7.jpeg&w=1920&q=90"
-                    alt=""
+                    src={img}
+                    alt={name}
                     className="rounded-2xl cursor-pointer hover:opacity-70"
                     style={{ height: "auto", width: "100%" }}
                 />
@@ -38,7 +44,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ name, type, equipment, detail
                         <div className="mx-2 py-1">
                             <h3 className="text-xs font-medium">RELEASE DATE</h3>
                             <p className="text-[15px] leading-tight font-medium text-slate-500">
-                                {year}
+                                {releaseDATE}
                             </p>
                         </div>
                     </div>
@@ -47,7 +53,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ name, type, equipment, detail
             <div className="flex gap-1 my-4 mx-2">
                 <div className="flex gap-1 text-center items-center px-3 py-2 rounded-full bg-[#F7F7F7]">
                     <Calendar width={16} height={16} />
-                    <span className="text-[12px]">{day}</span>
+                    <span className="text-[12px]">{day} </span>
                 </div>
                 <div className="flex gap-1 text-center items-center px-3 py-1 rounded-full bg-[#F7F7F7]">
                     <Clock4 width={16} height={16} />

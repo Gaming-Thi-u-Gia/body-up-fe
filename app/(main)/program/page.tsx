@@ -7,7 +7,8 @@ import ProgramCard from "./program-card";
 import Link from "next/link";
 import HeaderNavWorkoutPrograms from "./header-nav-workout-program";
 import { Calendar, CalendarCheck, Clock4, Ellipsis } from "lucide-react";
-import { fetchWorkoutProgramData } from "@/utils/video/workoutVideoCollection";
+import { fetchWorkoutProgramData, fetchWorkoutProgramDataByTopic } from "@/utils/video/workoutVideoCollection";
+import { fetchAllTopic } from "@/utils/video/topic";
 
 interface WorkoutProgram {
     id: number;
@@ -18,11 +19,15 @@ interface WorkoutProgram {
     day: string;
     time: string;
     year: string;
+    img: string;
+    topicName: string;
+    topicDescription: string;
+    releaseDATE: string;
 }
 
 const ProgramPage = () => {
-
     const [workoutPrograms, setWorkoutPrograms] = useState<WorkoutProgram[]>([]);
+    const [topicIds, setTopicIds] = useState<number[]>([]);
 
     useEffect(() => {
         const getWorkoutProgram = async () => {
@@ -30,6 +35,13 @@ const ProgramPage = () => {
             setWorkoutPrograms(workoutProgram);
         };
         getWorkoutProgram();
+
+        const loadTopicIds = async () => {
+            const topics = await fetchAllTopic();
+            const ids = topics.map((topic: { id: number }) => topic.id);
+            setTopicIds(ids);
+        };
+        loadTopicIds();
     }, []);
 
     return (
@@ -107,6 +119,8 @@ const ProgramPage = () => {
                 {workoutPrograms.slice(0, 3).map((program) => (
                     <Link href={`/program/${program.id}`} key={program.id}>
                         <ProgramCard
+                            id={program.id}
+                            key={program.id}
                             name={program.name}
                             type={program.type}
                             equipment={program.equipment}
@@ -114,12 +128,15 @@ const ProgramPage = () => {
                             day={program.day}
                             time={program.time}
                             year={program.year}
+                            img={program.img}
+                            releaseDATE={program.releaseDATE}
                         />
                     </Link>
                 ))}
             </div>
-            <CatelogyModelProgram />
+                <CatelogyModelProgram /> 
         </div>
     );
 };
 export default ProgramPage;
+

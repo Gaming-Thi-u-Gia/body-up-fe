@@ -59,7 +59,7 @@ export const BmiModal = () => {
     };
 
     const filteredPrograms = workoutPrograms.filter(program => {
-        const weightStatus = getWeightStatus(bmi);
+        const weightStatus = getWeightStatus(bmi !== null ? bmi : 0);
         if (weightStatus === "Underweight") {
             return program.id >= 0 && program.id <= 4;
         } else if (weightStatus === "Normal weight") {

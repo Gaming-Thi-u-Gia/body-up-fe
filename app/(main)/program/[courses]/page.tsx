@@ -39,6 +39,7 @@ interface WorkoutProgram {
     day: string;
     time: string;
     year: string;
+    banner: string;
 }
 
 const Page = () => {
@@ -86,7 +87,7 @@ const Page = () => {
                     <div className="flex-row bg-transparent border-r border-gray-200/50 bg-white rounded-2xl pb-[1px]">
                         <div className="relative">
                             <img
-                                src="https://static.chloeting.com/programs/65cbf2fba012bdacde4dcb8f/bf5c0890-cac2-11ee-a048-c9fe3e754b58.jpeg"
+                                src={workoutProgramById.banner}
                                 alt=""
                                 className="w-full h-auto rounded-2xl"
                             />
@@ -217,6 +218,7 @@ const Page = () => {
                             </div>
                         </div>
                     </div>
+                    
                     <div className="py-[10px] px-[18px] bg-white border-[#c4c4c4] border-[1px] rounded-full items-start">
                         <DailyCarousel day='Mon 23' title='Test' onClick={onClick} />
                     </div>

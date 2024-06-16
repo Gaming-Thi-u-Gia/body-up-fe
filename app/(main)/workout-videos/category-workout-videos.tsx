@@ -2,8 +2,8 @@
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import fetchVideos from "@/utils/video";
+import Modal from "./video";
 
 interface VideoItem {
     id: string;
@@ -16,6 +16,7 @@ interface VideoItem {
 
 const CategoryWorkoutVideos = () => {
     const [videos, setVideos] = useState<VideoItem[]>([]);
+    const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -29,6 +30,14 @@ const CategoryWorkoutVideos = () => {
 
         fetchData();
     }, []);
+
+    const handleThumnailClick = (videoId: string) => {
+        setSelectedVideoId(videoId);
+    };
+
+    const closeVideo = () => {
+        setSelectedVideoId(null);
+    };
 
     return (
         <div>
@@ -49,8 +58,9 @@ const CategoryWorkoutVideos = () => {
 
             <div className="grid grid-cols-5 gap-5 my-5">
                 {videos.map((video) => (
-                    <Link href={`https://www.youtube.com/watch?v=${video.id}`}
+                    <div
                         key={video.id}
+                        onClick={() => handleThumnailClick(video.id)}
                         className="relative bg-white border border-solid border-[#E9E9EF] rounded-lg cursor-pointer h-60 w-56"
                     >
                         <div className="relative">
@@ -60,7 +70,9 @@ const CategoryWorkoutVideos = () => {
                                 alt={video.title}
                             />
                             <div className="absolute w-10 right-[10px] bottom-[10px] rounded-[4px] bg-[#303033]">
-                                <p className="text-[#FAFAFA] text-[10px] font-bold text-center leading-[14px] py-[2px] px-[6px]">{video.duration}</p>
+                                <p className="text-[#FAFAFA] text-[10px] font-bold text-center leading-[14px] py-[2px] px-[6px]">
+                                    {video.duration}
+                                </p>
                             </div>
                         </div>
                         <div className="p-3">
@@ -87,9 +99,17 @@ const CategoryWorkoutVideos = () => {
                                 />
                             </div>
                         </div>
-                    </Link>
+                    </div>
                 ))}
             </div>
+
+            {selectedVideoId && (
+                <Modal
+                    isOpen={Boolean(selectedVideoId)}
+                    onClose={closeVideo}
+                    videoId={selectedVideoId}
+                />
+            )}
         </div>
     );
 };
