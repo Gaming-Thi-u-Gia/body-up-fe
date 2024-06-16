@@ -1,46 +1,20 @@
 import React from "react";
 import CardRecipe from "../../card-recipe";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import { RecipeCard } from "../../latest-recipes";
 
-type RecipeCategories = {
-  id: number;
-  name: string;
-  type: string;
-};
-
-type Recipe = {
-  id: number;
-  name: string;
-  avgStar: number;
-  prepTime: string;
-  cookDetail: string;
-  img: string;
-  bookmarked: boolean;
-  recipeCategories: RecipeCategories[];
-};
-
-type Recipes = Recipe[];
-
-const ListRecipe = ({ recipes }: { recipes: Recipes }) => {
+const ListRecipe = ({ recipes }: { recipes: RecipeCard[] }) => {
   const { user } = useAuthStore((store) => store);
 
   if (!recipes) {
     return <div>Loading...</div>;
   }
+
   return (
     <div className="max-w-7xl">
       <div className="grid grid-cols-4 gap-5">
         {recipes.map((recipe) => (
-          <CardRecipe
-            userId={user?.id as number}
-            key={recipe.id}
-            id={recipe.id}
-            img={recipe.img}
-            recipeCategories={recipe.recipeCategories}
-            name={recipe.name}
-            avgStar={recipe.avgStar}
-            bookmarked={recipe.bookmarked}
-          />
+          <CardRecipe recipe={recipe} />
         ))}
       </div>
     </div>

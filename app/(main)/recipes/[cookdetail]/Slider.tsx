@@ -1,10 +1,10 @@
-type Props = {
+type HeaderDetailRecipeType = {
   img: string;
   name: string;
   cookTime: number;
   prepTime: number;
 };
-const Slider = ({ img, name, cookTime, prepTime }: Props) => {
+const Slider = ({ img, name, cookTime, prepTime }: HeaderDetailRecipeType) => {
   return (
     <div>
       <div className="relative w-full">

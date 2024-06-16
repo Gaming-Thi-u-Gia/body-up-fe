@@ -3,17 +3,13 @@ import { Button } from "@/components/ui/button";
 import StarRating from "./star-rating";
 import { Heart } from "lucide-react";
 import Link from "next/link";
-import {
-  fetchSendBookmarkRecipe,
-  fetchSendRatingRecipe,
-  initialName,
-} from "@/utils/recipe";
+import { fetchSendBookmarkRecipe, initialName } from "@/utils/recipe";
 import { useState } from "react";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
-import { Recipe } from "./list-recipe-category";
+import { RecipeCard } from "./latest-recipes";
 
-const CardRecipe = ({ recipe }: { recipe: Recipe }) => {
+const CardRecipe = ({ recipe }: { recipe: RecipeCard }) => {
   const [bookmark, setBookmark] = useState<boolean>(recipe.bookmarked);
   const { sessionToken } = useAuthStore((store) => store);
   const handleBookmark = async () => {

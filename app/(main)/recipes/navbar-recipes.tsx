@@ -1,44 +1,44 @@
 "use client";
-import React, { use, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { fetchTopicRecipeData } from "@/utils/recipe";
 import Link from "next/link";
-type TopicRecipes = {
+import { useAuthStore } from "@/components/providers/auth-provider";
+import { useRouter } from "next/router";
+
+type TopicRecipe = {
   id: number;
   topic: string;
   name: string;
 };
-
 const NavbarRecipes = () => {
-  const [topicRecipes, setTopicRecipes] = React.useState<TopicRecipes[]>([]);
+  const { sessionToken } = useAuthStore((store) => store);
+
+  const [topicRecipes, setTopicRecipes] = useState<TopicRecipe[]>([
+    { id: -1, topic: "View All Collection", name: "View All Collection" },
+    { id: 0, topic: "Latest Recipes", name: "Latest Recipes" },
+  ]);
   useEffect(() => {
     const fetchTopicRecipes = async () => {
       try {
         const data = await fetchTopicRecipeData();
-        setTopicRecipes(data);
+        setTopicRecipes([...topicRecipes, ...data]);
       } catch (error) {
         toast.error("Failed to fetch recipe collections");
-        console.log(error);
       }
     };
     fetchTopicRecipes();
   }, []);
-  function handleOnOrOfCategories() {
-    const currentCate = document.getElementById("current__cate");
-    const listCate = document.getElementById("list__cate");
-    if (listCate && currentCate) {
-      listCate.classList.toggle("hidden");
-    }
-  }
+  const [showCollection, setShowCollection] = useState<boolean>(false);
   return (
     <div className="  h-full mx-auto flex py-[20px] justify-between items-center border-b border-gray-300">
       <div className="h-full relative">
         <Button
           color="bg-black"
           id="current__cate"
-          onClick={handleOnOrOfCategories}
+          onClick={() => setShowCollection(!showCollection)}
           variant="secondary"
           className="px-[14px]"
           size="default"
@@ -48,11 +48,11 @@ const NavbarRecipes = () => {
         </Button>
         <div
           id="list__cate"
-          className=" hidden mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px]"
+          className=" mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px]"
         >
           <ul>
-            {topicRecipes.map((topicRecipe, index) => {
-              return (
+            {showCollection &&
+              topicRecipes.map((topicRecipe, index) => (
                 <li
                   className=" py-[5px] px-5 hover:text-[#000000d9] hover:bg-[#F7F7F7] cursor-pointer whitespace-nowrap text-[14px]"
                   key={index}
@@ -61,8 +61,7 @@ const NavbarRecipes = () => {
                     {topicRecipe.name}
                   </Link>
                 </li>
-              );
-            })}
+              ))}
           </ul>
         </div>
       </div>
@@ -89,14 +88,33 @@ const NavbarRecipes = () => {
           </span>
         </div>
         <div>
-          <Button
-            className="bg-transparent mr-1 cursor-not-allowed"
-            variant="disabled"
-            size="default"
-          >
-            <Image width={20} height={20} src="/heart.svg" alt="More" />
-            Saved Recipes
-          </Button>
+          {sessionToken ? (
+            <Link href={`saved-recipes`}>
+              <Button
+                className="bg-transparent mr-1"
+                variant="default"
+                size="default"
+              >
+                <Image width={20} height={20} src="/heart.svg" alt="More" />
+                Saved Recipes
+              </Button>
+            </Link>
+          ) : (
+            <div className="group relative cursor-not-allowed">
+              <Button
+                className="bg-transparent mr-1 "
+                variant="disabled"
+                size="default"
+                disabled
+              >
+                <Image width={20} height={20} src="/heart.svg" alt="More" />
+                Saved Recipes
+              </Button>
+              <div className="group-hover:flex absolute bg-white p-2 rounded-[25px] transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                Login or Register for an account to save recipes
+              </div>
+            </div>
+          )}
         </div>
         <div>
           <Button variant="default" size="default">

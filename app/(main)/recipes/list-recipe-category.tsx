@@ -10,22 +10,7 @@ type TopicRecipes = {
   id: number;
   name: string;
   description: string;
-  recipes: Recipe[];
-};
-export type Recipe = {
-  id: number;
-  name: string;
-  detail: string;
-  avgStar: number;
-  img: string;
-  currentRating: number;
-  bookmarked: boolean;
-  recipeCategories: [
-    {
-      id: number;
-      name: string;
-    },
-  ];
+  recipes: [];
 };
 
 const RecipeCategoryList = () => {
@@ -45,15 +30,15 @@ const RecipeCategoryList = () => {
   return (
     <div>
       {topicRecipes.map((topicRecipe, index) => (
-        <div key={topicRecipe.name}>
+        <div key={topicRecipe.id}>
           <HeaderInfoViewAll
+            id={topicRecipe.id}
             name={topicRecipe.name}
             description={topicRecipe.description}
-            id={topicRecipe.id}
           />
           <div className="grid grid-cols-4 gap-5">
             {topicRecipe.recipes.map((recipe, index) => (
-              <CardRecipe recipe={recipe} />
+              <CardRecipe recipe={recipe} key={index} />
             ))}
           </div>
         </div>

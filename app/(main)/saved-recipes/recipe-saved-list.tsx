@@ -1,15 +1,42 @@
 "use client";
 import { ChevronDown, MoveLeft } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CardRecipe from "../recipes/card-recipe";
+import { RecipeCard } from "../recipes/latest-recipes";
+import { toast } from "sonner";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import { fetchSavedRecipeData } from "@/utils/recipe";
 
 const RecipeSavedList = () => {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const handleToggleSort = () => {
     setIsSortOpen(!isSortOpen);
   };
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [recipes, setRecipes] = useState<RecipeCard[]>([]);
   const typeSort = ["Most current", "Rating", "A to Z", "Z to A"];
+  const { sessionToken } = useAuthStore((store) => store);
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const response = await fetchSavedRecipeData(sessionToken!);
+        setRecipes(response);
+      } catch (error) {
+        toast.error("Please login account", {
+          description: `${new Date().toLocaleString()}`,
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+        });
+        console.error("Error while fetching saved recipe:", error);
+      }
+    };
+    if (sessionToken) {
+      fetchRecipes();
+    }
+  }, [sessionToken]);
+
   return (
     <div className="max-w-7xl m-auto">
       <div className="flex justify-between items-center py-5 max-w-7xl mx-auto">
@@ -45,22 +72,12 @@ const RecipeSavedList = () => {
           )}
         </button>
       </div>
-      <div className="text-[#303033] text-[22px] font-semibold leading-[30px]">
-        Saved recipes
+      <div className="text-[#303033] text-[22px] font-semibold leading-[30px] py-5">
+        My saved Recipes
       </div>
       <div className="grid grid-cols-4 gap-5">
         {recipes.map((recipe, index) => (
-          <CardRecipe
-            userId={user?.id as number}
-            id={recipe.id}
-            sessionToken={sessionToken!}
-            name={recipe.name}
-            avgStar={recipe.avgStar}
-            img={recipe.img}
-            bookmarked={recipe.bookmarked}
-            currentRating={recipe.currentRating}
-            recipeCategories={recipe.recipeCategories as []}
-          />
+          <CardRecipe key={index} recipe={recipe} />
         ))}
       </div>
     </div>

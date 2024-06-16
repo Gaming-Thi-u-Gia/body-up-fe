@@ -9,22 +9,9 @@ import { toast } from "sonner";
 export type Topic = {
   id: number;
   name: string;
-  recipes: Recipes[];
+  recipes: [];
 };
-type Recipes = {
-  id: number;
-  name: string;
-  avgStar: number;
-  prepTime: string;
-  cookDetail: string;
-  img: string;
-  recipeCategories: RecipeCategories[];
-};
-type RecipeCategories = {
-  id: number;
-  name: string;
-  type: string;
-};
+
 const Category = () => {
   const usePathName = usePathname();
   const parts = usePathName.split("=");

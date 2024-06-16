@@ -5,12 +5,12 @@ import { Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-type StarRatingProps = {
+type StarRatingType = {
   id: number;
   avgStar: Number;
   currentRating: number;
 };
-const StarRating = ({ id, avgStar, currentRating }: StarRatingProps) => {
+const StarRating = ({ id, avgStar, currentRating }: StarRatingType) => {
   const { sessionToken } = useAuthStore((store) => store);
   const [rating, setRating] = useState<number>(currentRating);
   const [averageStar, setAverageStar] = useState<Number>(avgStar);

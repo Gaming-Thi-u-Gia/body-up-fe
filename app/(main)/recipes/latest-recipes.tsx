@@ -10,7 +10,7 @@ import { useAuthStore } from "@/components/providers/auth-provider";
 import { initialName } from "@/utils/recipe";
 import Link from "next/link";
 import { toast } from "sonner";
-type Recipe = {
+export type RecipeCard = {
   id: number;
   name: string;
   detail: string;
@@ -27,7 +27,7 @@ type RecipeCategories = {
 };
 
 const LatestRecipes = () => {
-  const [listLatestRecipes, setListLatestRecipes] = useState<Recipe[]>([]);
+  const [listLatestRecipes, setListLatestRecipes] = useState<RecipeCard[]>([]);
   const { user, sessionToken } = useAuthStore((store) => store);
   const [bookmarks, setBookmarks] = useState<{ [key: number]: boolean }>({});
   useEffect(() => {

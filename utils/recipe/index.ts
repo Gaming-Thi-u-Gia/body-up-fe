@@ -220,6 +220,27 @@ export const fetchLatestRecipeData = async (
     throw new Error(`Error while get latest recipes`);
   }
 };
+export const fetchSavedRecipeData = async (
+  sessionToken: string | undefined
+) => {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+  };
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/saved-recipe`,
+      {
+        method: "GET",
+        headers: headers,
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get latest recipes`);
+  }
+};
 export const initialName = (name = "") => {
   const words = name.trim().split(" ");
   if (words.length === 1) {
