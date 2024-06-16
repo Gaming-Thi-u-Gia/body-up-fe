@@ -84,7 +84,6 @@ export const ForgotPasswordForm = () => {
                     >
                         Send Verify Code
                     </Button>
-                    ;
                 </form>
             </Form>
         </>

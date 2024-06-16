@@ -4,6 +4,7 @@ import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import fitness_icon from "/public/fitness-icon.svg";
 import message_icon from "/public/message-icon.svg";
+import share_icon from "/public/share-icon.svg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import before_after from "/public/before-after-icon.svg";
@@ -21,8 +22,6 @@ import { formatDistanceToNow, set } from "date-fns";
 import { fetchBookmarkPost, fetchPostData } from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
-import { useSharePostModal } from "@/stores/use-share-model";
-import { SharePostModal } from "@/components/modals/share-modal";
 export type Posts = {
     id: number;
     title: string;
@@ -60,7 +59,6 @@ const PostUser = ({ categoryId }: CategoryId) => {
     const [isBookmarked, setIsBookmarked] = useState<{
         [key: number]: boolean;
     }>({});
-    const { open: openShareModal } = useSharePostModal((store) => store);
     useEffect(() => {
         const getPostsByCategory = async () => {
             try {
@@ -328,7 +326,18 @@ const PostUser = ({ categoryId }: CategoryId) => {
                             />
                             <span className="text-[12px]">Saved</span>
                         </Button>
-                        {post && <SharePostModal post={post} />}
+                        <Button
+                            variant="secondary"
+                            className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
+                        >
+                            <Image
+                                src={share_icon}
+                                alt="logo"
+                                width={20}
+                                height={20}
+                            />
+                            <span className="text-[12px]">Share</span>
+                        </Button>
                     </div>
 
                     <hr className="mt-3" />

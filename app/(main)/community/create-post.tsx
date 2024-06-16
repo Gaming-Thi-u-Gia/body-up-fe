@@ -27,7 +27,7 @@ import { createPostNoImage, fetchBadgesData } from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { usePathname, useRouter } from "next/navigation";
 
-type Badges = {
+export type Badges = {
     id: number;
     name: string;
 };

@@ -50,6 +50,7 @@ import {
 } from "@/components/ui/form";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { Posts } from "../../user-post-no-image";
+import { SharePostModal } from "@/components/modals/share-modal";
 
 export type Comments = {
     id: number;
@@ -361,18 +362,7 @@ const Post = () => {
                         />
                         <span className="text-[12px]">Saved</span>
                     </Button>
-                    <Button
-                        variant="secondary"
-                        className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
-                    >
-                        <Image
-                            src={share_icon}
-                            alt="logo"
-                            width={20}
-                            height={20}
-                        />
-                        <span className="text-[12px]">Share</span>
-                    </Button>
+                    {posts && <SharePostModal post={posts} />}
                 </div>
 
                 <hr className="mt-3" />
