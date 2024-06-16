@@ -45,7 +45,7 @@ export type Posts = {
         categoryId: number;
         name: string;
     };
-    created_at: Date | string;
+    created_at: Date;
 };
 type CategoryId = {
     categoryId: number;
@@ -65,10 +65,6 @@ const PostUser = ({ categoryId }: CategoryId) => {
         const getPostsByCategory = async () => {
             try {
                 const data = await fetchPostData(categoryId, sessionToken!);
-                // const formattedData = data.map((post: Posts) => ({
-                //     ...post,
-                //     created_at: new Date(post.created_at),
-                // }));
                 setPosts(data);
                 const bookmarkStatus: BookmarkStatus = {};
                 data.forEach((post: Posts) => {
@@ -261,11 +257,8 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                 {post.user.username}
                             </label>
                             <span className="text-sm">
-                                {post.created_at instanceof Date &&
-                                !isNaN(post.created_at.getTime())
-                                    ? formatDistanceToNow(post.created_at) +
-                                      " ago"
-                                    : "Invalid date"}
+                                {/* {post.created_at.toLocaleString()} */}5 days
+                                ago
                             </span>
                         </div>
                         <div className="flex gap-2 items-center">

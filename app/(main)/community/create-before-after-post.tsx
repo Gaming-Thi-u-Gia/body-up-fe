@@ -1,5 +1,6 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     Form,
     FormControl,
@@ -37,9 +38,20 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import { createBeforeAfterPost, fetchBadgesData } from "@/utils/community";
+import { useAuthStore } from "@/components/providers/auth-provider";
+export type Badges = {
+    id: number;
+    name: string;
+};
+
+type CategoryId = {
+    categoryId: number;
+};
 const CreateBeforeAfterPost = () => {
     const [preview, setPreview] = useState<string | null>(null);
     const [preview2, setPreview2] = useState<string | null>(null);
+    const [badges, setBadges] = useState<Badges[]>([{ id: 0, name: "" }]);
 
     const onDrop = useCallback(
         (acceptedFiles: FileList, fileRejections: FileList) => {
@@ -99,26 +111,75 @@ const CreateBeforeAfterPost = () => {
     const [date, setDate] = React.useState<Date>();
     const [isOpenedSecond, setIsOpenSecond] = useState(false);
     const [isOpenedFirst, setIsOpenFirst] = useState(true);
-
+    const { sessionToken } = useAuthStore((store) => store);
     const form = useForm({
         resolver: zodResolver(BeforeAfterPostSchema),
         defaultValues: {
             title: "",
-            beforeImage: null,
-            afterImage: null,
-            dayBeforeTaken: new Date(),
-            dayAfterTaken: new Date(),
+            imgBefore: null,
+            imgAfter: null,
+            dayBefore: new Date(),
+            dayAfter: new Date(),
             moreImage: [],
             description: "",
-            tagSelect: "",
+            badge: {
+                id: 0,
+                name: "",
+            },
             programSelect: "",
         },
     });
+    useEffect(() => {
+        const fetchBadge = async () => {
+            try {
+                const data = await fetchBadgesData();
+                console.log(data);
+                setBadges(data);
+            } catch (error) {
+                toast.error("Failed to fetch tags");
+                console.log(error);
+            }
+        };
 
-    const onSubmit = (data: z.infer<typeof BeforeAfterPostSchema>) => {
-        data.beforeImage = acceptedFiles[0];
-        data.afterImage = acceptedFiles2[0];
-        console.log(data);
+        fetchBadge();
+    }, []);
+
+    const onSubmit = async (data: z.infer<typeof BeforeAfterPostSchema>) => {
+        try {
+            data.imgBefore = acceptedFiles[0];
+            data.imgAfter = acceptedFiles2[0];
+            const selectedBadge = badges.find(
+                (badge) => badge.name === data.badge.name
+            );
+            if (!selectedBadge) {
+                throw new Error("Selected badge not found");
+            }
+            const res = await createBeforeAfterPost(
+                sessionToken!,
+                data,
+                selectedBadge.id,
+                2,
+                preview ?? "",
+                preview2 ?? ""
+            );
+
+            toast.success("Create Post Successfully!", {
+                description: `${new Date().toLocaleString()}`,
+                action: {
+                    label: "Close",
+                    onClick: () => console.log("Close"),
+                },
+            });
+            console.log(res);
+        } catch (error) {
+            toast.error("Something went wrong!", {
+                description: `${new Date().toLocaleString()}`,
+                action: {
+                    label: "Close",
+                    onClick: () => console.log("Close"),
+                },
+            });
+        }
     };
 
     return (
@@ -205,7 +266,7 @@ const CreateBeforeAfterPost = () => {
                                                             control={
                                                                 form.control
                                                             }
-                                                            name="beforeImage"
+                                                            name="imgBefore"
                                                             render={({
                                                                 field,
                                                             }) => (
@@ -255,7 +316,7 @@ const CreateBeforeAfterPost = () => {
                                                             control={
                                                                 form.control
                                                             }
-                                                            name="afterImage"
+                                                            name="imgAfter"
                                                             render={({
                                                                 field,
                                                             }) => (
@@ -298,7 +359,7 @@ const CreateBeforeAfterPost = () => {
                                                 </span>
                                                 <FormField
                                                     control={form.control}
-                                                    name="dayBeforeTaken"
+                                                    name="dayBefore"
                                                     render={({ field }) => (
                                                         <FormItem className="flex flex-col">
                                                             <Popover>
@@ -368,7 +429,7 @@ const CreateBeforeAfterPost = () => {
                                                 </span>
                                                 <FormField
                                                     control={form.control}
-                                                    name="dayAfterTaken"
+                                                    name="dayAfter"
                                                     render={({ field }) => (
                                                         <FormItem className="flex flex-col">
                                                             <Popover>
@@ -516,33 +577,53 @@ const CreateBeforeAfterPost = () => {
                                         </span>
                                         <FormField
                                             control={form.control}
-                                            name="tagSelect"
+                                            name="badge"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
                                                         <Select
-                                                            onValueChange={
-                                                                field.onChange
+                                                            onValueChange={(
+                                                                value
+                                                            ) => {
+                                                                const badge =
+                                                                    badges.find(
+                                                                        (
+                                                                            badge
+                                                                        ) =>
+                                                                            badge.name ===
+                                                                            value
+                                                                    );
+                                                                field.onChange(
+                                                                    badge
+                                                                );
+                                                            }}
+                                                            value={
+                                                                field.value.name
                                                             }
-                                                            value={field.value}
                                                         >
                                                             <SelectTrigger className="w-full rounded-lg">
                                                                 <SelectValue placeholder="Select a tag" />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                <SelectItem value="Workout">
-                                                                    Workout
-                                                                </SelectItem>
-                                                                <SelectItem value="Food">
-                                                                    Food
-                                                                </SelectItem>
-                                                                <SelectItem value="Chloe's Programs">
-                                                                    Chloe's
-                                                                    Programs
-                                                                </SelectItem>
-                                                                <SelectItem value="Misc">
-                                                                    Misc
-                                                                </SelectItem>
+                                                                {badges.map(
+                                                                    (
+                                                                        badge: Badges
+                                                                    ) =>
+                                                                        badge.name && (
+                                                                            <SelectItem
+                                                                                key={
+                                                                                    badge.id
+                                                                                }
+                                                                                value={
+                                                                                    badge.name
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    badge.name
+                                                                                }
+                                                                            </SelectItem>
+                                                                        )
+                                                                )}
                                                             </SelectContent>
                                                         </Select>
                                                     </FormControl>

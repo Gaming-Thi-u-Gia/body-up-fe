@@ -1,4 +1,4 @@
-import { CommentSchema, PostSchema } from "@/schemas";
+import { BeforeAfterPostSchema, CommentSchema, PostSchema } from "@/schemas";
 import { z } from "zod";
 
 export const fetchBadgesData = async () => {
@@ -205,5 +205,72 @@ export const fetchBookmarkPost = async (
         return data;
     } catch (error) {
         throw new Error("Error while fetching bookmark post");
+    }
+};
+
+export const createBeforeAfterPost = async (
+    sessionToken: string,
+    data: z.infer<typeof BeforeAfterPostSchema>,
+    badgeId: number,
+    categoryId: number,
+    preview: string,
+    preview2: string
+) => {
+    const { imgBefore, imgAfter, ...rest } = data;
+    const resultFromSv = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/before-after-image/`,
+        {
+            method: "POST",
+            body: JSON.stringify({
+                base64Img: preview,
+                base64Img1: preview2,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+    ).then(async (res) => {
+        const payload = await res.json();
+        const datas = {
+            status: res.status,
+            payload,
+        };
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        console.log(datas);
+
+        return datas;
+    });
+    try {
+        console.log(resultFromSv.payload.results.secure_url);
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/create?&badgeId=${badgeId}&categoryId=${categoryId}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+                body: JSON.stringify({
+                    ...rest,
+                    imgBefore: resultFromSv.payload.results.secure_url,
+                    imgAfter: resultFromSv.payload.results1.secure_url,
+                }),
+            }
+        ).then(async (res) => {
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return data;
+        });
+    } catch (error) {
+        throw new Error("Something went wrong");
     }
 };

@@ -4,8 +4,6 @@ import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import fitness_icon from "/public/fitness-icon.svg";
 import message_icon from "/public/message-icon.svg";
-import saved_icon from "/public/saved-posts-icon.svg";
-import share_icon from "/public/share-icon.svg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import before_after from "/public/before-after-icon.svg";

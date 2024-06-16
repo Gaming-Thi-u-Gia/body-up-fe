@@ -117,22 +117,22 @@ export const BeforeAfterPostSchema = z.object({
     title: z.string().min(3, {
         message: "Please enter a title for your post!",
     }),
-    beforeImage: z.instanceof(File).nullable(),
-    afterImage: z.instanceof(File).nullable(),
-    dayBeforeTaken: z.date().min(new Date(2003, 1, 1), {
-        message: "Please enter a valid date for the before image!",
-    }),
-    dayAfterTaken: z.date().min(new Date(2003, 1, 1), {
-        message: "Please enter a valid date for the after image!",
-    }),
-    moreImage: z.array(z.string()).optional(),
     description: z.string().min(3, {
         message: "Please enter a description for your post!",
     }),
-    tagSelect: z.string().min(1, {
-        message: "Please select a tag for your post!",
+    imgBefore: z.instanceof(File).nullable(),
+    imgAfter: z.instanceof(File).nullable(),
+    dayBefore: z.date().min(new Date(2003, 1, 1), {
+        message: "Please enter a valid date for the before image!",
     }),
-    programSelect: z.string().min(1, {
-        message: "Please select a tag for your post!",
+    dayAfter: z.date().min(new Date(2003, 1, 1), {
+        message: "Please enter a valid date for the after image!",
     }),
+    moreImage: z.array(z.string()).optional(),
+
+    badge: z.object({
+        id: z.number(),
+        name: z.string(),
+    }),
+    programSelect: z.string().optional(),
 });

@@ -105,6 +105,18 @@ const CreatePost = ({ categoryId }: CategoryId) => {
             }
         });
     };
+    if (!sessionToken) {
+        toast.error("You Need to Login To Create A Post!", {
+            description: `${new Date().toLocaleString()}`,
+            action: {
+                label: "Close",
+                onClick: () => console.log("Close"),
+            },
+        });
+        router.push("/login");
+        return null;
+    }
+
     return (
         <div className="w-full bg-white rounded-lg py-7">
             <h1 className="px-5 py-2 text-[20px] font-semibold ">
