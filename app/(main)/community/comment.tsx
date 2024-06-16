@@ -13,12 +13,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import defaultProfile from "/public/default-iProfile.png";
-import upvote_icon from "/public/upvote-icon.svg";
-import updown_icon from "/public/updown-icon.svg";
 import reply_icon from "/public/reply-icon.svg";
-import { Comments } from "./fitness/[viewpost]/page";
-import { fetchUpvote } from "@/utils/community";
 import { ArrowBigUp, ArrowBigDown } from "lucide-react";
+import { Comments } from "./view-post";
+import moment from "moment";
 // import { ArrowBigUp } from 'lucide-react';
 const Comment = ({ comment }: { comment: Comments }) => {
     const [isOpennedReply, setIsOpennedReply] = useState(false);
@@ -92,7 +90,7 @@ const Comment = ({ comment }: { comment: Comments }) => {
                                     alt="logo"
                                     width={50}
                                     height={50}
-                                    className="cursor-pointer py-2 rounded-full"
+                                    className="cursor-pointer mt-2 rounded-full"
                                 />
                                 <label
                                     className="text-[16px] font-semibold mt-2"
@@ -169,7 +167,12 @@ const Comment = ({ comment }: { comment: Comments }) => {
                     >
                         {comment.user.firstName || "Anonymous"}
                     </label>
-                    <span className="text-sm">5 days ago</span>
+                    <span className="text-sm">
+                        {" "}
+                        {comment?.createAt
+                            ? moment(comment?.createAt).fromNow()
+                            : "No date provided"}
+                    </span>
                 </div>
                 <div className="flex gap-2 items-center">
                     <Button

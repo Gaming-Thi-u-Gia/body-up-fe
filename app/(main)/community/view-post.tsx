@@ -164,6 +164,9 @@ const Post = () => {
                     Number(postId),
                     data
                 );
+
+                setComments((prev) => [...prev, res.payload]);
+
                 toast.success("Create Comment Successfully!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {

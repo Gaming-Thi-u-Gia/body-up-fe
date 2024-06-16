@@ -163,11 +163,15 @@ const BeforAfterPost = () => {
                             </div>
                         </div>
                         <div className="flex gap-2 items-center">
-                            <div className="flex rounded-full bg-[#E1E6FA] p-3 h-7 justify-center items-center">
-                                <span className="text-[12px] font-medium">
-                                    NEW
-                                </span>
-                            </div>
+                            {post.createdAt &&
+                            moment().diff(moment(post.createdAt), "days") <
+                                1 ? (
+                                <div className="flex rounded-full bg-[#E1E6FA] p-3 h-7 justify-center items-center">
+                                    <span className="text-[12px] font-medium">
+                                        NEW
+                                    </span>
+                                </div>
+                            ) : null}
                         </div>
                     </div>
                     <h1 className="text-[14px] font-bold p-2">{post.title}</h1>
