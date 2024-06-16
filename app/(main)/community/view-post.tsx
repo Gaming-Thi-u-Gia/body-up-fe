@@ -1,11 +1,9 @@
-/* eslint-disable react/no-unescaped-entities */
 "use client";
 import React, { useEffect, useState, useTransition } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
+import fitness_icon from "/public/fitness-icon.svg";
 import message_icon from "/public/message-icon.svg";
-import saved_icon from "/public/saved-posts-icon.svg";
-import share_icon from "/public/share-icon.svg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import before_after from "/public/before-after-icon.svg";
@@ -21,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import back_Icon from "/public/back-icon.svg";
 import { usePathname } from "next/navigation";
 import { Bookmark, ChevronDown } from "lucide-react";
-import { Gallery, Item } from "react-photoswipe-gallery";
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -29,16 +27,17 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Comment from "../../comment";
 import {
     createComment,
     fetchBookmarkPost,
     fetchCommentData,
     fetchPostById,
 } from "@/utils/community";
-import { useAuthStore } from "@/components/providers/auth-provider";
-import { Posts } from "../../user-post-no-image";
 import { toast } from "sonner";
+import { CommentSchema } from "@/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import {
     Form,
     FormControl,
@@ -46,29 +45,42 @@ import {
     FormItem,
     FormMessage,
 } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { CommentSchema } from "@/schemas";
-import { z } from "zod";
+import { useAuthStore } from "@/components/providers/auth-provider";
+
 import { SharePostModal } from "@/components/modals/share-modal";
-import { Comments } from "../../view-post";
-const BeforeAfterPost = () => {
+import { Posts } from "./user-post-no-image";
+import Comment from "./comment";
+
+export type Comments = {
+    id: number;
+    detail: string;
+    upVote: number;
+    user: {
+        avatar: string;
+        firstName: string;
+        email: string;
+        lastName: string;
+        id: number;
+    };
+};
+
+const Post = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
-    const postId = pathParts[3];
     const title = pathParts[2];
+    const postId = pathParts[3];
+    const [posts, setPosts] = useState<Posts>();
     const { sessionToken } = useAuthStore((store) => store);
-    const [isBookmarked, setIsBookmarked] = useState(false);
-    const [comments, setComments] = useState<Comments[]>([]);
     const [isPending, startTransition] = useTransition();
-
+    const [comments, setComments] = useState<Comments[]>([]);
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
             detail: "",
         },
     });
-    const [posts, setPosts] = useState<Posts>();
+    const [isBookmarked, setIsBookmarked] = useState(false);
+
     useEffect(() => {
         const fetchComments = async () => {
             try {
@@ -82,6 +94,7 @@ const BeforeAfterPost = () => {
         };
         fetchComments();
     }, [postId]);
+
     useEffect(() => {
         const fetchFullPost = async () => {
             try {
@@ -95,6 +108,7 @@ const BeforeAfterPost = () => {
         };
         fetchFullPost();
     }, [sessionToken, postId]);
+
     const handleBookmark = async () => {
         try {
             if (!sessionToken)
@@ -138,6 +152,7 @@ const BeforeAfterPost = () => {
             });
         }
     };
+
     const onSubmit = (data: z.infer<typeof CommentSchema>) => {
         console.log(data);
 
@@ -169,20 +184,20 @@ const BeforeAfterPost = () => {
     };
 
     return (
-        <Gallery>
-            <div className="w-[823px] mt-[5%]">
-                <Link
-                    href={`/community/${title}`}
-                    className="flex gap-2 items-center justify-start mb-4"
-                >
-                    <Image src={back_Icon} width={24} height={24} alt="back" />
-                    <span className="text-[15px] text-black flex gap-2 ">
-                        Back to <span>#{title}</span>
-                    </span>
-                </Link>
+        <>
+            <Link
+                href={`/community/${title}`}
+                className="flex gap-2 items-center justify-start mb-4"
+            >
+                <Image src={back_Icon} width={24} height={24} alt="back" />
+                <span className="text-[15px] text-black flex gap-2 ">
+                    Back to <span>#{title}</span>
+                </span>
+            </Link>
 
-                <div className="w-full flex flex-col p-2 gap-2 hover:bg-[#f5f5f5] rounded-lg">
-                    <div className="flex gap-2 items-center">
+            <div className="w-full flex flex-col p-2 gap-2 hover:bg-[#f5f5f5] rounded-lg">
+                <div className="w-full flex justify-between items-center ">
+                    <div className="flex gap-2 items-center ">
                         <Sheet>
                             <SheetTrigger>
                                 <Image
@@ -213,11 +228,11 @@ const BeforeAfterPost = () => {
                                         className="text-[16px] font-semibold mt-2"
                                         htmlFor=""
                                     >
-                                        {posts?.user.username}
+                                        {posts?.user.firstName}
                                     </label>
                                     <div className="flex flex-col gap-2 mt-1">
                                         <span className="text-sm">
-                                            {posts?.user.username}
+                                            {posts?.user.email}
                                         </span>
 
                                         <div className="flex gap-1">
@@ -288,183 +303,140 @@ const BeforeAfterPost = () => {
                                 </div>
                             </SheetContent>
                         </Sheet>
-                        <div className="flex flex-col text-sm items-start">
-                            <label className="font-bold text-black">
-                                {posts?.user.username}
-                            </label>
-                            <span className="font-light text-black ">
-                                13 hours ago
-                            </span>
-                        </div>
-                    </div>
-                    <div className="text-black text-lg font-medium mt-3">
-                        {posts?.title}
-                    </div>
-                    <div className="text-[#303033] text-[16px] mt-2">
-                        {posts?.description}
-                    </div>
-                    <div className="w-full flex items-center gap-4">
-                        <div className="flex flex-col gap-1 w-[50%]">
-                            <span className="text-[12px] font-bold">
-                                Before
-                            </span>
-                            <Item
-                                original={posts?.imgBefore || ""}
-                                thumbnail={posts?.imgBefore || ""}
-                                width={1000}
-                                height={800}
-                            >
-                                {({ ref, open }) => (
-                                    <Image
-                                        ref={ref}
-                                        onClick={open}
-                                        src={posts?.imgBefore || ""}
-                                        alt=""
-                                        width={0}
-                                        height={0}
-                                        sizes="100"
-                                        className="w-[100%] h-[100%] object-cover rounded-xl "
-                                        // priority={true}
-                                    />
-                                )}
-                            </Item>
-                            <span className="text-[12px] font-semibold flex items-stretch bg-[#EFF0F4] rounded-full p-2 mt-2">
-                                Date Taken: ${posts?.dayBefore}
-                            </span>
-                        </div>
-                        <div className="flex flex-col gap-1 w-[50%]">
-                            <span className="text-[12px] font-bold">After</span>
-                            <Item
-                                original={posts?.imgAfter || ""}
-                                thumbnail={posts?.imgAfter || ""}
-                                width={1000}
-                                height={800}
-                            >
-                                {({ ref, open }) => (
-                                    <Image
-                                        ref={ref}
-                                        onClick={open}
-                                        src={posts?.imgAfter || ""}
-                                        width={0}
-                                        height={0}
-                                        sizes="100"
-                                        alt=""
-                                        className="w-[100%] h-[100%] object-cover rounded-xl "
-                                        // priority={true}
-                                    />
-                                )}
-                            </Item>
-
-                            <span className="text-[12px] font-semibold flex items-stretch bg-[#EFF0F4] rounded-full p-2 mt-2">
-                                Date Taken: {posts?.dayAfter}
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex gap-2 items-center mt-6">
-                        <Button
-                            variant="secondary"
-                            className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
+                        <label
+                            className="text-[#303033] text-sm font-bold cursor-pointer"
+                            htmlFor=""
                         >
+                            {posts?.user.firstName}
+                        </label>
+                        <span className="text-sm">5 days ago</span>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                        <div className="flex gap-1 rounded-full bg-[#EFF0F4] px-3 py-2 justify-center items-center">
                             <Image
-                                src={message_icon}
+                                src={fitness_icon}
                                 alt="logo"
-                                width={20}
-                                height={20}
+                                width={13}
+                                height={12}
                             />
                             <span className="text-[12px]">
-                                <span>33</span> Replies
+                                {posts?.badge.name}
                             </span>
-                        </Button>
-                        <Button
-                            variant="secondary"
-                            className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
-                            onClick={() => handleBookmark()}
-                        >
-                            <Bookmark
-                                size={20}
-                                fill={isBookmarked ? "#7065cd" : "transparent"}
-                                strokeWidth={1}
-                            />
-                            <span className="text-[12px]">Saved</span>
-                        </Button>
-                        {posts && <SharePostModal post={posts} />}
-                    </div>
-
-                    <hr className="mt-3" />
-                </div>
-                <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-5 mt-2"
-                    >
-                        <div className="w-full px-2 flex flex-col gap-1">
-                            <h1 className="flex items-center p-1 font-bold">
-                                Post A Reply
-                            </h1>
-                            <FormField
-                                control={form.control}
-                                name="detail"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <Textarea
-                                                {...field}
-                                                placeholder="Write a response for this post"
-                                                className="rounded-lg bg-transparent p-3 text-[16px]"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            ></FormField>
-
-                            <div className=" flex items-center justify-end mt-3">
-                                <Button
-                                    type="submit"
-                                    variant="primary"
-                                    className="w-[188px] h-9 flex"
-                                >
-                                    Reply
-                                </Button>
-                            </div>
-                            <hr className="mt-3" />
                         </div>
-                    </form>
-                </Form>
-
-                {/* comment section */}
-                <div className="flex items-center mt-10 gap-2">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <div className="flex items-center cursor-pointer ">
-                                <span className="text-sm">Latest</span>
-                                <ChevronDown className="text-sm w-[18.72px]" />
-                            </div>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            className="w-35 absolute mt-5 "
-                            side="left"
-                        >
-                            <DropdownMenuGroup>
-                                <DropdownMenuItem>
-                                    <span>Latest</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <span>Upvotes</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    </div>
+                </div>
+                <Link
+                    href="/community/fitness"
+                    className="text-black text-lg font-medium mt-3"
+                >
+                    {posts?.title}
+                </Link>
+                <div className="text-[#303033] text-[16px] mt-2">
+                    {posts?.description}
+                </div>
+                <div className="flex gap-2 items-center mt-6">
+                    <Button
+                        variant="secondary"
+                        className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
+                    >
+                        <Image
+                            src={message_icon}
+                            alt="logo"
+                            width={20}
+                            height={20}
+                        />
+                        <span className="text-[12px]">
+                            <span>33</span> Replies
+                        </span>
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
+                        onClick={() => handleBookmark()}
+                    >
+                        <Bookmark
+                            size={20}
+                            fill={isBookmarked ? "#7065cd" : "transparent"}
+                            strokeWidth={1}
+                        />
+                        <span className="text-[12px]">Saved</span>
+                    </Button>
+                    {posts && <SharePostModal post={posts} />}
                 </div>
 
-                {comments.map((comment: Comments) => (
-                    <div key={comment.id}>
-                        <Comment comment={comment} />
-                    </div>
-                ))}
+                <hr className="mt-3" />
             </div>
-        </Gallery>
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-5 mt-2"
+                >
+                    <div className="w-full px-2 flex flex-col gap-1">
+                        <h1 className="flex items-center p-1 font-bold">
+                            Post A Reply
+                        </h1>
+                        <FormField
+                            control={form.control}
+                            name="detail"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Textarea
+                                            {...field}
+                                            placeholder="Write a response for this post"
+                                            className="rounded-lg bg-transparent p-3 text-[16px]"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        ></FormField>
+
+                        <div className=" flex items-center justify-end mt-3">
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                className="w-[188px] h-9 flex"
+                            >
+                                Reply
+                            </Button>
+                        </div>
+                        <hr className="mt-3" />
+                    </div>
+                </form>
+            </Form>
+
+            {/* comment section */}
+            <div className="flex items-center mt-10 gap-2">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <div className="flex items-center cursor-pointer ">
+                            <span className="text-sm">Latest</span>
+                            <ChevronDown className="text-sm w-[18.72px]" />
+                        </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        className="w-35 absolute mt-5 "
+                        side="left"
+                    >
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem>
+                                <span>Latest</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <span>Upvotes</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+            {comments.map((comment: Comments) => (
+                <div key={comment.id}>
+                    <Comment comment={comment} />
+                </div>
+            ))}
+        </>
     );
 };
 
-export default BeforeAfterPost;
+export default Post;

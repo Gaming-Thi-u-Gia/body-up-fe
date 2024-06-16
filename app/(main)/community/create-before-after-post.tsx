@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/popover";
 import { createBeforeAfterPost, fetchBadgesData } from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import { useRouter } from "next/navigation";
 export type Badges = {
     id: number;
     name: string;
@@ -109,6 +110,7 @@ const CreateBeforeAfterPost = () => {
         maxSize: 1000000,
     });
     const [date, setDate] = React.useState<Date>();
+    const router = useRouter();
     const [isOpenedSecond, setIsOpenSecond] = useState(false);
     const [isOpenedFirst, setIsOpenFirst] = useState(true);
     const { sessionToken } = useAuthStore((store) => store);
@@ -170,6 +172,8 @@ const CreateBeforeAfterPost = () => {
                     onClick: () => console.log("Close"),
                 },
             });
+            router.push("/community/before-after-results");
+
             console.log(res);
         } catch (error) {
             toast.error("Something went wrong!", {

@@ -5,11 +5,6 @@ const BeforeAfterResultPage = () => {
         <div className="w-[823px] mt-3">
             <div className="w-full grid grid-cols-2 gap-4">
                 <BeforAfterPost />
-                <BeforAfterPost />
-                <BeforAfterPost />
-                <BeforAfterPost />
-                <BeforAfterPost />
-                <BeforAfterPost />
             </div>
         </div>
     );

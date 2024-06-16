@@ -28,6 +28,10 @@ export type Posts = {
     title: string;
     description: string;
     bookmarked: boolean;
+    imgBefore: string;
+    imgAfter: string;
+    dayBefore: string;
+    dayAfter: string;
     user: {
         id: number;
         firstName: string;
@@ -60,7 +64,6 @@ const PostUser = ({ categoryId }: CategoryId) => {
     const [isBookmarked, setIsBookmarked] = useState<{
         [key: number]: boolean;
     }>({});
-    const { open: openShareModal } = useSharePostModal((store) => store);
     useEffect(() => {
         const getPostsByCategory = async () => {
             try {
