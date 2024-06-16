@@ -50,6 +50,7 @@ import { useAuthStore } from "@/components/providers/auth-provider";
 import { SharePostModal } from "@/components/modals/share-modal";
 import { Posts } from "./user-post-no-image";
 import Comment from "./comment";
+import moment from "moment";
 
 export type Comments = {
     id: number;
@@ -307,9 +308,13 @@ const Post = () => {
                             className="text-[#303033] text-sm font-bold cursor-pointer"
                             htmlFor=""
                         >
-                            {posts?.user.firstName}
+                            {posts?.user.username}
                         </label>
-                        <span className="text-sm">5 days ago</span>
+                        <span className="text-sm">
+                            {posts?.createdAt
+                                ? moment(posts?.createdAt).fromNow()
+                                : "No date provided"}
+                        </span>
                     </div>
                     <div className="flex gap-2 items-center">
                         <div className="flex gap-1 rounded-full bg-[#EFF0F4] px-3 py-2 justify-center items-center">

@@ -4,8 +4,6 @@ import React, { useEffect, useState, useTransition } from "react";
 import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import message_icon from "/public/message-icon.svg";
-import saved_icon from "/public/saved-posts-icon.svg";
-import share_icon from "/public/share-icon.svg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import before_after from "/public/before-after-icon.svg";
@@ -52,6 +50,7 @@ import { CommentSchema } from "@/schemas";
 import { z } from "zod";
 import { SharePostModal } from "@/components/modals/share-modal";
 import { Comments } from "../../view-post";
+import moment from "moment";
 const BeforeAfterPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
@@ -293,7 +292,9 @@ const BeforeAfterPost = () => {
                                 {posts?.user.username}
                             </label>
                             <span className="font-light text-black ">
-                                13 hours ago
+                                {posts?.createdAt
+                                    ? moment(posts?.createdAt).fromNow()
+                                    : "No date provided"}
                             </span>
                         </div>
                     </div>
@@ -329,7 +330,15 @@ const BeforeAfterPost = () => {
                                 )}
                             </Item>
                             <span className="text-[12px] font-semibold flex items-stretch bg-[#EFF0F4] rounded-full p-2 mt-2">
-                                Date Taken: ${posts?.dayBefore}
+                                Date Taken:{" "}
+                                {posts?.dayBefore &&
+                                    new Date(
+                                        posts.dayBefore
+                                    ).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })}
                             </span>
                         </div>
                         <div className="flex flex-col gap-1 w-[50%]">
@@ -356,7 +365,16 @@ const BeforeAfterPost = () => {
                             </Item>
 
                             <span className="text-[12px] font-semibold flex items-stretch bg-[#EFF0F4] rounded-full p-2 mt-2">
-                                Date Taken: {posts?.dayAfter}
+                                Date Taken:{" "}
+                                {posts?.dayAfter &&
+                                    new Date(posts.dayAfter).toLocaleDateString(
+                                        "en-US",
+                                        {
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                        }
+                                    )}
                             </span>
                         </div>
                     </div>

@@ -17,6 +17,7 @@ import { usePathname } from "next/navigation";
 import { Posts } from "./user-post-no-image";
 import { fetchPostData } from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import moment from "moment";
 const BeforAfterPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
@@ -155,7 +156,9 @@ const BeforAfterPost = () => {
                                     {post.user.username}
                                 </label>
                                 <span className="font-light text-black ">
-                                    13 hours ago
+                                    {post.createdAt
+                                        ? moment(post.createdAt).fromNow()
+                                        : "No date provided"}
                                 </span>
                             </div>
                         </div>

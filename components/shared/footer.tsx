@@ -6,6 +6,11 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 export const Footer = () => {
+    const pathname = usePathname();
+
+    if (pathname.includes("/community")) {
+        return null;
+    }
     return (
         <footer className="h-[32px] py-[31.5px] border-t border-t-[#C4C4C4] z-50">
             <div className="max-w-7xl mx-auto flex items-center justify-between h-full">

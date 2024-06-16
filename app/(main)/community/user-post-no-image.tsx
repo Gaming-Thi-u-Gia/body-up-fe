@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import before_after from "/public/before-after-icon.svg";
 import challenges_icon from "/public/challenges-icon.svg";
+import moment from "moment";
 import {
     Sheet,
     SheetContent,
@@ -49,7 +50,7 @@ export type Posts = {
         categoryId: number;
         name: string;
     };
-    created_at: Date;
+    createdAt: string;
 };
 type CategoryId = {
     categoryId: number;
@@ -260,8 +261,9 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                 {post.user.username}
                             </label>
                             <span className="text-sm">
-                                {/* {post.created_at.toLocaleString()} */}5 days
-                                ago
+                                {post.createdAt
+                                    ? moment(post.createdAt).fromNow()
+                                    : "No date provided"}
                             </span>
                         </div>
                         <div className="flex gap-2 items-center">
