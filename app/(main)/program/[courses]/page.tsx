@@ -30,6 +30,12 @@ const dailyVideoData = {
     url: "https://www.youtube.com/watch?v=j5SHMJ6mUoA",
 };
 
+interface Category {
+    id: number;
+    name: string;
+    type: string;
+}
+
 interface WorkoutProgram {
     id: number;
     name: string;
@@ -40,6 +46,8 @@ interface WorkoutProgram {
     time: string;
     year: string;
     banner: string;
+    releaseDate: string;
+    workoutProgramCategories: Category[]; 
 }
 
 const Page = () => {
@@ -80,6 +88,21 @@ const Page = () => {
         getWorkoutProgramById();
     }, []);
 
+    const getTypes = (categories: Category[] | undefined): string => {
+        if (!categories) return '';
+        return categories.filter(cat => cat.type === 'FOCUS AREA').map(cat => cat.name).join(', ');
+    };
+    
+    const getEquipment = (categories: Category[] | undefined): string => {
+        if (!categories) return '';
+        return categories.filter(cat => cat.type === 'EQUIPMENT').map(cat => cat.name).join(', ');
+    };
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
+    }    
+
     return (
         <div className="max-w-7xl flex items-center justify-center mx-auto my-8">
             <div className="w-full flex">
@@ -106,7 +129,7 @@ const Page = () => {
                         </div>
                         <div className="flex-row my-4 mx-5">
                             <span className="text-xs font-bold tracking-wider text-[#868A93]">
-                                FEBRUARY 2024
+                                {workoutProgramById.releaseDate ? formatDate(workoutProgramById.releaseDate) : 'N/A'}
                             </span>
                             <div className="flex gap-1 my-2">
                                 <Image
@@ -116,7 +139,7 @@ const Page = () => {
                                     alt="conflict"
                                 />
                                 <span className="text-[14px]">
-                                    {workoutProgramById.type}
+                                    {getTypes(workoutProgramById.workoutProgramCategories)}
                                 </span>
                             </div>
                             <div className="flex gap-2 my-2">
@@ -129,7 +152,7 @@ const Page = () => {
                                     />
                                 </div>
                                 <p className="text-[14px]">
-                                    {workoutProgramById.equipment}
+                                    {getEquipment(workoutProgramById.workoutProgramCategories)}
                                 </p>
                             </div>
 

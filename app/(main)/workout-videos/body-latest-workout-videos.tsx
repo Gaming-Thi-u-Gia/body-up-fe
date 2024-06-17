@@ -1,37 +1,43 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { title } from "process";
 import Image from "next/image";
-import { category } from "@/constants";
+import fetchVideos from "@/utils/video";
+import Modal from "./video";
+
+type VideoItem = {
+    id: string;
+    title: string;
+    img: string;
+    views: string;
+    date: string;
+    duration: string;
+};
 
 const BodyLatestWorkoutVideos = () => {
-    const listLastestWorkoutVideos = [
-        {
-            id_video: 1,
-            title: "15 Min Intense HIIT",
-            dietary: ["HIIT & CARDIO", "FULL BODY"],
-            img: "/video1.png",
-            views: "203K views",
-            date: "May 24",
-        },
-        {
-            id_video: 2,
-            title: "Toned Arms & Core Workout",
-            dietary: ["LF"],
-            img: "/video2.png",
-            views: "186K views",
-            date: "May 24",
-        },
-        {
-            id_video: 3,
-            title: "10 Min Intense Abs",
-            dietary: ["LF"],
-            img: "/video3.png",
-            views: "142K views",
-            date: "May 24",
-        },
-    ];
+    const [videos, setVideos] = useState<VideoItem[]>([]);
+    const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const fetchedVideos = await fetchVideos();
+            if (fetchedVideos && fetchedVideos.length > 0) {
+                setVideos(fetchedVideos.slice(0, 3));
+            } else {
+                console.error("No videos found");
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const handleThumbnailClick = (id: string) => {
+        setSelectedVideoId(id);
+    };
+
+    const closeVideo = () => {
+        setSelectedVideoId(null);
+    };
 
     return (
         <div className="max-w-7xl h-full mx-auto">
@@ -46,155 +52,109 @@ const BodyLatestWorkoutVideos = () => {
                 </Button>
             </div>
             <div className="flex gap-10">
-                {/* Video1 */}
-                <div
-                    className="flex relative gap-10 w-[737px] h-[242.27px] px-4 pt-[24px] pb-[24px] justify-self-start bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px]"
-                    style={{ borderRadius: "20px" }}
-                >
-                    <div className="relative">
-                        <div>
-                          <Image
-                              className="h-[95%] cursor-pointer rounded-2xl"
-                              width={320}
-                              height={1}
-                              src="/video1.png"
-                              alt="Video image"
-                          />
-                        </div>
-                        <div className="absolute w-10 right-[12px] bottom-[24px] rounded-[4px] bg-[#303033]">
-                          <p className="text-[#FAFAFA] text-[10px] font-bold text-center leading-[14px] py-[2px] px-[6px]">16:22</p>
-                        </div>
-                    </div>
-                    <div className="flex-1 ml-10px relative">
-                        <p className="text-[18px] font-medium leading-[150%] tracking-wide max-w-[255px] h-[15%] text-[#303033] cursor-pointer">
-                            <a href="#">{listLastestWorkoutVideos[0].title}</a>
-                        </p>
-                        {/* Frame for dietary information */}
-                        <div className="flex mt-2">
-                            {listLastestWorkoutVideos[0].dietary.map(
-                                (dietary, index) => (
-                                    <div
-                                        key={index}
-                                        className="bg-gray-100 rounded-full px-3 py-1 text-xs text-gray-700 mr-2"
-                                    >
-                                        {dietary}
+                {videos.map((video, index) => (
+                    <div
+                        key={video.id}
+                        onClick={() => handleThumbnailClick(video.id)}
+                        className={`relative bg-white border border-solid border-[#E9E9EF] rounded-lg cursor-pointer ${
+                            index === 0
+                                ? "flex w-[737px] h-[242.27px] px-4 pt-[24px] pb-[24px]"
+                                : "w-[232px] h-[228px]"
+                        }`}
+                    >
+                        {index === 0 ? (
+                            <>
+                                <div className="flex-1 h-full relative w-[60%]">
+                                    <Image
+                                        layout="fill"
+                                        className="rounded-t-lg object-cover rounded-2xl"
+                                        src={video.img}
+                                        alt="Video image"
+                                    />
+                                    <div className="absolute w-10 right-[10px] bottom-[10px] rounded-[4px] bg-[#303033]">
+                                        <p className="text-[#FAFAFA] text-[10px] font-bold text-center leading-[14px] py-[2px] px-[6px]">
+                                            {video.duration}
+                                        </p>
                                     </div>
-                                )
-                            )}
-                        </div>
-                        {/* End of frame for dietary information */}
-                        <div className="h-[10%]">{/* Star */}</div>
-                        <div className="absolute bottom-0 flex h-[12.5%] w-full justify-between items-center">
-                            <span className="text-[14px] font-medium text-sm text-[#868A93]">
-                                {listLastestWorkoutVideos[0].views} •{" "}
-                                {listLastestWorkoutVideos[0].date}
-                            </span>
-                            <div className="flex gap-2">
-                                <Image
-                                    width={18}
-                                    height={19}
-                                    src="/i.svg"
-                                    alt="i"
-                                />
-                                <Image
-                                    width={20}
-                                    height={20}
-                                    src="/heart.svg"
-                                    alt="heart"
-                                />
-                            </div>
-                        </div>
+                                </div>
+                                <div className="flex-1 p-3 w-[40%]">
+                                    <p className="text-[18px] font-medium leading-[150%] tracking-wide text-[#303033] line-clamp-2">
+                                        {video.title}
+                                    </p>
+                                    <div className="flex justify-between items-center font-medium text-sm text-[#868A93] mt-auto">
+                                        <span className="truncate">
+                                            {video.views} views • {video.date}
+                                        </span>
+                                        <div className="flex space-x-2">
+                                            <Image
+                                                width={18}
+                                                height={19}
+                                                src="/i.svg"
+                                                alt="Information icon"
+                                            />
+                                            <Image
+                                                width={20}
+                                                height={20}
+                                                src="/heart.svg"
+                                                alt="Heart icon"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="relative w-full h-[58%]">
+                                    <Image
+                                        layout="fill"
+                                        className="rounded-t-lg object-cover rounded-2xl"
+                                        src={video.img}
+                                        alt="Video image"
+                                    />
+                                    <div className="absolute w-10 right-[10px] bottom-[10px] rounded-[4px] bg-[#303033]">
+                                        <p className="text-[#FAFAFA] text-[10px] font-bold text-center leading-[14px] py-[2px] px-[6px]">
+                                            {video.duration}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="p-3">
+                                    <p className="text-[16px] font-normal leading-[20px] text-[#303033] line-clamp-2">
+                                        {video.title}
+                                    </p>
+                                </div>
+                                <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center font-medium text-sm text-[#868A93]">
+                                    <span className="truncate">
+                                        {video.views} views • {video.date}
+                                    </span>
+                                    <div className="flex space-x-2">
+                                        <Image
+                                            width={18}
+                                            height={19}
+                                            src="/i.svg"
+                                            alt="Information icon"
+                                        />
+                                        <Image
+                                            width={20}
+                                            height={20}
+                                            src="/heart.svg"
+                                            alt="Heart icon"
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
-                </div>
-
-                {/* Video2 */}
-                <div
-                    className="flex-1 justify-self-end relative bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px] cursor-pointer w-[232px] h-[242px]"
-                    style={{ borderRadius: "20px" }}
-                >
-                    <div className="relative">
-                        <div>
-                            <Image
-                                className="h-[60%] cursor-pointer rounded-2xl"
-                                width={300}
-                                height={1}
-                                src="/video2.png"
-                                alt="Video image"
-                            />
-                        </div>
-                        <div className="absolute w-10 right-[10px] bottom-[10px] rounded-[4px] bg-[#303033]">
-                          <p className="text-[#FAFAFA] text-[10px] font-bold text-center leading-[14px] py-[2px] px-[6px]">16:22</p>
-                        </div>
-                    </div>
-                    <p className="text-[16px] font-normal leading-[20px] tracking-wide text-[#303033] flex items-center px-5 py-3">
-                        {listLastestWorkoutVideos[1].title}
-                    </p>
-                    <div className="absolute bottom-3 left-5 right-5 flex justify-between items-center font-medium text-sm text-[#868A93]">
-                        <span>
-                            {listLastestWorkoutVideos[1].views} •{" "}
-                            {listLastestWorkoutVideos[1].date}
-                        </span>
-                        <div className="flex gap-2">
-                            <Image
-                                width={18}
-                                height={19}
-                                src="/i.svg"
-                                alt="i"
-                            />
-                            <Image
-                                width={20}
-                                height={20}
-                                src="/heart.svg"
-                                alt="heart"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Video3 */}
-                <div
-                    className="flex-1 justify-self-end relative bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px] cursor-pointer w-[232px] h-[242px]"
-                    style={{ borderRadius: "20px" }}
-                >
-                    <div className="relative">
-                        <div>
-                            <Image
-                                className="h-[60%] cursor-pointer rounded-2xl"
-                                width={300}
-                                height={1}
-                                src="/video3.png"
-                                alt="Video image"
-                            />
-                        </div>
-                        <div className="absolute w-10 right-[10px] bottom-[10px] rounded-[4px] bg-[#303033]">
-                          <p className="text-[#FAFAFA] text-[10px] font-bold text-center leading-[14px] py-[2px] px-[6px]">16:22</p>
-                        </div>
-                    </div>
-                    <p className="text-[16px] font-normal leading-[20px] tracking-wide text-[#303033] flex items-center px-5 py-3">
-                        {listLastestWorkoutVideos[2].title}
-                    </p>
-                    <div className="absolute bottom-3 left-5 right-5 flex justify-between items-center font-medium text-sm text-[#868A93]">
-                        <span>
-                            {listLastestWorkoutVideos[2].views} •{" "}
-                            {listLastestWorkoutVideos[2].date}
-                        </span>
-                        <div className="flex gap-2">
-                            <Image
-                                width={18}
-                                height={19}
-                                src="/i.svg"
-                                alt="i"
-                            />
-                            <Image
-                                width={20}
-                                height={20}
-                                src="/heart.svg"
-                                alt="heart"
-                            />
-                        </div>
-                    </div>
-                </div>
+                ))}
             </div>
+
+            {selectedVideoId && (
+                <Modal
+                    isOpen={Boolean(selectedVideoId)}
+                    onClose={closeVideo}
+                    videoId={selectedVideoId}
+                />
+            )}
+
             <div className="flex justify-center items-center w-full h-11 rounded-xl border border-[#EFF0F4] bg-white cursor-pointer my-5">
                 <p className="text-[#868A93] text-center text-base leading-6">
                     Load More Latest Workouts

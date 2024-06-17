@@ -1,4 +1,5 @@
-"use client";
+'use client'
+
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -12,19 +13,23 @@ interface VideoCategory {
 
 const HeaderNavWorkoutVideos = () => {
   const [titleWorkoutVideos, setTitleWorkoutVideos] = useState<VideoCategory[]>([]);
+  const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
 
   useEffect(() => {
     const getVideoCategories = async () => {
       const categories = await fetchVideoCategoryData();
-      setTitleWorkoutVideos(categories);
+      setTitleWorkoutVideos([
+        ...titleWorkoutVideos,
+        { id: -1, topic: "workout", name: "View All Collections" },
+        { id: 0, topic: "workout", name: "Latest Workouts" },
+        ...categories,
+      ]);
     };
     getVideoCategories();
   }, []);
 
   function handleOnOrOfCategories() {
-    const currentCate = document.getElementById("current__cate");
-    const listCate = document.getElementById("list__cate");
-    if (listCate) listCate.classList.toggle("hidden");
+    setIsCategoriesVisible(!isCategoriesVisible);
   }
 
   return (
@@ -43,12 +48,12 @@ const HeaderNavWorkoutVideos = () => {
           </Button>
           <div
             id="list__cate"
-            className="hidden mt-2 absolute bg-white z-10 rounded-[15px] w-[220px]"
+            className={`${isCategoriesVisible ? '' : 'hidden'} mt-2 absolute bg-white z-10 rounded-[15px] w-[220px] py-4`}
           >
             <ul>
               {titleWorkoutVideos.map((category) => (
                 <li
-                  className="pl-3 py-[5px] hover:text-[gray] hover:bg-slate-400"
+                  className="pl-6 py-[5px] hover:text-[gray] hover:bg-slate-400 "
                   key={category.id}
                 >
                   {category.name}
@@ -58,35 +63,6 @@ const HeaderNavWorkoutVideos = () => {
           </div>
         </div>
         <div className="flex h-8">
-          <div className="group">
-            <Button
-              className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out"
-              variant="defaultOutline"
-              size="default"
-            >
-              <Image width={20} height={20} src="/search.svg" alt="More" />
-              Search
-            </Button>
-            <input
-              className="group-hover:w-[240px] group-hover:opacity-100 opacity-0 group-hover:inline-flex w-[0px] transition-all duration-500 ease-in-out rounded-[15px] border-solid border-[1px] border-[#E9E9EF]"
-              placeholder="Search"
-            />
-          </div>
-          <div>
-            <Button
-              className="bg-transparent mr-1 cursor-not-allowed"
-              variant="disabled"
-              size="default"
-            >
-              <Image width={20} height={20} src="/heart.svg" alt="More" />
-              Favorites
-            </Button>
-          </div>
-          <div>
-            <Button variant="default" size="default">
-              <Image width={20} height={20} src="/filter.svg" alt="More" /> Filter
-            </Button>
-          </div>
         </div>
       </div>
     </div>

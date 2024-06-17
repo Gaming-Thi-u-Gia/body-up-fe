@@ -40,7 +40,7 @@ const fetchVideos = async () => {
         }
 
         const playlistId = "UUCgLoMYIyP0U56dEhEL1wXQ";
-        const apiKey = "AIzaSyBkauoYst7aOwpbevoWECI-emb8CbZiPB8"; // Thay YOUR_API_KEY bằng api key của bạn
+        const apiKey = "AIzaSyADY8e4ihQaU9XL0iZLDQMKZoAo5Qg3NOQ"; 
 
         let matchedVideos: VideoItem[] = [];
         let nextPageToken = "";
@@ -58,7 +58,6 @@ const fetchVideos = async () => {
                 playlistData.items.map(async (item: any) => {
                     const videoId = item.snippet.resourceId.videoId;
                     const videoData = videoDataFromDb.find(video => video.url === videoId);
-                    // Kiểm tra xem videoId có trong cơ sở dữ liệu không
                     if (videoData) {
                         const videoResponse = await fetch(
                             `https://youtube.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoId}&key=${apiKey}`
@@ -78,11 +77,11 @@ const fetchVideos = async () => {
                             duration: convertDuration(videoInfo.contentDetails.duration),
                         };
                     }
-                    return null; // Trả về null nếu videoId không trong cơ sở dữ liệu
+                    return null; 
                 })
             );
 
-            matchedVideos = matchedVideos.concat(videoDetails.filter(video => video !== null)); // Lọc bỏ các giá trị null
+            matchedVideos = matchedVideos.concat(videoDetails.filter(video => video !== null));
             nextPageToken = playlistData.nextPageToken;
         } while (nextPageToken);
 
@@ -99,7 +98,7 @@ const convertDuration = (duration: string) => {
     const matches = duration.match(regex);
 
     if (!matches) {
-        return "00:00"; // Default value if the duration string is invalid
+        return "00:00"; 
     }
 
     const hours = matches[1] ? parseInt(matches[1].slice(0, -1)) : 0;

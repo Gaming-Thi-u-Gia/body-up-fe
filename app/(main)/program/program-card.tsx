@@ -13,11 +13,10 @@ interface ProgramCardProps {
     time: string;
     year: string;
     img: string;
-    releaseDATE: string;
+    releaseDate: string;
 }
 
-const ProgramCard: React.FC<ProgramCardProps> = ({ id, key, name, type, equipment, day, time, year, img, releaseDATE }) => {
-    console.log(img);
+const ProgramCard: React.FC<ProgramCardProps> = ({ id, key, name, type, equipment, day, time, year, img, releaseDate }) => {
     return (
         <div className="flex-col bg-white rounded-2xl">
             <div className="relative overflow-hidden">
@@ -44,7 +43,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ id, key, name, type, equipmen
                         <div className="mx-2 py-1">
                             <h3 className="text-xs font-medium">RELEASE DATE</h3>
                             <p className="text-[15px] leading-tight font-medium text-slate-500">
-                                {releaseDATE}
+                                {releaseDate}
                             </p>
                         </div>
                     </div>
