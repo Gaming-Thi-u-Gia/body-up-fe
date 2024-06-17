@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useTransition } from "react";
 import {
     Form,
     FormControl,
@@ -110,6 +110,8 @@ const CreateBeforeAfterPost = () => {
         maxSize: 1000000,
     });
     const [date, setDate] = React.useState<Date>();
+    const [isPending, startTransition] = useTransition();
+
     const router = useRouter();
     const [isOpenedSecond, setIsOpenSecond] = useState(false);
     const [isOpenedFirst, setIsOpenFirst] = useState(true);
@@ -147,42 +149,45 @@ const CreateBeforeAfterPost = () => {
     }, []);
 
     const onSubmit = async (data: z.infer<typeof BeforeAfterPostSchema>) => {
-        try {
-            data.imgBefore = acceptedFiles[0];
-            data.imgAfter = acceptedFiles2[0];
-            const selectedBadge = badges.find(
-                (badge) => badge.name === data.badge.name
-            );
-            if (!selectedBadge) {
-                throw new Error("Selected badge not found");
-            }
-            const res = await createBeforeAfterPost(
-                sessionToken!,
-                data,
-                selectedBadge.id,
-                2,
-                preview ?? "",
-                preview2 ?? ""
-            );
-            router.push("/community/before-after-results");
-            toast.success("Create Post Successfully!", {
-                description: `${new Date().toLocaleString()}`,
-                action: {
-                    label: "Close",
-                    onClick: () => console.log("Close"),
-                },
-            });
+        startTransition(async () => {
+            try {
+                data.imgBefore = acceptedFiles[0];
+                data.imgAfter = acceptedFiles2[0];
+                const selectedBadge = badges.find(
+                    (badge) => badge.name === data.badge.name
+                );
+                if (!selectedBadge) {
+                    throw new Error("Selected badge not found");
+                }
+                const res = await createBeforeAfterPost(
+                    sessionToken!,
+                    data,
+                    selectedBadge.id,
+                    2,
+                    preview ?? "",
+                    preview2 ?? ""
+                );
 
-            console.log(res);
-        } catch (error) {
-            toast.error("Something went wrong!", {
-                description: `${new Date().toLocaleString()}`,
-                action: {
-                    label: "Close",
-                    onClick: () => console.log("Close"),
-                },
-            });
-        }
+                toast.success("Create Post Successfully!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+                router.push("/community/before-after-results");
+
+                console.log(res);
+            } catch (error) {
+                toast.error("Something went wrong!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            }
+        });
     };
 
     return (
@@ -685,6 +690,7 @@ const CreateBeforeAfterPost = () => {
                                                 type="submit"
                                                 variant="primary"
                                                 className="px-10 py-2 flex"
+                                                disabled={isPending}
                                             >
                                                 Create
                                             </Button>

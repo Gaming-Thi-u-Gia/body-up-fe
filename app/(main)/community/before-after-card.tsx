@@ -192,7 +192,9 @@ const BeforAfterPost = () => {
                             ) : null}
                         </div>
                     </div>
-                    <h1 className="text-[14px] font-bold p-2">{post.title}</h1>
+                    <h1 className="text-sm font-bold px-2 my-2 line-clamp-1">
+                        {post.title}
+                    </h1>
 
                     <Link
                         href={`/community/${title}/${post.id}`}

@@ -63,7 +63,6 @@ export type Comments = {
         email: string;
         lastName: string;
         id: number;
-        createAt: string;
     };
     createAt: string;
 };
@@ -78,6 +77,7 @@ const Post = () => {
     const [isPending, startTransition] = useTransition();
     const [comments, setComments] = useState<Comments[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [countComments, setCountComments] = useState(0);
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -93,12 +93,13 @@ const Post = () => {
                 const res = await fetchCommentData(Number(postId));
                 console.log(res);
                 setComments(res);
+                setCountComments(comments.length);
             } catch (error) {
                 console.log(error);
             }
         };
         fetchComments();
-    }, [postId]);
+    }, [postId, comments.length]);
 
     useEffect(() => {
         const fetchFullPost = async () => {
@@ -176,8 +177,8 @@ const Post = () => {
                     data
                 );
 
-                setComments((prev) => [...prev, res.payload]);
-
+                setComments((prev) => [res.payload, ...prev]);
+                setCountComments(countComments + 1);
                 toast.success("Create Comment Successfully!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
@@ -364,7 +365,7 @@ const Post = () => {
                             height={20}
                         />
                         <span className="text-[12px]">
-                            <span>33</span> Replies
+                            <span>{countComments}</span> Replies
                         </span>
                     </Button>
                     <Button

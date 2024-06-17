@@ -62,6 +62,7 @@ const BeforeAfterPost = () => {
     const [comments, setComments] = useState<Comments[]>([]);
     const [isPending, startTransition] = useTransition();
     const [isLoading, setIsLoading] = useState(false);
+    const [countComments, setCountComments] = useState(0);
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -76,7 +77,9 @@ const BeforeAfterPost = () => {
                 setIsLoading(true);
                 const res = await fetchCommentData(Number(postId));
                 console.log(res);
+
                 setComments(res);
+                setCountComments(comments.length);
             } catch (error) {
                 console.log(error);
             } finally {
@@ -84,7 +87,7 @@ const BeforeAfterPost = () => {
             }
         };
         fetchComments();
-    }, [postId]);
+    }, [postId, comments.length]);
     useEffect(() => {
         const fetchFullPost = async () => {
             try {
@@ -162,7 +165,8 @@ const BeforeAfterPost = () => {
                         onClick: () => console.log("Close"),
                     },
                 });
-                setComments((prev) => [...prev, res.payload]);
+                setComments((prev) => [res.payload, ...prev]);
+                setCountComments(countComments + 1);
             } catch (error) {
                 toast.error("You Need To Sign In To Comment!", {
                     description: `${new Date().toLocaleString()}`,
@@ -404,7 +408,7 @@ const BeforeAfterPost = () => {
                                 height={20}
                             />
                             <span className="text-[12px]">
-                                <span>33</span> Replies
+                                <span>{countComments}</span> Replies
                             </span>
                         </Button>
                         <Button
@@ -455,6 +459,7 @@ const BeforeAfterPost = () => {
                                     type="submit"
                                     variant="primary"
                                     className="w-[188px] h-9 flex"
+                                    disabled={isPending}
                                 >
                                     Reply
                                 </Button>
