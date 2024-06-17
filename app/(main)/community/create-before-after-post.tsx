@@ -164,7 +164,7 @@ const CreateBeforeAfterPost = () => {
                 preview ?? "",
                 preview2 ?? ""
             );
-
+            router.push("/community/before-after-results");
             toast.success("Create Post Successfully!", {
                 description: `${new Date().toLocaleString()}`,
                 action: {
@@ -172,7 +172,6 @@ const CreateBeforeAfterPost = () => {
                     onClick: () => console.log("Close"),
                 },
             });
-            router.push("/community/before-after-results");
 
             console.log(res);
         } catch (error) {

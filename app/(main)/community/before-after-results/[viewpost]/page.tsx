@@ -163,7 +163,6 @@ const BeforeAfterPost = () => {
                     },
                 });
                 setComments((prev) => [...prev, res.payload]);
-                window.location.reload();
             } catch (error) {
                 toast.error("You Need To Sign In To Comment!", {
                     description: `${new Date().toLocaleString()}`,
