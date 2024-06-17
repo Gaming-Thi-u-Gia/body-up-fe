@@ -63,6 +63,7 @@ export const fetchPostData = async (
             {
                 method: "GET",
                 headers: headers,
+                next: { revalidate: 3600 },
             }
         ).then(async (res) => {
             if (!res.ok) {
@@ -272,5 +273,27 @@ export const createBeforeAfterPost = async (
         });
     } catch (error) {
         throw new Error("Something went wrong");
+    }
+};
+
+export const fetchMyPosts = async (sessionToken: string) => {
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/getAllPostByUser`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+            }
+        );
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = res.json();
+        return data;
+    } catch (error) {
+        throw new Error("Error while fetching my posts");
     }
 };

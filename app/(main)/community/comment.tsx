@@ -165,7 +165,7 @@ const Comment = ({ comment }: { comment: Comments }) => {
                         className="text-[#303033] text-sm font-bold cursor-pointer"
                         htmlFor=""
                     >
-                        {comment.user.firstName || "Anonymous"}
+                        {comment.user.username || "Anonymous"}
                     </label>
                     <span className="text-sm">
                         {" "}
@@ -212,17 +212,6 @@ const Comment = ({ comment }: { comment: Comments }) => {
                             className="cursor-pointer"
                             onClick={handleDownvoteClick}
                         />
-
-                        {/* <Image
-                            src={updown_icon}
-                            alt="logo"
-                            width={18}
-                            height={18}
-                            className={`cursor-pointer ${
-                                isDownvoted ? "bg-red-500" : ""
-                            }`}
-                            onClick={handleDownvoteClick}
-                        /> */}
                     </div>
                 </div>
             </div>

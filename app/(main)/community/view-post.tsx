@@ -63,6 +63,7 @@ export type Comments = {
         email: string;
         lastName: string;
         id: number;
+        username: string;
     };
     createAt: string;
 };
