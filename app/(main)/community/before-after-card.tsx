@@ -18,27 +18,49 @@ import { Posts } from "./user-post-no-image";
 import { fetchPostData } from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import moment from "moment";
+import { Skeleton } from "@/components/ui/skeleton";
 const BeforAfterPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
     const [posts, setPosts] = useState<Posts[]>([]);
     const { sessionToken } = useAuthStore((store) => store);
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         const getPostsByCategory = async () => {
             try {
+                setIsLoading(true);
                 const data = await fetchPostData(2, sessionToken!);
                 setPosts(data);
                 console.log(data);
             } catch (error) {
                 console.log(error);
+            } finally {
+                setIsLoading(false);
             }
         };
         getPostsByCategory();
     }, [sessionToken]);
-    if (!posts) {
-        return <div>Loading...</div>; // or any other loading indicator
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col istems-center gap-3">
+                <div className="flex items-center justify-between gap-4">
+                    <BeforeAfterPostSkeleton />
+                    <BeforeAfterPostSkeleton />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                    <BeforeAfterPostSkeleton />
+                    <BeforeAfterPostSkeleton />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                    <BeforeAfterPostSkeleton />
+                    <BeforeAfterPostSkeleton />
+                </div>
+            </div>
+        );
     }
+
     return (
         <>
             {posts.map((post) => (
@@ -175,29 +197,28 @@ const BeforAfterPost = () => {
                         </div>
                     </div>
                     <h1 className="text-[14px] font-bold p-2">{post.title}</h1>
-                    {post.imgAfter && post.imgBefore && (
-                        <Link
-                            href={`/community/${title}/${post.id}`}
-                            className="flex gap-2 rounded-md items-center justify-center px-1"
-                        >
-                            <Image
-                                src={post.imgBefore}
-                                alt="image_before"
-                                className="w-[50%] h-[378px] object-cover rounded-xl"
-                                width={0}
-                                height={0}
-                                sizes="100"
-                            />
-                            <Image
-                                src={post.imgAfter}
-                                className="w-[50%] h-[378px] object-cover rounded-xl"
-                                alt="image_after"
-                                width={0}
-                                height={0}
-                                sizes="100"
-                            />
-                        </Link>
-                    )}
+
+                    <Link
+                        href={`/community/${title}/${post.id}`}
+                        className="flex gap-2 rounded-md items-center justify-center px-1"
+                    >
+                        <Image
+                            src={post.imgBefore}
+                            alt="image_before"
+                            className="w-[50%] h-[378px] object-cover rounded-xl"
+                            width={0}
+                            height={0}
+                            sizes="100"
+                        />
+                        <Image
+                            src={post.imgAfter}
+                            className="w-[50%] h-[378px] object-cover rounded-xl"
+                            alt="image_after"
+                            width={0}
+                            height={0}
+                            sizes="100"
+                        />
+                    </Link>
                 </div>
             ))}
         </>
@@ -205,3 +226,31 @@ const BeforAfterPost = () => {
 };
 
 export default BeforAfterPost;
+
+const BeforeAfterPostSkeleton = () => {
+    return (
+        <div className="bg-white rounded-md px-2 py-3 space-y-4">
+            {/* User details and new tag placeholder */}
+            <div className="flex items-center justify-between ">
+                <div className="flex gap-2 items-center">
+                    {/* User avatar skeleton */}
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                    {/* User name and email skeletons */}
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-[250px]" />
+                        <Skeleton className="h-4 w-[200px]" />
+                    </div>
+                </div>
+                {/* New tag skeleton */}
+                <Skeleton className="h-7 w-20 rounded-full" />
+            </div>
+            {/* Post title skeleton */}
+            <Skeleton className="h-6 w-[75%]" />
+            {/* Images placeholders */}
+            <div className="flex gap-4">
+                <Skeleton className="w-[49%] h-[378px] rounded-xl" />
+                <Skeleton className="w-[49%] h-[378px] rounded-xl" />
+            </div>
+        </div>
+    );
+};

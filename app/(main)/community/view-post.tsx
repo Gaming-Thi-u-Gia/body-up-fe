@@ -51,6 +51,7 @@ import { SharePostModal } from "@/components/modals/share-modal";
 import { Posts } from "./user-post-no-image";
 import Comment from "./comment";
 import moment from "moment";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export type Comments = {
     id: number;
@@ -76,6 +77,7 @@ const Post = () => {
     const { sessionToken } = useAuthStore((store) => store);
     const [isPending, startTransition] = useTransition();
     const [comments, setComments] = useState<Comments[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -101,16 +103,23 @@ const Post = () => {
     useEffect(() => {
         const fetchFullPost = async () => {
             try {
+                setIsLoading(true);
                 const data = await fetchPostById(Number(postId), sessionToken!);
                 console.log(data);
                 setIsBookmarked(data.bookmarked);
                 setPosts(data);
             } catch (error) {
                 toast.error("Something went wrong");
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchFullPost();
     }, [sessionToken, postId]);
+
+    if (isLoading) {
+        return <PostSkeleton />;
+    }
 
     const handleBookmark = async () => {
         try {
@@ -176,7 +185,6 @@ const Post = () => {
                         onClick: () => console.log("Close"),
                     },
                 });
-                window.location.reload();
             } catch (error) {
                 toast.error("You Need To Sign In To Comment!", {
                     description: `${new Date().toLocaleString()}`,
@@ -407,6 +415,7 @@ const Post = () => {
                                 type="submit"
                                 variant="primary"
                                 className="w-[188px] h-9 flex"
+                                disabled={isPending}
                             >
                                 Reply
                             </Button>
@@ -450,3 +459,33 @@ const Post = () => {
 };
 
 export default Post;
+
+const PostSkeleton = () => {
+    return (
+        <div className="w-full flex flex-col p-2 gap-2 hover:bg-[#f5f5f5] rounded-lg animate-pulse">
+            {/* Profile and title section */}
+            <div className="flex justify-between items-center ">
+                <div className="flex gap-2 items-center">
+                    <Skeleton className="h-8 w-8 bg-gray-200 rounded-full"></Skeleton>{" "}
+                    {/* Avatar placeholder */}
+                    <Skeleton className="h-6 w-32 bg-gray-200 rounded"></Skeleton>{" "}
+                    {/* Username placeholder */}
+                </div>
+                <Skeleton className="h-6 w-24 bg-gray-200 rounded-full"></Skeleton>{" "}
+                {/* Badge placeholder */}
+            </div>
+            {/* Post title */}
+            <Skeleton className="h-6 w-3/4 bg-gray-200 rounded mt-3"></Skeleton>
+            {/* Post description */}
+            <Skeleton className="h-4 w-full bg-gray-200 rounded mt-2"></Skeleton>
+            {/* Interaction buttons */}
+            <div className="flex gap-2 mt-3">
+                <Skeleton className="h-7 w-32 bg-gray-200 rounded-full"></Skeleton>{" "}
+                {/* Replies button */}
+                <Skeleton className="h-7 w-32 bg-gray-200 rounded-full"></Skeleton>{" "}
+                {/* Bookmark button */}
+            </div>
+            <hr className="mt-3" />
+        </div>
+    );
+};

@@ -51,6 +51,7 @@ import { z } from "zod";
 import { SharePostModal } from "@/components/modals/share-modal";
 import { Comments } from "../../view-post";
 import moment from "moment";
+import { Skeleton } from "@/components/ui/skeleton";
 const BeforeAfterPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
@@ -60,7 +61,7 @@ const BeforeAfterPost = () => {
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [comments, setComments] = useState<Comments[]>([]);
     const [isPending, startTransition] = useTransition();
-
+    const [isLoading, setIsLoading] = useState(false);
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -72,11 +73,14 @@ const BeforeAfterPost = () => {
         const fetchComments = async () => {
             try {
                 console.log("render");
+                setIsLoading(true);
                 const res = await fetchCommentData(Number(postId));
                 console.log(res);
                 setComments(res);
             } catch (error) {
                 console.log(error);
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchComments();
@@ -84,12 +88,16 @@ const BeforeAfterPost = () => {
     useEffect(() => {
         const fetchFullPost = async () => {
             try {
+                setIsLoading(true);
                 const data = await fetchPostById(Number(postId), sessionToken!);
                 console.log(data);
                 setIsBookmarked(data.bookmarked);
                 setPosts(data);
+                setIsLoading(false);
             } catch (error) {
                 toast.error("Something went wrong");
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchFullPost();
@@ -167,6 +175,12 @@ const BeforeAfterPost = () => {
             }
         });
     };
+    if (isLoading)
+        return (
+            <div className="w-[823px] mt-[5%]">
+                <BeforeAfterPostSkeleton />
+            </div>
+        );
 
     return (
         <Gallery>
@@ -311,8 +325,8 @@ const BeforeAfterPost = () => {
                                 Before
                             </span>
                             <Item
-                                original={posts?.imgBefore || ""}
-                                thumbnail={posts?.imgBefore || ""}
+                                original={posts?.imgBefore}
+                                thumbnail={posts?.imgBefore}
                                 width={1000}
                                 height={800}
                             >
@@ -320,7 +334,7 @@ const BeforeAfterPost = () => {
                                     <Image
                                         ref={ref}
                                         onClick={open}
-                                        src={posts?.imgBefore || ""}
+                                        src={posts?.imgBefore!}
                                         alt=""
                                         width={0}
                                         height={0}
@@ -345,8 +359,8 @@ const BeforeAfterPost = () => {
                         <div className="flex flex-col gap-1 w-[50%]">
                             <span className="text-[12px] font-bold">After</span>
                             <Item
-                                original={posts?.imgAfter || ""}
-                                thumbnail={posts?.imgAfter || ""}
+                                original={posts?.imgAfter}
+                                thumbnail={posts?.imgAfter}
                                 width={1000}
                                 height={800}
                             >
@@ -354,7 +368,7 @@ const BeforeAfterPost = () => {
                                     <Image
                                         ref={ref}
                                         onClick={open}
-                                        src={posts?.imgAfter || ""}
+                                        src={posts?.imgAfter!}
                                         width={0}
                                         height={0}
                                         sizes="100"
@@ -487,3 +501,57 @@ const BeforeAfterPost = () => {
 };
 
 export default BeforeAfterPost;
+
+const BeforeAfterPostSkeleton = () => {
+    return (
+        <div className="w-[823px] mt-[5%] animate-pulse">
+            <div className="flex items-center space-x-4">
+                {/* Skeleton for back link */}
+                <Skeleton className="h-6 w-6 rounded-full" />
+                <Skeleton className="h-6 w-64" />
+            </div>
+
+            <div className="w-full flex flex-col p-2 gap-2 rounded-lg">
+                {/* Skeleton for user avatar and info */}
+                <div className="flex gap-2 items-center">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <Skeleton className="h-6 w-40" />
+                </div>
+
+                {/* Skeleton for title */}
+                <Skeleton className="h-8 w-full mt-3" />
+
+                {/* Skeleton for description */}
+                <Skeleton className="h-6 w-[90%] mt-2" />
+                <Skeleton className="h-6 w-[80%]" />
+
+                {/* Skeleton for images 'Before' and 'After' */}
+                <div className="w-full flex items-center gap-4">
+                    <div className="flex flex-col gap-1 w-[50%]">
+                        <Skeleton className="h-4 w-[30%]" />
+                        <Skeleton className="h-60 w-full rounded-xl" />
+                        <Skeleton className="h-4 w-[90%] mt-2" />
+                    </div>
+                    <div className="flex flex-col gap-1 w-[50%]">
+                        <Skeleton className="h-4 w-[30%]" />
+                        <Skeleton className="h-60 w-full rounded-xl" />
+                        <Skeleton className="h-4 w-[90%] mt-2" />
+                    </div>
+                </div>
+
+                {/* Skeleton for buttons at the bottom */}
+                <div className="flex gap-2 items-center mt-6">
+                    <Skeleton className="h-10 w-36 rounded-full" />
+                    <Skeleton className="h-10 w-36 rounded-full" />
+                </div>
+            </div>
+
+            {/* Skeleton for comment form */}
+            <div className="flex flex-col mt-10 gap-2 w-full">
+                <Skeleton className="h-10 w-[20%]" />
+                <Skeleton className="h-12 w-full rounded-lg" />
+                <Skeleton className="h-10 w-48 self-end mt-3" />
+            </div>
+        </div>
+    );
+};

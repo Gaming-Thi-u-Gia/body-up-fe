@@ -226,6 +226,7 @@ const CreatePost = ({ categoryId }: CategoryId) => {
                             type="submit"
                             variant="primary"
                             className="px-10 py-2 flex"
+                            disabled={isPending}
                         >
                             Create
                         </Button>

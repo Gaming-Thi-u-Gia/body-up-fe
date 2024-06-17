@@ -24,6 +24,7 @@ import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
 import { useSharePostModal } from "@/stores/use-share-model";
 import { SharePostModal } from "@/components/modals/share-modal";
+import { Skeleton } from "@/components/ui/skeleton";
 export type Posts = {
     id: number;
     title: string;
@@ -62,12 +63,14 @@ type BookmarkStatus = {
 const PostUser = ({ categoryId }: CategoryId) => {
     const [posts, setPosts] = useState<Posts[]>([]);
     const { sessionToken } = useAuthStore((store) => store);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isBookmarked, setIsBookmarked] = useState<{
         [key: number]: boolean;
     }>({});
     useEffect(() => {
         const getPostsByCategory = async () => {
             try {
+                setIsLoading(true);
                 const data = await fetchPostData(categoryId, sessionToken!);
                 setPosts(data);
                 const bookmarkStatus: BookmarkStatus = {};
@@ -79,6 +82,8 @@ const PostUser = ({ categoryId }: CategoryId) => {
                 console.log("hello");
             } catch (error) {
                 console.log(error);
+            } finally {
+                setIsLoading(false);
             }
         };
         getPostsByCategory();
@@ -139,6 +144,16 @@ const PostUser = ({ categoryId }: CategoryId) => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
+    if (isLoading) {
+        return (
+            <>
+                <PostSkeleton />
+                <PostSkeleton />
+                <PostSkeleton />
+            </>
+        );
+    }
+
     return (
         <>
             {posts.map((post) => (
@@ -337,3 +352,31 @@ const PostUser = ({ categoryId }: CategoryId) => {
 };
 
 export default PostUser;
+
+const PostSkeleton = () => (
+    <div className="w-full mb-10 flex flex-col p-2 gap-2 rounded-lg">
+        <div className="w-full flex justify-between items-center ">
+            <div className="flex gap-2 items-center">
+                {/* User avatar and username */}
+                <Skeleton className="h-8 w-8 bg-gray-200 rounded-full" />
+                <Skeleton className="h-6 bg-gray-200 w-40" />
+                {/* Timestamp skeleton */}
+                <Skeleton className="h-4 w-20 bg-gray-200" />
+            </div>
+            {/* Badge area */}
+            <Skeleton className="h-6 w-24 bg-gray-200 rounded-full" />
+        </div>
+        {/* Title skeleton */}
+        <Skeleton className="h-6 w-full mt-3 bg-gray-200" />
+        {/* Description skeleton */}
+        <Skeleton className="h-4 w-full mt-2 bg-gray-200" />
+        <Skeleton className="h-4 w-[90%] bg-gray-200" />
+        {/* Buttons for replies and save */}
+        <div className="flex gap-2 mt-3">
+            <Skeleton className="h-7 w-32 rounded-full bg-gray-200" />
+            <Skeleton className="h-7 w-32 rounded-full bg-gray-200" />
+        </div>
+        {/* Bottom separator */}
+        <Skeleton className="h-1 w-full mt-3 bg-gray-200" />
+    </div>
+);
