@@ -27,21 +27,15 @@ import {
 } from "react-share";
 
 export function SharePostModal({ post }: { post: Posts }) {
-    const router = useRouter();
-    const [isPending, startTransition] = useTransition();
     const { isOpen, close, open } = useSharePostModal((store) => store);
     const [isClient, setIsClient] = useState(false);
     useEffect(() => setIsClient(true), []);
-    const pathname = usePathname();
-    const pathParts = pathname.split("/");
-    const title = pathParts[2];
-    const shareUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/community/${title}/${post.id}`;
+    const shareUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/community/${post.categoryCommunity.name}/${post.id}`;
     useEffect(() => {
         console.log("Domain:", process.env.NEXT_PUBLIC_DOMAIN);
-        console.log("Pathname:", pathname);
         console.log("Post ID:", post.id);
         console.log("Share URL:", shareUrl);
-    }, [post.id, pathname, shareUrl]);
+    }, [post.id, shareUrl]);
 
     return (
         <AlertDialog open={isOpen} onOpenChange={close}>

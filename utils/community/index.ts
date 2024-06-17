@@ -297,3 +297,25 @@ export const fetchMyPosts = async (sessionToken: string) => {
         throw new Error("Error while fetching my posts");
     }
 };
+
+export const fetchPostsBookmark = async (sessionToken: string) => {
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/getAllPostBookmark`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+            }
+        );
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = res.json();
+        return data;
+    } catch (error) {
+        throw new Error("Error while fetching my posts");
+    }
+};

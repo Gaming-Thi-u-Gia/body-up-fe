@@ -1,14 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import defaultProfile from "/public/default-iProfile.png";
-import Image from "next/image";
-import fitness_icon from "/public/fitness-icon.svg";
-import message_icon from "/public/message-icon.svg";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import before_after from "/public/before-after-icon.svg";
-import challenges_icon from "/public/challenges-icon.svg";
-import moment from "moment";
+import { BookmarkStatus, Posts } from "./user-post-no-image";
+import { fetchBookmarkPost, fetchPostsBookmark } from "@/utils/community";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Bookmark } from "lucide-react";
 import {
     Sheet,
     SheetContent,
@@ -16,78 +13,57 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { usePathname } from "next/navigation";
-import { Bookmark } from "lucide-react";
-import { formatDistanceToNow, set } from "date-fns";
-import { fetchBookmarkPost, fetchPostData } from "@/utils/community";
-import { useAuthStore } from "@/components/providers/auth-provider";
-import { toast } from "sonner";
-import { useSharePostModal } from "@/stores/use-share-model";
+import Image from "next/image";
+import defaultProfile from "/public/default-iProfile.png";
+import before_after from "/public/before-after-icon.svg";
+import challenges_icon from "/public/challenges-icon.svg";
+import { Button } from "@/components/ui/button";
+import moment from "moment";
+import fitness_icon from "/public/fitness-icon.svg";
+import message_icon from "/public/message-icon.svg";
+import Link from "next/link";
 import { SharePostModal } from "@/components/modals/share-modal";
 import { Skeleton } from "@/components/ui/skeleton";
-export type Posts = {
-    id: number;
-    title: string;
-    description: string;
-    bookmarked: boolean;
-    imgBefore: string;
-    imgAfter: string;
-    dayBefore: string;
-    dayAfter: string;
-    user: {
-        id: number;
-        firstName: string;
-        lastName: string;
-        username: string;
-        email: string;
-        avatar: string;
-        profile_picture: string;
-    };
-    badge: {
-        id: number;
-        name: string;
-    };
-    categoryCommunity: {
-        categoryId: number;
-        name: string;
-    };
-    createdAt: string;
-};
-type CategoryId = {
-    categoryId: number;
-};
-export type BookmarkStatus = {
-    [key: number]: boolean;
-};
 
-const PostUser = ({ categoryId }: CategoryId) => {
+const MyPostsBookmark = () => {
     const [posts, setPosts] = useState<Posts[]>([]);
-    const { sessionToken } = useAuthStore((store) => store);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isBookmarked, setIsBookmarked] = useState<{
         [key: number]: boolean;
     }>({});
+    const { sessionToken } = useAuthStore((store) => store);
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
-        const getPostsByCategory = async () => {
+        const fetchPosts = async () => {
             try {
                 setIsLoading(true);
-                const data = await fetchPostData(categoryId, sessionToken!);
-                setPosts(data);
+                const res = await fetchPostsBookmark(sessionToken!);
+                const sortPosts = res.sort((a: any, b: any) => {
+                    return (
+                        new Date(b.createdAt).getTime() -
+                        new Date(a.createdAt).getTime()
+                    );
+                });
+                setPosts(sortPosts);
                 const bookmarkStatus: BookmarkStatus = {};
-                data.forEach((post: Posts) => {
+                res.forEach((post: Posts) => {
                     bookmarkStatus[post.id] = post.bookmarked;
                 });
                 setIsBookmarked(bookmarkStatus);
-                console.log(data);
-                console.log("hello");
             } catch (error) {
-                console.log(error);
+                toast.error("Something Went Wrong!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
             } finally {
                 setIsLoading(false);
             }
         };
-        getPostsByCategory();
-    }, [categoryId, sessionToken]);
+        fetchPosts();
+    }, [sessionToken]);
 
     const handleBookmark = async (id: number) => {
         try {
@@ -103,7 +79,6 @@ const PostUser = ({ categoryId }: CategoryId) => {
             }
 
             const response = await fetchBookmarkPost(id, sessionToken!);
-            console.log(response);
             if (response && response.bookmarked !== undefined) {
                 const updatedPosts = posts.map((post) =>
                     post.id === id
@@ -115,7 +90,6 @@ const PostUser = ({ categoryId }: CategoryId) => {
                     ...isBookmarked,
                     [id]: response.bookmarked,
                 });
-                console.log(isBookmarked);
                 if (response.bookmarked) {
                     toast.success("Post Bookmarked!", {
                         description: `${new Date().toLocaleString()}`,
@@ -137,25 +111,39 @@ const PostUser = ({ categoryId }: CategoryId) => {
                 throw new Error("Invalid response structure from backend");
             }
         } catch (error) {
-            toast.error("Error while bookmarking post!");
+            toast.error("Something Went Wrong!", {
+                description: `${new Date().toLocaleString()}`,
+                action: {
+                    label: "Close",
+                    onClick: () => console.log("Close"),
+                },
+            });
         }
     };
 
-    const pathname = usePathname();
-    const pathParts = pathname.split("/");
-    const title = pathParts[2];
+    if (!sessionToken) {
+        toast.error("You need to login to view this page", {
+            description: `${new Date().toLocaleString()}`,
+            action: {
+                label: "Close",
+                onClick: () => console.log("Close"),
+            },
+        });
+        router.push("/login");
+        return null;
+    }
     if (isLoading) {
         return (
-            <>
+            <div className="w-[823px] mt-3">
                 <PostSkeleton />
                 <PostSkeleton />
                 <PostSkeleton />
-            </>
+            </div>
         );
     }
 
     return (
-        <>
+        <div className="w-[823px] mt-3">
             {posts.map((post) => (
                 <div
                     key={post.id}
@@ -296,17 +284,48 @@ const PostUser = ({ categoryId }: CategoryId) => {
                         </div>
                     </div>
                     <Link
-                        href={`/community/${title}/${post.id}`}
+                        href={`/community/${post.categoryCommunity.name}/${post.id}`}
                         className="text-black text-lg font-medium mt-3"
                     >
                         {post.title}
                     </Link>
-                    <Link
-                        href={`/community/${title}/${post.id}`}
-                        className="text-[#303033] text-[16px] h-[48px] mt-2 line-clamp-2 "
-                    >
-                        {post.description}
-                    </Link>
+                    {post.imgBefore !== null ? (
+                        <div></div>
+                    ) : (
+                        <Link
+                            href={`/community/${post.categoryCommunity.name}/${post.id}`}
+                            className="text-[#303033] text-[16px] h-[48px] mt-2 line-clamp-2 "
+                        >
+                            {post.description}
+                        </Link>
+                    )}
+
+                    {post.imgBefore !== null ? (
+                        <Link
+                            href={`/community/${post.categoryCommunity.name}/${post.id}`}
+                            className="flex gap-2 rounded-md items-center justify-center px-1"
+                        >
+                            <Image
+                                src={post.imgBefore || ""}
+                                alt="image_before"
+                                className="w-[50%] h-[378px] object-cover rounded-xl"
+                                width={0}
+                                height={0}
+                                sizes="100"
+                            />
+                            <Image
+                                src={post.imgAfter || ""}
+                                className="w-[50%] h-[378px] object-cover rounded-xl"
+                                alt="image_after"
+                                width={0}
+                                height={0}
+                                sizes="100"
+                            />
+                        </Link>
+                    ) : (
+                        <div></div>
+                    )}
+
                     <div className="flex gap-2 items-center mt-3">
                         <Button
                             variant="secondary"
@@ -319,7 +338,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                 height={20}
                             />
                             <Link
-                                href={`/community/${title}/${post.id}`}
+                                href={`/community/${post.categoryCommunity.name}/${post.id}`}
                                 className="text-[12px]"
                             >
                                 <span>33</span> Replies
@@ -347,11 +366,11 @@ const PostUser = ({ categoryId }: CategoryId) => {
                     <hr className="mt-3" />
                 </div>
             ))}
-        </>
+        </div>
     );
 };
 
-export default PostUser;
+export default MyPostsBookmark;
 
 const PostSkeleton = () => (
     <div className="w-full mb-10 flex flex-col p-2 gap-2 rounded-lg">

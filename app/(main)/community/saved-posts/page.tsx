@@ -1,12 +1,11 @@
 import React from "react";
-import PostUser from "@/app/(main)/community/user-post-no-image";
-const SavedPostPage = () => {
-    const categoryId = 1;
+import MyPostsBookmark from "../my-post-bookmark";
+const MyPostsBookmarkPage = () => {
     return (
         <div className="w-[823px] mt-3">
-            <PostUser categoryId={categoryId} />
+            <MyPostsBookmark />
         </div>
     );
 };
 
-export default SavedPostPage;
+export default MyPostsBookmarkPage;
