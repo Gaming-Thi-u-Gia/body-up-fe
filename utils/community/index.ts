@@ -298,10 +298,14 @@ export const fetchMyPosts = async (sessionToken: string) => {
     }
 };
 
-export const fetchPostsBookmark = async (sessionToken: string) => {
+export const fetchPostsBookmark = async (
+    sessionToken: string,
+    offset: number,
+    limit: number
+) => {
     try {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/getAllPostBookmark`,
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/getAllPostBookmark?page=${offset}&size=${limit}`,
             {
                 method: "GET",
                 headers: {
