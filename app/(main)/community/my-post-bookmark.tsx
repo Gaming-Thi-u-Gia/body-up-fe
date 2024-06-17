@@ -285,7 +285,7 @@ const MyPostsBookmark = () => {
                     </div>
                     <Link
                         href={`/community/${post.categoryCommunity.name}/${post.id}`}
-                        className="text-black text-lg font-medium mt-3"
+                        className="text-black text-lg font-medium"
                     >
                         {post.title}
                     </Link>
@@ -294,7 +294,7 @@ const MyPostsBookmark = () => {
                     ) : (
                         <Link
                             href={`/community/${post.categoryCommunity.name}/${post.id}`}
-                            className="text-[#303033] text-[16px] h-[48px] mt-2 line-clamp-2 "
+                            className="text-[#303033] text-[16px] h-[48px] mt-1 line-clamp-2 "
                         >
                             {post.description}
                         </Link>

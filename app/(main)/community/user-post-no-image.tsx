@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
 import { Bookmark } from "lucide-react";
-import { formatDistanceToNow, set } from "date-fns";
 import { fetchBookmarkPost, fetchPostData } from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
