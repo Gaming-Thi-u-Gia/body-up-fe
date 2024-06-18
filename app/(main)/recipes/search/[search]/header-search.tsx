@@ -18,10 +18,10 @@ const HeaderSearch = ({
     <div className="max-w-7xl mx-auto">
       <RecipeNavbar />
       <div className="flex">
-        <div className="flex-1 bg-white py-2 my-3 flex justify-between items-center px-5 rounded-2xl">
-          <span>
+        <div className="flex-1  bg-white py-2 my-3 flex justify-between items-center px-5 rounded-2xl">
+          <div>
             Showing <b>{totalSearchResult}</b> matching <b>Search Criteria</b>
-          </span>
+          </div>
         </div>
         <div
           onClick={() => setIsSortOpen(!isSortOpen)}

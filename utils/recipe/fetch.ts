@@ -256,3 +256,29 @@ export const fetchGetTableFilter = async () => {
     throw new Error(`Error while get table filter`);
   }
 };
+export const fetchGetRecipeByCategories = async (
+  categoryIds: string[],
+  sessionToken: string | undefined
+) => {
+  try {
+    let url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/category?`;
+    if (categoryIds.length > 0) {
+      categoryIds.forEach((categoryId) => {
+        url += `categoryIds=${categoryId}&`;
+      });
+    }
+    console.log(url);
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+      ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    };
+    const response = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error when get search by name`);
+  }
+};

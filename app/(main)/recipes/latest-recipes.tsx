@@ -72,12 +72,12 @@ const RecipesLatest = () => {
     );
   } else {
     return (
-      <div className=" h-full mx-auto">
+      <div className="max-w-7xl m-auto">
         <HeaderInfoSearch name="Latest Recipes" description="" id={1} />
         {listLatestRecipes.length === 2 && (
           <div className="flex gap-5 ">
             {/* Recipe1 */}
-            <div className="flex relative gap-5 w-[75%] h-[450px] bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px] box-border py-5 px-4">
+            <div className="flex justify-between relative gap-5 w-[75%] h-[450px] bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px] box-border py-5 px-4">
               <div className="relative">
                 <Link href={`/recipes/${listLatestRecipes[0].id}`}>
                   <img
@@ -226,7 +226,7 @@ const RecipesLatest = () => {
 export default RecipesLatest;
 const LatestRecipesSkeleton = () => {
   return (
-    <div className="h-full mx-auto">
+    <div className="max-w-7xl h-full mx-auto">
       <div className="flex gap-5">
         <div className="flex relative gap-5 w-[75%] h-[450px] bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px] box-border py-5 px-4 animate-pulse">
           <div className="relative">

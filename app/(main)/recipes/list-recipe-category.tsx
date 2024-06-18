@@ -33,7 +33,7 @@ const RecipeCategoryList = () => {
   }
 
   return (
-    <div>
+    <div className="max-w-7xl m-auto">
       <Link
         href="/recipes"
         className="inline-flex items-center text-[15px] leading-5 font-semibold"
@@ -60,7 +60,7 @@ const RecipeCategoryList = () => {
 
 export const RecipeCategoryListSkeleton = () => {
   return (
-    <div>
+    <div className="max-w-7xl m-auto">
       <div>
         <HeaderInfoViewAllSkeleton />
         <div className="grid grid-cols-4 gap-5">

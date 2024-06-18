@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { fetchGetTableFilter } from "@/utils/recipe/fetch";
 import { RecipesCategoriesType } from "@/utils/recipe/type";
 import { Check } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -15,13 +17,24 @@ type TableFilterType = {
 const FilterRecipe = () => {
   const [tableFilter, setTableFilter] = useState<TableFilterType[]>([]);
   const [listFilter, setListFilter] = useState<{ [key: string]: number }>({});
+  const router = useRouter();
 
   useEffect(() => {
     const getTableFilter = async () => {
       try {
         const response = await fetchGetTableFilter();
-        setTableFilter(response);
-        console.log(response);
+        const sortedResponse = response
+          .sort((a: TableFilterType, b: TableFilterType) =>
+            a.type.localeCompare(b.type)
+          )
+          .map((table: TableFilterType) => ({
+            ...table,
+            recipeCategories: table.recipeCategories.sort((a, b) =>
+              a.name.localeCompare(b.name)
+            ),
+          }));
+        setTableFilter(sortedResponse);
+        console.log(sortedResponse);
       } catch (error) {
         toast.error("Table filter not exists", {
           description: `${new Date().toLocaleString()}`,
@@ -36,6 +49,14 @@ const FilterRecipe = () => {
     getTableFilter();
   }, []);
 
+  const handleFilter = () => {
+    let url = "/recipes/filter-recipe/";
+    Object.keys(listFilter).forEach((key) => {
+      url += `categoryId${listFilter[key]}`;
+    });
+    router.push(url);
+  };
+
   const handleFilterChange = (type: string, id: number) => {
     setListFilter((prevListFilter) => {
       const newListFilter = { ...prevListFilter };
@@ -49,9 +70,9 @@ const FilterRecipe = () => {
   };
 
   return (
-    <div className="w-full bg-white">
+    <div className="w-full bg-white py-5">
       <div className="flex flex-col m-auto max-w-7xl">
-        <div className={`grid gap-4 w-full grid-cols-${tableFilter.length} `}>
+        <div className={`grid gap-4 w-full grid-cols-${tableFilter.length}`}>
           {tableFilter.map((table, index) => (
             <div
               key={index}
@@ -62,7 +83,7 @@ const FilterRecipe = () => {
                   {table.type}
                 </h1>
               </div>
-              <div className="flex flex-col ">
+              <div className="flex flex-col">
                 {table.recipeCategories.map((recipeCategory) => (
                   <div
                     key={recipeCategory.id}
@@ -104,7 +125,9 @@ const FilterRecipe = () => {
           </div>
           <div className="flex justify-center items-center">
             <div className="pr-2">Cancel</div>
-            <Button variant="active">Apply</Button>
+            <Button variant="active" onClick={handleFilter}>
+              Apply
+            </Button>
           </div>
         </div>
       </div>

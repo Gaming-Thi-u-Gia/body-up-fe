@@ -11,7 +11,6 @@ import { handleSort } from "@/utils/recipe/handle-data";
 
 const Search = () => {
   const [recipes, setRecipes] = useState<RecipeCardType[]>([]);
-  const [totalSearchResult, setTotalSearchResult] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const pathName = usePathname();
   const parts = pathName.split("=");
@@ -30,12 +29,8 @@ const Search = () => {
         });
       } else {
         try {
-          const data = await fetchGetRecipeByName(
-            recipeName as string,
-            sessionToken as string
-          );
+          const data = await fetchGetRecipeByName(recipeName, sessionToken!);
           setRecipes(data.recipes);
-          setTotalSearchResult(data.totalSearchResults);
         } catch (error) {
           toast.error("Fail to Fetch Recipe", {
             description: `${new Date().toLocaleString()}`,
@@ -60,7 +55,7 @@ const Search = () => {
   return (
     <div>
       <HeaderSearch
-        totalSearchResult={totalSearchResult}
+        totalSearchResult={recipes.length}
         handleSortType={handleSortType}
       />
       <BodySearch recipes={recipes} isLoading={isLoading} />

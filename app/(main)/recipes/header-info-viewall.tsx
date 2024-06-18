@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const HeaderInfoViewAll = ({ id, name, description }: HeaderInfoType) => {
   return (
-    <div className="flex justify-between py-5">
+    <div className="max-w-7xl mx-auto flex justify-between py-5">
       <div>
         <p className="text-[#303033] text-[22px] font-semibold leading-[30px]">
           {name}

@@ -32,9 +32,9 @@ const PopularCategories = () => {
 
   if (isLoading) {
     return (
-      <div>
+      <div className="max-w-7xl flex flex-col mx-auto">
         <div>
-          <p className="text-[#303033] text-[22px] font-semibold leading-[30px] pt-5">
+          <p className=" text-[#303033] text-[22px] font-semibold leading-[30px] pt-5">
             Popular Categories
           </p>
         </div>
@@ -49,7 +49,7 @@ const PopularCategories = () => {
   }
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto flex-col">
       <div>
         <p className="text-[#303033] text-[22px] font-semibold leading-[30px] pt-5">
           Popular Categories
@@ -85,7 +85,7 @@ const PopularCategories = () => {
 
 const PopularCategoriesSkeleton = () => {
   return (
-    <div className="flex h-full items-center bg-white rounded-[15px] border border-[#EFF0F4] animate-pulse">
+    <div className="max-w-7xl mx-auto flex h-full items-center bg-white rounded-[15px] border border-[#EFF0F4] animate-pulse">
       <div className="h-full w-[95px] bg-gray-300 rounded-[15px]"></div>
       <div className="flex-1 pl-2">
         <div className="h-[20px] w-[70%] bg-gray-300 rounded-md mb-1"></div>
