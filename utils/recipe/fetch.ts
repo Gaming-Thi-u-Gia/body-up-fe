@@ -1,7 +1,4 @@
-import { create } from "zustand";
-import { RecipeCard } from "@/app/(main)/recipes/latest-recipes";
-
-export const fetchTopicRecipeData = async () => {
+export const fetchGetRecipeTopic = async () => {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/all`,
@@ -18,7 +15,7 @@ export const fetchTopicRecipeData = async () => {
     throw new Error(`Error while fetching data recipe collection`);
   }
 };
-export const fetchRecipeWithTopicData = async (sessionToken: string) => {
+export const fetchGetEachTopicWith4Recipe = async (sessionToken: string) => {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
@@ -37,28 +34,8 @@ export const fetchRecipeWithTopicData = async (sessionToken: string) => {
     throw new Error(`Error while fetching data recipe collection`);
   }
 };
-export const fetchToggleRecipe = async (
-  recipeId: number,
-  sessionToken: string
-) => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/bookmark-recipe/toggle?recipeId=${recipeId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      }
-    );
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    throw new Error(`Error while toggle recipe`);
-  }
-};
-export const fetchListBookMarkRecipeData = async (sessionToken: string) => {
+
+export const fetchGetBookmarkRecipeList = async (sessionToken: string) => {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/bookmark-recipe`,
@@ -76,7 +53,7 @@ export const fetchListBookMarkRecipeData = async (sessionToken: string) => {
     throw new Error(`Error while get bookmark recipe for user`);
   }
 };
-export const fetchRecipeByIdData = async (
+export const fetchGetRecipeById = async (
   recipeId: number,
   sessionToken: string | undefined
 ) => {
@@ -98,7 +75,7 @@ export const fetchRecipeByIdData = async (
     throw new Error(`Error while getting bookmark recipe for user: ${error}`);
   }
 };
-export const fetchRatingRecipeData = async (
+export const fetchGetRatingRecipe = async (
   recipeId: number,
   sessionToken: string
 ) => {
@@ -119,7 +96,7 @@ export const fetchRatingRecipeData = async (
     throw new Error(`Error while get rating recipe`);
   }
 };
-export const fetchSendRatingRecipe = async (
+export const fetchPostRatingRecipe = async (
   recipeId: number,
   sessionToken: string,
   rating: number
@@ -142,7 +119,7 @@ export const fetchSendRatingRecipe = async (
     throw new Error(`Error while send rating recipe`);
   }
 };
-export const fetchSendBookmarkRecipe = async (
+export const fetchPostBookmarkRecipe = async (
   recipeId: number,
   sessionToken: string
 ) => {
@@ -160,27 +137,32 @@ export const fetchSendBookmarkRecipe = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    throw new Error(`Error while send rating recipe`);
+    throw new Error(`Error while send bookmar recipe`);
   }
 };
-export const fetchTopicById = async (topicId: number) => {
+export const fetchGetTopicRecipeById = async (
+  topicId: number,
+  sessionToken: string | undefined
+) => {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topicId?topicId=${topicId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topicId?topicId=${topicId}`;
+
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+      ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    };
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
     const data = await response.json();
     return data;
   } catch (error) {
     throw new Error(`Error while get all recipe by topic id`);
   }
 };
-export const fetchPopularCategoryData = async () => {
+export const fetchGetPopularCategoryRecipe = async () => {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/recipe-category/popular`,
@@ -197,7 +179,7 @@ export const fetchPopularCategoryData = async () => {
     throw new Error(`Error while get popular category`);
   }
 };
-export const fetchLatestRecipeData = async (
+export const fetchGetRecipeLatest = async (
   sessionToken: string | undefined
 ) => {
   const headers: HeadersInit = {
@@ -218,9 +200,7 @@ export const fetchLatestRecipeData = async (
     throw new Error(`Error while get latest recipes`);
   }
 };
-export const fetchSavedRecipeData = async (
-  sessionToken: string | undefined
-) => {
+export const fetchGetSavedRecipe = async (sessionToken: string | undefined) => {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
@@ -236,35 +216,10 @@ export const fetchSavedRecipeData = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    throw new Error(`Error while get latest recipes`);
+    throw new Error(`Error while get saved recipes`);
   }
 };
-export const initialName = (name = "") => {
-  const words = name.trim().split(" ");
-  if (words.length === 1) {
-    return words[0].substring(0, 2);
-  }
-  const initials = words.map((word) => word.charAt(0));
-  return initials.join("").substring(0, 2);
-};
-export const handleSort = (recipes: RecipeCard[], sort: string) => {
-  switch (sort) {
-    case "Most current":
-      return recipes.sort(
-        (a, b) =>
-          new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
-      );
-    case "Rating":
-      return recipes.sort((a, b) => b.avgStar - a.avgStar);
-    case "A to Z":
-      return recipes.sort((a, b) => a.name.localeCompare(b.name));
-    case "Z to A":
-      return recipes.sort((a, b) => b.name.localeCompare(a.name));
-    default:
-      return recipes;
-  }
-};
-export const fetchGetSearchByNameData = async (
+export const fetchGetRecipeByName = async (
   recipeName: string,
   sessionToken: string | undefined
 ) => {
@@ -282,5 +237,22 @@ export const fetchGetSearchByNameData = async (
     return data;
   } catch (error) {
     throw new Error(`Error when get search by name`);
+  }
+};
+export const fetchGetTableFilter = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/recipe-category/table`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get table filter`);
   }
 };

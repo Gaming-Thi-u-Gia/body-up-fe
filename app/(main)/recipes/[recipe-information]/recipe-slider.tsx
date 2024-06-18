@@ -1,10 +1,7 @@
-type HeaderDetailRecipeType = {
-  img: string;
-  name: string;
-  cookTime: number;
-  prepTime: number;
-};
-const Slider = ({ img, name, cookTime, prepTime }: HeaderDetailRecipeType) => {
+import { RecipeSilerType } from "@/utils/recipe/type";
+import Link from "next/link";
+
+const RecipeSlider = ({ img, name, cookTime, prepTime }: RecipeSilerType) => {
   return (
     <div>
       <div className="relative w-full">
@@ -16,7 +13,7 @@ const Slider = ({ img, name, cookTime, prepTime }: HeaderDetailRecipeType) => {
         <div className="absolute left-1/2 top-0 w-[1280px] -translate-x-1/2 h-full flex flex-col justify-between">
           <div className="mt-5 ml-[45px]">
             <p className="text-[14px] text-[#fff] font-semibold leading-6">
-              Recipes / {name}
+              <Link href={"/recipes"}>Recipes</Link> / {name}
             </p>
           </div>
           <div className="mb-[15%] ml-[45px] flex flex-col">
@@ -51,4 +48,4 @@ const Slider = ({ img, name, cookTime, prepTime }: HeaderDetailRecipeType) => {
   );
 };
 
-export default Slider;
+export default RecipeSlider;

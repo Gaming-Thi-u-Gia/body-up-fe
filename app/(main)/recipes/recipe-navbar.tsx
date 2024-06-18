@@ -3,39 +3,43 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { fetchTopicRecipeData } from "@/utils/recipe";
 import Link from "next/link";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { useRouter } from "next/navigation";
+import { fetchGetRecipeTopic } from "@/utils/recipe/fetch";
 
-type TopicRecipe = {
+type TopicRecipeType = {
   id: number;
   topic: string;
   name: string;
 };
 
-const NavbarRecipes = () => {
+const RecipeNavbar = () => {
   const { sessionToken } = useAuthStore((store) => store);
-  const [search, setSearch] = useState<string>("");
-  const [topicRecipes, setTopicRecipes] = useState<TopicRecipe[]>([
-    { id: -1, topic: "View All Collection", name: "View All Collection" },
-    { id: 0, topic: "Latest Recipes", name: "Latest Recipes" },
-  ]);
+  const [searchRecipeName, setRecipeSearch] = useState<string>("");
+  const [recipeTopics, setRecipeTopics] = useState<TopicRecipeType[]>([]);
 
   useEffect(() => {
-    const fetchTopicRecipes = async () => {
+    const getTopicRecipes = async () => {
       try {
-        const data = await fetchTopicRecipeData();
-        setTopicRecipes([...topicRecipes, ...data]);
+        const data = await fetchGetRecipeTopic();
+        setRecipeTopics([
+          { id: -1, topic: "View All Collection", name: "View All Collection" },
+          { id: 0, topic: "Latest Recipes", name: "Latest Recipes" },
+          ,
+          ...data,
+        ]);
       } catch (error) {
         toast.error("Failed to fetch recipe collections");
       }
     };
-    fetchTopicRecipes();
+    getTopicRecipes();
+    console.log();
   }, []);
   const router = useRouter();
 
-  const [showCollection, setShowCollection] = useState<boolean>(false);
+  const [showTopicCollection, setShowTopicCollection] =
+    useState<boolean>(false);
 
   return (
     <div className="h-full mx-auto flex py-[20px] justify-between items-center border-b border-gray-300">
@@ -43,7 +47,7 @@ const NavbarRecipes = () => {
         <Button
           color="bg-black"
           id="current__cate"
-          onClick={() => setShowCollection(!showCollection)}
+          onClick={() => setShowTopicCollection(!showTopicCollection)}
           variant="secondary"
           className="px-[14px]"
           size="default"
@@ -56,14 +60,14 @@ const NavbarRecipes = () => {
           className="mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px]"
         >
           <ul>
-            {showCollection &&
-              topicRecipes.map((topicRecipe, index) => (
+            {showTopicCollection &&
+              recipeTopics.map((recipeTopic, index) => (
                 <li
                   className="py-[5px] px-5 hover:text-[#000000d9] hover:bg-[#F7F7F7] cursor-pointer whitespace-nowrap text-[14px]"
                   key={index}
                 >
-                  <Link href={`/recipes/c/id=${topicRecipe.id}`}>
-                    {topicRecipe.name}
+                  <Link href={`/recipes/c/id=${recipeTopic.id}`}>
+                    {recipeTopic.name}
                   </Link>
                 </li>
               ))}
@@ -86,13 +90,18 @@ const NavbarRecipes = () => {
               src="/search.svg"
               alt="More"
               onClick={() =>
-                router.push(`/recipes/search/recipeName=${search}`)
+                router.push(`/recipes/search/recipeName=${searchRecipeName}`)
               }
             />
             <input
               className="pl-5 w-full rounded-[15px] border-2 border-black"
               placeholder="Search"
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => setRecipeSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  router.push(`/recipes/search/recipeName=${searchRecipeName}`);
+                }
+              }}
             />
           </span>
         </div>
@@ -134,4 +143,4 @@ const NavbarRecipes = () => {
     </div>
   );
 };
-export default NavbarRecipes;
+export default RecipeNavbar;

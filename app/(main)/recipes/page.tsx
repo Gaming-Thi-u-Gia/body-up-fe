@@ -1,18 +1,21 @@
-import NavbarRecipes from "./navbar-recipes";
-import LatestRecipes from "./latest-recipes";
-import PopularCategories from "./popular-categories";
-import RecipeCategoryList from "./list-recipe-category";
+// import PopularCategories from "./popular-categories";
+// import RecipeCategoryList from "./list-recipe-category";
+// import RecipesLatest from "./latest-recipes";
+// import RecipeNavbar from "./recipe-navbar";
+import FilterRecipe from "./filter-recipes";
 
 const page = () => {
   return (
     <>
-      <div className=" max-w-7xl h-full mx-auto mb-10">
-        <NavbarRecipes />
-        <LatestRecipes />
+      <div className=" h-full mx-auto mb-10">
+        {/* <RecipeNavbar />
+        <RecipesLatest />
         <PopularCategories />
-        <RecipeCategoryList />
+        <RecipeCategoryList /> */}
+        <FilterRecipe />
       </div>
     </>
   );
 };
+
 export default page;

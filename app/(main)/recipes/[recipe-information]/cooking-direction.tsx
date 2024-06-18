@@ -1,15 +1,15 @@
 "use client";
+
+import { RecipesNoteType } from "@/utils/recipe/type";
 import React from "react";
-type CookInfoType = {
+
+const CookingDirection = ({
+  cookingInstruction,
+  noteRecipes,
+}: {
   cookingInstruction: string;
-  noteRecipes: [
-    {
-      id: number;
-      detail: string;
-    },
-  ];
-};
-const CookInfo = ({ cookingInstruction, noteRecipes }: CookInfoType) => {
+  noteRecipes: RecipesNoteType;
+}) => {
   return (
     <div className="flex max-w-7xl text-[22px] m-auto my-20 items-center">
       <div className="w-[60%] pr-20 leading-10">
@@ -32,4 +32,4 @@ const CookInfo = ({ cookingInstruction, noteRecipes }: CookInfoType) => {
   );
 };
 
-export default CookInfo;
+export default CookingDirection;

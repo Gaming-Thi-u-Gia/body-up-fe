@@ -1,5 +1,6 @@
 import React from "react";
-const Recommend = () => {
+
+const RecommendRecipe = () => {
   return (
     <div className="max-w-7xl m-auto py-20">
       <p className="text-[26px] font-medium leading-[50px]">
@@ -9,4 +10,4 @@ const Recommend = () => {
   );
 };
 
-export default Recommend;
+export default RecommendRecipe;

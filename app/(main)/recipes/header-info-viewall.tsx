@@ -1,10 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { HeaderInfoType } from "@/utils/recipe/type";
 import Link from "next/link";
-export type HeaderInfoType = {
-  name: string;
-  description: string;
-  id: number;
-};
 
 const HeaderInfoViewAll = ({ id, name, description }: HeaderInfoType) => {
   return (

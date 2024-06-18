@@ -1,15 +1,15 @@
 "use client";
+
+// eslint-disable-next-line @next/next/no-img-element
+import { OtherImageSwipeType } from "@/utils/recipe/type";
 import "photoswipe/dist/photoswipe.css";
 import { Gallery, Item } from "react-photoswipe-gallery";
-type ImageSwipeType = {
-  otherImageRecipes: [
-    {
-      id: number;
-      img: string;
-    },
-  ];
-};
-const ImageSwipe = ({ otherImageRecipes }: ImageSwipeType) => {
+
+const OtherImageSwipe = ({
+  otherImageRecipes,
+}: {
+  otherImageRecipes: OtherImageSwipeType;
+}) => {
   return (
     <div>
       <Gallery>
@@ -23,7 +23,6 @@ const ImageSwipe = ({ otherImageRecipes }: ImageSwipeType) => {
                 height="700"
               >
                 {({ ref, open }) => (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     ref={ref}
                     onClick={open}
@@ -41,4 +40,4 @@ const ImageSwipe = ({ otherImageRecipes }: ImageSwipeType) => {
   );
 };
 
-export default ImageSwipe;
+export default OtherImageSwipe;

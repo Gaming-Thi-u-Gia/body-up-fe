@@ -1,26 +1,53 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
+import { fetchGetPopularCategoryRecipe } from "@/utils/recipe/fetch";
+import { PopularCategoriesType } from "@/utils/recipe/type";
 import React, { useEffect, useState } from "react";
-import { fetchPopularCategoryData } from "@/utils/recipe";
-type PopularCategories = {
-  id: number;
-  name: string;
-  img: string;
-  totalRecipe: number;
-}[];
+import { toast } from "sonner";
+
 const PopularCategories = () => {
-  const [popularCategories, setPopularCategories] = useState<PopularCategories>(
-    []
-  );
+  const [popularCategories, setPopularCategories] = useState<
+    PopularCategoriesType[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchPopularCategory = async () => {
       try {
-        const data = await fetchPopularCategoryData();
+        const data = await fetchGetPopularCategoryRecipe();
         setPopularCategories(data);
-      } catch (error) {}
+      } catch (error) {
+        toast.error("Failure to fetch Popular Categories", {
+          description: `${new Date().toLocaleString()}`,
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchPopularCategory();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div>
+        <div>
+          <p className="text-[#303033] text-[22px] font-semibold leading-[30px] pt-5">
+            Popular Categories
+          </p>
+        </div>
+        <div className="grid grid-cols-4 gap-5 h-[95px] box-border my-5">
+          <PopularCategoriesSkeleton />
+          <PopularCategoriesSkeleton />
+          <PopularCategoriesSkeleton />
+          <PopularCategoriesSkeleton />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div>
@@ -33,15 +60,15 @@ const PopularCategories = () => {
           {popularCategories.map((category, index) => (
             <div
               key={index}
-              className="flex h-full items-center bg-white rounded-[15px] border border-[#EFF0F4]  cursor-pointer "
+              className="flex h-full items-center bg-white rounded-[15px] border border-[#EFF0F4] cursor-pointer"
             >
               <img
                 className="h-full w-[95px] rounded-[15px] object-cover"
-                src={category.img!}
-                alt="pupular food"
+                src={category.img}
+                alt="popular food"
               />
               <div className="flex-1 pl-2">
-                <p className="text-[#303033] text-[18px] font-medium leading-[140%] pb-1 ">
+                <p className="text-[#303033] text-[18px] font-medium leading-[140%] pb-1">
                   {category.name}
                 </p>
                 <p className="text-[14px] font-normal leading-[140%]">
@@ -51,6 +78,18 @@ const PopularCategories = () => {
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
+};
+
+const PopularCategoriesSkeleton = () => {
+  return (
+    <div className="flex h-full items-center bg-white rounded-[15px] border border-[#EFF0F4] animate-pulse">
+      <div className="h-full w-[95px] bg-gray-300 rounded-[15px]"></div>
+      <div className="flex-1 pl-2">
+        <div className="h-[20px] w-[70%] bg-gray-300 rounded-md mb-1"></div>
+        <div className="h-[16px] w-[50%] bg-gray-300 rounded-md"></div>
       </div>
     </div>
   );

@@ -3,21 +3,24 @@ import { Button } from "@/components/ui/button";
 import StarRating from "./star-rating";
 import { Heart } from "lucide-react";
 import Link from "next/link";
-import { fetchSendBookmarkRecipe, initialName } from "@/utils/recipe";
 import { useState } from "react";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
-import { RecipeCard } from "./latest-recipes";
+import { fetchPostBookmarkRecipe } from "@/utils/recipe/fetch";
+import { splitName } from "@/utils/recipe/handle-data";
+import { RecipeCardType } from "@/utils/recipe/type";
 
-const CardRecipe = ({ recipe }: { recipe: RecipeCard }) => {
-  const [bookmark, setBookmark] = useState<boolean>(recipe.bookmarked);
+const RecipeCard = ({ recipe }: { recipe: RecipeCardType }) => {
+  const [currentBookmark, setCurrentBookmark] = useState<boolean>(
+    recipe.bookmarked
+  );
   const { sessionToken } = useAuthStore((store) => store);
   const handleBookmark = async () => {
     try {
-      await fetchSendBookmarkRecipe(recipe.id, sessionToken!);
-      setBookmark(!bookmark);
+      await fetchPostBookmarkRecipe(recipe.id, sessionToken!);
+      setCurrentBookmark(!currentBookmark);
       toast.success(
-        `${!bookmark ? "Book mark success fully" : "Delete Bookmark Successfully"} `,
+        `${!currentBookmark ? "Book mark success fully" : "Delete Bookmark Successfully"} `,
         {
           description: `${new Date().toLocaleString()}`,
           action: {
@@ -58,7 +61,7 @@ const CardRecipe = ({ recipe }: { recipe: RecipeCard }) => {
                   variant="secondary"
                   size="icon"
                 >
-                  <a href="#">{initialName(recipeCategory.name)}</a>
+                  <a href="#">{splitName(recipeCategory.name)}</a>
                 </Button>
                 <Button
                   className=" my-1 group-hover:flex hidden"
@@ -84,7 +87,7 @@ const CardRecipe = ({ recipe }: { recipe: RecipeCard }) => {
                   strokeWidth={1}
                   width={24}
                   height={25}
-                  fill={`${bookmark === false ? "#D5D5D5" : "#FF0000"}`}
+                  fill={`${currentBookmark === false ? "#D5D5D5" : "#FF0000"}`}
                   onClick={() => handleBookmark()}
                 />
               </Button>
@@ -101,4 +104,4 @@ const CardRecipe = ({ recipe }: { recipe: RecipeCard }) => {
   );
 };
 
-export default CardRecipe;
+export default RecipeCard;
