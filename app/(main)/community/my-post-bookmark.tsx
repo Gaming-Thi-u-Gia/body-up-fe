@@ -387,7 +387,8 @@ const MyPostsBookmark = () => {
                                         href={`/community/${post.categoryCommunity.name}/${post.id}`}
                                         className="text-[12px]"
                                     >
-                                        <span>33</span> Replies
+                                        <span>{post.comments.length}</span>{" "}
+                                        Replies
                                     </Link>
                                 </Button>
                                 <Button

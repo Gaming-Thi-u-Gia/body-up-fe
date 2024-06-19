@@ -68,6 +68,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
     const [isBookmarked, setIsBookmarked] = useState<{
         [key: number]: boolean;
     }>({});
+    const [countComments, setCountComments] = useState<number>(0);
     useEffect(() => {
         const getPostsByCategory = async () => {
             try {
@@ -89,7 +90,6 @@ const PostUser = ({ categoryId }: CategoryId) => {
         };
         getPostsByCategory();
     }, [categoryId, sessionToken]);
-
     const handleBookmark = async (id: number) => {
         try {
             if (!sessionToken) {
@@ -323,7 +323,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                 href={`/community/${title}/${post.id}`}
                                 className="text-[12px]"
                             >
-                                <span>33</span> Replies
+                                <span>{post.comments.length}</span> Replies
                             </Link>
                         </Button>
                         <Button

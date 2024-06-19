@@ -96,7 +96,7 @@ const Comment = ({ comment }: { comment: Comments }) => {
                                     className="text-[16px] font-semibold mt-2"
                                     htmlFor=""
                                 >
-                                    Destiny
+                                    {comment.user.username || "Anonymous"}
                                 </label>
                                 <div className="flex flex-col gap-2 mt-1">
                                     <span className="text-sm">
