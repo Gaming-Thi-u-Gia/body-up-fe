@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { useSharePostModal } from "@/stores/use-share-model";
 import { SharePostModal } from "@/components/modals/share-modal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Comments } from "./view-post";
 export type Posts = {
     id: number;
     title: string;
@@ -50,6 +51,7 @@ export type Posts = {
         categoryId: number;
         name: string;
     };
+    comments: Comments[];
     createdAt: string;
 };
 type CategoryId = {

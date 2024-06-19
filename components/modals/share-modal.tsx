@@ -31,11 +31,11 @@ export function SharePostModal({ post }: { post: Posts }) {
     const [isClient, setIsClient] = useState(false);
     useEffect(() => setIsClient(true), []);
     const shareUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/community/${post.categoryCommunity.name}/${post.id}`;
-    useEffect(() => {
-        console.log("Domain:", process.env.NEXT_PUBLIC_DOMAIN);
-        console.log("Post ID:", post.id);
-        console.log("Share URL:", shareUrl);
-    }, [post.id, shareUrl]);
+    // useEffect(() => {
+    //     console.log("Domain:", process.env.NEXT_PUBLIC_DOMAIN);
+    //     console.log("Post ID:", post.id);
+    //     console.log("Share URL:", shareUrl);
+    // }, [post.id, shareUrl]);
 
     return (
         <AlertDialog open={isOpen} onOpenChange={close}>
