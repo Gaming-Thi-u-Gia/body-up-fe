@@ -49,6 +49,8 @@ const MyPostsBookmark = () => {
                 setHasMorePosts(false);
                 setIsLoading(false);
             }
+            console.log(res);
+
             //* Sort By Day
             const sortPosts = res.sort((a: any, b: any) => {
                 return (
@@ -85,6 +87,10 @@ const MyPostsBookmark = () => {
             setIsLoading(false);
         }
     };
+    useEffect(() => {
+        console.log("Page State Updated to:", page);
+        console.log("Data Load", posts);
+    }, [page, posts]);
 
     const handleBookmark = async (id: number) => {
         try {

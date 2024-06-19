@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 "use client";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -9,18 +8,24 @@ import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
 import moment from "moment";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MyCommentPage = () => {
     const [posts, setPosts] = useState<Posts[]>([]);
     const { sessionToken } = useAuthStore((store) => store);
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         const getPostsCommented = async () => {
             try {
+                setLoading(true);
                 const data = await fetchPostsCommented(sessionToken!);
+                setLoading(false);
                 setPosts(data);
                 console.log(data);
             } catch (error) {
                 console.log(error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -34,6 +39,18 @@ const MyCommentPage = () => {
                 onClick: () => console.log("Close"),
             },
         });
+    }
+
+    if (loading) {
+        return (
+            <div className="w-[823px] mt-3">
+                <PostSkeleton />
+                <PostSkeleton />
+                <PostSkeleton />
+                <PostSkeleton />
+                <PostSkeleton />
+            </div>
+        );
     }
 
     return (
@@ -83,3 +100,22 @@ const MyCommentPage = () => {
 };
 
 export default MyCommentPage;
+
+const PostSkeleton = () => (
+    <div className="animate-pulse flex flex-col gap-2 hover:bg-[#f5f5f5] rounded-lg p-3">
+        <div className="flex items-center gap-3">
+            <Skeleton className="h-6 bg-gray-300 rounded w-1/2"></Skeleton>
+            <div className="flex gap-1 rounded-full bg-gray-200 px-3 py-2 justify-center items-center">
+                <Skeleton className="h-4 bg-gray-300 rounded w-4"></Skeleton>
+                <Skeleton className="w-16 bg-gray-300 rounded h-4"></Skeleton>
+            </div>
+        </div>
+        <div className="flex flex-col w-full gap-3 mb-1">
+            <div className="flex flex-col p-2 bg-gray-200 w-full rounded-lg">
+                <Skeleton className="h-2 bg-gray-300 rounded w-1/4 mb-1"></Skeleton>
+                <Skeleton className="h-2 bg-gray-300 rounded w-full"></Skeleton>
+                <Skeleton className="h-2 bg-gray-300 rounded w-2/3"></Skeleton>
+            </div>
+        </div>
+    </div>
+);

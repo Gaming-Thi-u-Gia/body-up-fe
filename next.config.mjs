@@ -7,6 +7,7 @@ const nextConfig = {
             "static.chloeting.com",
         ],
     },
+    reactStrictMode: false,
 };
 
 export default nextConfig;
