@@ -61,7 +61,7 @@ const MyCommentPage = () => {
 
                     {post.comments.map((comment) => (
                         <div
-                            key={post.id}
+                            key={comment.id}
                             className="flex flex-col w-full gap-3 mb-1"
                         >
                             <div className="flex flex-col p-2 bg-[#ebf4ff] w-full rounded-lg">
