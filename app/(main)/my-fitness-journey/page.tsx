@@ -11,19 +11,18 @@ import { Button } from "@/components/ui/button";
 import { CardProgram } from "./card-program";
 import Link from "next/link";
 import { DaySchedule } from "@/components/shared/day-schedule";
-const data = {
-    title: "2424 Summer Shred Challenge",
-    releaseDate: "May 2424",
-    days: "26",
-    time: "40-60 min/day",
-    type: "Weight Loss, Full Body, Abs & Core",
-    equipment: "Fitness Mat",
-};
-const MySchedulePage = () => {
-    const isHasSchedule = true;
+import { cookies } from "next/headers";
+import { getAllWorkoutProgram, getUncompletedChallenge } from "@/utils/user";
+const MySchedulePage = async () => {
+    const userCookie = cookies().get("sessionToken");
+    const challenge = await getUncompletedChallenge(userCookie?.value!);
+    let allChallenge;
+    if (!challenge) {
+        allChallenge = await getAllWorkoutProgram(userCookie?.value!);
+    }
     return (
         <>
-            {!isHasSchedule ? (
+            {!challenge ? (
                 <div>
                     <h2 className='text-3xl font-bold'>My Schedule</h2>
                     <div className='w-full p-[30px] bg-white border-[#c4c4c4] border-[1px] rounded-lg flex items-start mt-4'>
@@ -71,19 +70,22 @@ const MySchedulePage = () => {
                                 variant='default'
                             />
                             <CarouselContent>
-                                {Array.from({ length: 5 }).map((_, index) => (
+                                {allChallenge?.payload?.map((program: any) => (
                                     <CarouselItem
-                                        key={index}
+                                        key={program.title}
                                         className='ml-4 basis-1/4'
                                     >
-                                        <div className='p-4' key={data.title}>
+                                        <div className='p-4'>
                                             <CardProgram
-                                                days={data.days}
-                                                title={data.title}
-                                                releaseDate={data.releaseDate}
-                                                time={data.time}
-                                                type={data.type}
-                                                equipment={data.equipment}
+                                                days={program.day}
+                                                title={program.name}
+                                                releaseDate={
+                                                    program.releaseDate
+                                                }
+                                                time={program.time}
+                                                type={program.type}
+                                                equipment={program.equipment}
+                                                imgUrl={program.img}
                                             />
                                         </div>
                                     </CarouselItem>
@@ -94,12 +96,13 @@ const MySchedulePage = () => {
                 </div>
             ) : (
                 <DaySchedule
-                    days={data.days}
-                    title={data.title}
-                    releaseDate={data.releaseDate}
-                    time={data.time}
-                    type={data.type}
-                    equipment={data.equipment}
+                    days={challenge?.payload?.workoutProgram.day}
+                    title={challenge?.payload?.workoutProgram.name}
+                    releaseDate={challenge?.payload?.workoutProgram.releaseDate}
+                    time={challenge?.payload?.workoutProgram.time}
+                    type={challenge?.payload?.workoutProgram.type}
+                    equipment={challenge?.payload?.workoutProgram.equipment}
+                    banner={challenge?.payload?.workoutProgram.banner}
                 />
             )}
         </>

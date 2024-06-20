@@ -109,15 +109,24 @@ export const deleteAvatar = async (sessionToken: string) => {
     return result;
 };
 //PROGRESS PHOTO
-export const getAllProgressPhoto = async (sessionToken:string,photoAngle?:string) => {
-    let path = photoAngle !== "all" ? `getProgressPhotoByPhotoAngle?photoAngle=${photoAngle}` : "getProgressPhoto"
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/${path}`,{
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${sessionToken}`,
+export const getAllProgressPhoto = async (
+    sessionToken: string,
+    photoAngle?: string
+) => {
+    let path =
+        photoAngle !== "all"
+            ? `getProgressPhotoByPhotoAngle?photoAngle=${photoAngle}`
+            : "getProgressPhoto";
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/${path}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
         }
-    }) 
+    );
     if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
     }
@@ -127,16 +136,25 @@ export const getAllProgressPhoto = async (sessionToken:string,photoAngle?:string
         payload,
     };
     return result;
-}
+};
 
-export const getAllProgressPhotoByUserId = async (userId:number,photoAngle?:string) => {
-    let path = photoAngle !== "all" ? `getPhotoByUserIdAndPhotoAngle?userId=${userId}&photoAngle=${photoAngle}` : `getPhotoByUserId?userId=${userId}`
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/${path}`,{
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
+export const getAllProgressPhotoByUserId = async (
+    userId: number,
+    photoAngle?: string
+) => {
+    let path =
+        photoAngle !== "all"
+            ? `getPhotoByUserIdAndPhotoAngle?userId=${userId}&photoAngle=${photoAngle}`
+            : `getPhotoByUserId?userId=${userId}`;
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/${path}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
         }
-    }) 
+    );
     if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
     }
@@ -146,13 +164,13 @@ export const getAllProgressPhotoByUserId = async (userId:number,photoAngle?:stri
         payload,
     };
     return result;
-}
+};
 
 //Add new progress photo
 export const addProgressPhoto = async (
     sessionToken: string,
-    data:z.infer<typeof UploadPhotoSchema>,
-    img:string
+    data: z.infer<typeof UploadPhotoSchema>,
+    img: string
 ) => {
     const resultFromSv = await fetch(
         `${process.env.NEXT_PUBLIC_API}/upload-progress-photo/`,
@@ -183,7 +201,10 @@ export const addProgressPhoto = async (
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${sessionToken}`,
                 },
-                body: JSON.stringify({...data,imgUrl:resultFromSv.payload.results.secure_url}),
+                body: JSON.stringify({
+                    ...data,
+                    imgUrl: resultFromSv.payload.results.secure_url,
+                }),
             }
         );
 
@@ -203,7 +224,10 @@ export const addProgressPhoto = async (
     return resultFromSv;
 };
 
-export const deletePhoto = async (sessionToken:string,progressPhotoId:number) => {
+export const deletePhoto = async (
+    sessionToken: string,
+    progressPhotoId: number
+) => {
     const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/deleteUserProgressPhotoById?progressPhotoId=${progressPhotoId}`,
         {
@@ -215,29 +239,35 @@ export const deletePhoto = async (sessionToken:string,progressPhotoId:number) =>
         }
     );
     return res;
-}
+};
 
-export const getProgressPhotoById = async (sessionToken:string,progressPhotoId:number) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/getProgressPhotoById?progressPhotoId=${progressPhotoId}`,{
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${sessionToken}`,
+export const getProgressPhotoById = async (
+    sessionToken: string,
+    progressPhotoId: number
+) => {
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/getProgressPhotoById?progressPhotoId=${progressPhotoId}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
         }
-    }) 
+    );
     const payload = await res.json();
     const result = {
         status: res.status,
         payload,
     };
     return result;
-}
+};
 
 export const updateProgreePhoto = async (
     sessionToken: string,
-    data:z.infer<typeof UploadPhotoSchema>,
-    img:string,
-    progressPhotoId:number
+    data: z.infer<typeof UploadPhotoSchema>,
+    img: string,
+    progressPhotoId: number
 ) => {
     const resultFromSv = await fetch(
         `${process.env.NEXT_PUBLIC_API}/upload-progress-photo/`,
@@ -268,7 +298,10 @@ export const updateProgreePhoto = async (
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${sessionToken}`,
                 },
-                body: JSON.stringify({...data,imgUrl:resultFromSv.payload.results.secure_url}),
+                body: JSON.stringify({
+                    ...data,
+                    imgUrl: resultFromSv.payload.results.secure_url,
+                }),
             }
         );
 
@@ -288,17 +321,85 @@ export const updateProgreePhoto = async (
     return resultFromSv;
 };
 
-export const getUserByUserName2 = async (username2:string) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/getUserByUsername2?username2=${username2}`,{
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
+export const getUserByUserName2 = async (username2: string) => {
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/user/getUserByUsername2?username2=${username2}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
         }
-    }) 
+    );
     const payload = await res.json();
     const result = {
         status: res.status,
         payload,
     };
     return result;
-}
+};
+export const getUncompletedChallenge = async (sessionToken: string) => {
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/userChallenge/getUncompletedChallenge`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+        }
+    );
+    if (!res.ok) {
+        return null;
+    }
+    const payload = await res.json();
+    const result = {
+        status: res.status,
+        payload,
+    };
+    return result;
+};
+
+export const getVideoChallenge = async (sessionToken: string, day: string) => {
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/userChallenge/getDailyVideoByDay?day=${day}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+        }
+    );
+    if (!res.ok) {
+        return null;
+    }
+    const payload = await res.json();
+    const result = {
+        status: res.status,
+        payload,
+    };
+    return result;
+};
+
+export const getAllWorkoutProgram = async (sessionToken: string) => {
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/userChallenge/getAllWorkoutPrograms`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+        }
+    );
+    if (!res.ok) {
+        return null;
+    }
+    const payload = await res.json();
+    const result = {
+        status: res.status,
+        payload,
+    };
+    return result;
+};

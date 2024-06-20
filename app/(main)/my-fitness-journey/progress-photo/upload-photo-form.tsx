@@ -34,13 +34,16 @@ import {
 } from "@/utils/user";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { useUploadPhotoModal } from "@/stores/use-upload-photo";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 type Props = {
     progressPhotoId?: number;
 };
 export const UploadPhotoForm = () => {
+    const router = useRouter();
     const [isPending, startTransition] = useTransition();
-    const { close, progressPhotoId } = useUploadPhotoModal((store) => store);
+    const { close, progressPhotoId, update } = useUploadPhotoModal(
+        (store) => store
+    );
     const { sessionToken } = useAuthStore((store) => store);
     const form = useForm({
         resolver: zodResolver(UploadPhotoSchema),
@@ -62,7 +65,7 @@ export const UploadPhotoForm = () => {
             form.setValue("caption", res.payload.caption);
             setPreview(res.payload.imgUrl);
         });
-    }, [progressPhotoId, sessionToken]);
+    }, [progressPhotoId, sessionToken, form]);
     const onDrop = useCallback(
         (acceptedFiles: FileList, fileRejections: FileList) => {
             // Do something with the files
@@ -129,9 +132,10 @@ export const UploadPhotoForm = () => {
                             onClick: () => console.log("Close"),
                         },
                     });
+                    update(res.payload);
                 }
                 close();
-                window.location.reload();
+                //TODO: refresh page
             } catch (error) {
                 toast.error("Save Photo Failed!", {
                     description: `${new Date().toLocaleString()}`,

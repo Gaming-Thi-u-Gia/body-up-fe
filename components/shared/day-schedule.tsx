@@ -8,7 +8,6 @@ import {
     Menu,
     Users,
 } from "lucide-react";
-import Image from "next/image";
 import {
     Accordion,
     AccordionContent,
@@ -18,10 +17,12 @@ import {
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
 import { DailyCarousel } from "./daily-carousel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { VideoDailyCard } from "./video-daily-card";
 import { Button } from "../ui/button";
 import { date } from "zod";
+import { useAuthStore } from "../providers/auth-provider";
+import { getVideoChallenge } from "@/utils/user";
 type Props = {
     title: string;
     releaseDate: string;
@@ -29,6 +30,7 @@ type Props = {
     time: string;
     type: string;
     equipment: string;
+    banner: string;
 };
 //TODO: fetch API
 const dailyVideoData = {
@@ -51,18 +53,23 @@ export const DaySchedule = ({
     time,
     type,
     equipment,
+    banner,
 }: Props) => {
-    const [data, setData] = useState("");
-    const validatedStatus =
-        dailyVideoData.status === "complete" ||
-        dailyVideoData.status === "incomplete"
-            ? dailyVideoData.status
-            : "incomplete";
+    const { sessionToken } = useAuthStore((store) => store);
+    const [dailyVideoData, setDailyVideoData] = useState([]);
+    const [day, setDay] = useState("1");
     //TODO: SET DATA WHEN CLICK ON SCHEDULE
     const onClick = (index: number) => {
-        const day = "Day " + index;
-        setData(day);
+        setDay("" + index);
     };
+    useEffect(() => {
+        const getVideoData = async () => {
+            const res = await getVideoChallenge(sessionToken!, day);
+            console.log(res);
+            setDailyVideoData(res?.payload);
+        };
+        getVideoData();
+    }, [day, sessionToken]);
     return (
         <div>
             <div className='flex justify-between items-center'>
@@ -84,11 +91,11 @@ export const DaySchedule = ({
                     <AccordionItem value='item-1'>
                         <AccordionTrigger>
                             <h3 className='text-[22px] font-semibold w-[60%] text-left'>
-                                2021 Flat Stomach Challenge
+                                {title}
                             </h3>
                             <div className='mr-2'>
                                 <div className='flex text-[10px] text-[#6C6F78] justify-between mt-1'>
-                                    <span>DAY 3/28</span>
+                                    <span>DAY {day}/28</span>
                                     <span>25%</span>
                                 </div>
                                 <Progress
@@ -123,14 +130,17 @@ export const DaySchedule = ({
                                     </Badge>
                                 </div>
                             </div>
-                            <div className='bg-[url("https://static.chloeting.com/programs/61bd418558da74df97000d5c/be3502c0-86d3-11ed-be97-e54de3bdbeba.jpeg")] pb-[18%] bg-cover w-[40%] -translate-x-6 rounded-2xl relative'>
+                            <div
+                                className='pb-[18%] bg-cover w-[40%] -translate-x-6 rounded-2xl relative'
+                                style={{ backgroundImage: `url(${banner})` }}
+                            >
                                 <div className='absolute flex bottom-2 left-2 right-2 gap-2'>
                                     <Badge
                                         variant='secondary'
                                         className='text-[#303033] text-xs space-x-1 py-1 px-2'
                                     >
                                         <Calendar width={16} height={16} />
-                                        <p>{days} days</p>
+                                        <p>{days}</p>
                                     </Badge>
                                     <Badge
                                         variant='secondary'
@@ -158,22 +168,31 @@ export const DaySchedule = ({
                             </p>
                         </AccordionTrigger>
                         <AccordionContent>
-                            {Array.from({ length: 5 }).map((_, index) => (
+                            {/* {Array.from({ length: 5 }).map((_, index) => (
+                                // <VideoDailyCard
+                                //     key={index}
+                                //     title={dailyVideoData.title}
+                                //     bannerUrl={dailyVideoData.bannerUrl}
+                                //     duration={dailyVideoData.duration}
+                                //     releaseDate={dailyVideoData.releaseDate}
+                                //     target={dailyVideoData.target}
+                                //     view={dailyVideoData.view}
+                                //     isOptional={dailyVideoData.isOptional}
+                                //     url={dailyVideoData.url}
+                                //     initialStatus={validatedStatus}
+                                // />
+                            ))} */}
+                            {dailyVideoData.map((dailyVideo: any) => (
                                 <VideoDailyCard
-                                    key={index}
-                                    title={dailyVideoData.title + " " + data}
-                                    bannerUrl={dailyVideoData.bannerUrl}
-                                    duration={dailyVideoData.duration}
-                                    releaseDate={dailyVideoData.releaseDate}
-                                    target={dailyVideoData.target}
-                                    view={dailyVideoData.view}
-                                    isOptional={dailyVideoData.isOptional}
-                                    url={dailyVideoData.url}
-                                    initialStatus={validatedStatus}
+                                    id={dailyVideo.id}
+                                    key={dailyVideo.id}
+                                    title={dailyVideo.name}
+                                    initialStatus={dailyVideo.status}
+                                    videoUrl={dailyVideo.url}
                                 />
                             ))}
                             <Button variant='primary' className='my-4 ml-2'>
-                                Mark {data} as Complete
+                                Mark day {day} as Complete
                             </Button>
                         </AccordionContent>
                     </AccordionItem>

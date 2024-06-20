@@ -6,8 +6,8 @@ import { getAllProgressPhotoByUserId } from "@/utils/user";
 import { Plus } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { PhotoProps } from "../my-fitness-journey/progress-photo/page";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import { PhotoProps } from "../my-fitness-journey/progress-photo/progress-photo";
 
 type Props = {
     photoAngle: { type: string; title: string }[];
@@ -21,8 +21,8 @@ export const UserProgressPhoto = ({
     onClick,
     userId,
 }: Props) => {
+    const { update, photos } = useUploadPhotoModal((state) => state);
     const { user } = useAuthStore((state) => state);
-    const [photo, setPhotos] = useState([]);
     useEffect(() => {
         getAllProgressPhotoByUserId(userId, angle).then((res) => {
             if (res.status === 200) {
@@ -31,10 +31,10 @@ export const UserProgressPhoto = ({
                         new Date(b.date).getTime() - new Date(a.date).getTime()
                     );
                 });
-                setPhotos(res.payload);
+                update(res.payload);
             }
         });
-    }, [angle, userId]);
+    }, [angle, userId, update]);
     const { open } = useUploadPhotoModal((state) => state);
     return (
         <>
@@ -69,9 +69,9 @@ export const UserProgressPhoto = ({
                 )}
             </div>
             <div className='mt-6 w-full bg-[#fafafa] py-[52px] rounded-lg'>
-                {photo ? (
+                {photos ? (
                     <div className='flex gap-4 flex-wrap px-4'>
-                        {photo.map((photo: PhotoProps) => (
+                        {photos.map((photo: PhotoProps) => (
                             <ImageCard
                                 key={photo.id}
                                 date={photo.date}
