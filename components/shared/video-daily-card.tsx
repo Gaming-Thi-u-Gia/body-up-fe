@@ -10,6 +10,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 type Props = {
+    id: number;
     title: string;
     target: string;
     view: string;
@@ -19,6 +20,7 @@ type Props = {
     isOptional: boolean;
     url: string;
     initialStatus: "incomplete" | "complete";
+    videoUrl: string;
 };
 export const VideoDailyCard = ({
     title,
