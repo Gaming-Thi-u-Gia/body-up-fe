@@ -1,28 +1,3 @@
-const fetchVideoIdsFromDatabase = async () => {
-    try {
-        const response = await fetch(
-            "http://localhost:8080/api/v1/workout-video/getVideoAll"
-        );
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (!data || !Array.isArray(data)) {
-            throw new Error("Invalid data format");
-        }
-
-        return data.map((item) => ({
-            id: item.id,
-            name: item.name,
-            url: item.url,
-        })); // Trả về mảng các đối tượng chứa id, name và url
-    } catch (error) {
-        console.error("Error fetching videoIds from database:", error);
-        return [];
-    }
-};
-
 export interface VideoItem {
     id: string;
     title: string;
@@ -37,7 +12,7 @@ const fetchVideos = async (videos: any) => {
         const videoDataFromDb = videos;
 
         const playlistId = "UUCgLoMYIyP0U56dEhEL1wXQ";
-        const apiKey = "AIzaSyADY8e4ihQaU9XL0iZLDQMKZoAo5Qg3NOQ";
+        const apiKey = "AIzaSyBCM2AezbVyQI-JKej57iHCT8GfIMH4Pwc";
 
         let matchedVideos: VideoItem[] = [];
         let nextPageToken = "";
@@ -87,7 +62,6 @@ const fetchVideos = async (videos: any) => {
                     return null;
                 })
             );
-
             matchedVideos = matchedVideos.concat(
                 videoDetails.filter((video) => video !== null)
             );

@@ -16,14 +16,15 @@ import {
 } from "../ui/accordion";
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
-import { DailyCarousel } from "./daily-carousel";
+import { DailyCarousel, DailyExercise } from "./daily-carousel";
 import { useEffect, useState } from "react";
 import { VideoDailyCard } from "./video-daily-card";
 import { Button } from "../ui/button";
 import { date } from "zod";
 import { useAuthStore } from "../providers/auth-provider";
-import { getVideoChallenge } from "@/utils/user";
+import { getFirstUncompleted, getVideoChallenge } from "@/utils/user";
 import fetchVideos, { VideoItem } from "@/utils/dailyVideo";
+import { getAllDay } from "@/utils/dailyExercise";
 type Props = {
     title: string;
     releaseDate: string;
@@ -32,20 +33,10 @@ type Props = {
     type: string;
     equipment: string;
     banner: string;
+    challenge: string;
+    currDay: DailyExercise;
 };
 //TODO: fetch API
-const dailyVideoData = {
-    title: "Full Body Warm Up",
-    target: "Warm Up",
-    view: "1.2M",
-    releaseDate: "2021-06-01",
-    duration: "05:00",
-    bannerUrl:
-        "https://static.chloeting.com/videos/61bc1877dff295b571b03e08/af196bc0-5ef5-11ec-b4e8-6545cdfc138f.jpeg",
-    isOptional: true,
-    status: "incomplete",
-    url: "https://www.youtube.com/watch?v=j5SHMJ6mUoA",
-};
 
 export const DaySchedule = ({
     title,
@@ -55,22 +46,44 @@ export const DaySchedule = ({
     type,
     equipment,
     banner,
+    challenge,
+    currDay,
 }: Props) => {
     const { sessionToken } = useAuthStore((store) => store);
     const [dailyVideoData, setDailyVideoData] = useState<VideoItem[] | []>([]);
-    const [day, setDay] = useState("1");
+    const [videoData, setVideoData] = useState();
+    const [allDay, setAllDay] = useState<DailyExercise[]>([]);
+    const [day, setDay] = useState(currDay.dailyExercise.day || "1");
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingDay, setIsLoadingDay] = useState(false);
     //TODO: SET DATA WHEN CLICK ON SCHEDULE
     const onClick = (index: number) => {
+        if (isLoading) return;
         setDay("" + index);
     };
     useEffect(() => {
+        const getDay = async () => {
+            setIsLoadingDay(true);
+            const res = await getAllDay(sessionToken!, challenge);
+            console.log(res?.payload);
+            const sortDay = res?.payload.sort(
+                (a: any, b: any) => a.dailyExercise.day - b.dailyExercise.day
+            );
+            setAllDay(sortDay);
+            setIsLoadingDay(false);
+        };
+        getDay();
+    }, [sessionToken, challenge]);
+    useEffect(() => {
         const getVideoData = async () => {
+            setIsLoading(true);
             const res = await getVideoChallenge(sessionToken!, day);
             const video = await fetchVideos(
                 res?.payload.map((item: any) => item.video)
             );
-            console.log(video);
+            setVideoData(res?.payload);
             setDailyVideoData(video);
+            setIsLoading(false);
         };
         getVideoData();
     }, [day, sessionToken]);
@@ -158,7 +171,14 @@ export const DaySchedule = ({
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
-                <DailyCarousel day='Mon 23' title='Test' onClick={onClick} />
+                <DailyCarousel
+                    day={day}
+                    title='Test'
+                    onClick={onClick}
+                    allDay={allDay!}
+                    currDay={currDay!}
+                    isLoading={isLoadingDay}
+                />
             </div>
             <div className='w-full py-[30px] px-[18px] bg-white border-[#c4c4c4] border-[1px] rounded-lg items-start my-4'>
                 <Accordion type='single' collapsible>
@@ -172,29 +192,23 @@ export const DaySchedule = ({
                             </p>
                         </AccordionTrigger>
                         <AccordionContent>
-                            {/* {Array.from({ length: 5 }).map((_, index) => (
-                                // <VideoDailyCard
-                                //     key={index}
-                                //     title={dailyVideoData.title}
-                                //     bannerUrl={dailyVideoData.bannerUrl}
-                                //     duration={dailyVideoData.duration}
-                                //     releaseDate={dailyVideoData.releaseDate}
-                                //     target={dailyVideoData.target}
-                                //     view={dailyVideoData.view}
-                                //     isOptional={dailyVideoData.isOptional}
-                                //     url={dailyVideoData.url}
-                                //     initialStatus={validatedStatus}
-                                // />
-                            ))} */}
-                            {dailyVideoData.map((dailyVideo: any) => (
-                                <VideoDailyCard
-                                    id={dailyVideo.id}
-                                    key={dailyVideo.id}
-                                    title={dailyVideo.name}
-                                    initialStatus={dailyVideo.status}
-                                    url={dailyVideo.url}
-                                />
-                            ))}
+                            {dailyVideoData.map(
+                                (dailyVideo: any, index: number) => (
+                                    <VideoDailyCard
+                                        id={dailyVideo.id}
+                                        key={dailyVideo.id}
+                                        title={dailyVideo.title}
+                                        // @ts-ignore
+                                        initialStatus={videoData![index].status}
+                                        url={dailyVideo.id}
+                                        img={dailyVideo.img}
+                                        view={dailyVideo.views}
+                                        releaseDate={dailyVideo.date}
+                                        duration={dailyVideo.duration}
+                                        isLoading={isLoading}
+                                    />
+                                )
+                            )}
                             <Button variant='primary' className='my-4 ml-2'>
                                 Mark day {day} as Complete
                             </Button>

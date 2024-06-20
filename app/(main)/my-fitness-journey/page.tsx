@@ -12,10 +12,18 @@ import { CardProgram } from "./card-program";
 import Link from "next/link";
 import { DaySchedule } from "@/components/shared/day-schedule";
 import { cookies } from "next/headers";
-import { getAllWorkoutProgram, getUncompletedChallenge } from "@/utils/user";
+import {
+    getAllWorkoutProgram,
+    getFirstUncompleted,
+    getUncompletedChallenge,
+} from "@/utils/user";
+import { DailyExercise } from "@/components/shared/daily-carousel";
 const MySchedulePage = async () => {
     const userCookie = cookies().get("sessionToken");
     const challenge = await getUncompletedChallenge(userCookie?.value!);
+    const currDay: DailyExercise = await getFirstUncompleted(
+        userCookie?.value!
+    );
     let allChallenge;
     if (!challenge) {
         allChallenge = await getAllWorkoutProgram(userCookie?.value!);
@@ -103,6 +111,8 @@ const MySchedulePage = async () => {
                     type={challenge?.payload?.workoutProgram.type}
                     equipment={challenge?.payload?.workoutProgram.equipment}
                     banner={challenge?.payload?.workoutProgram.banner}
+                    challenge={challenge?.payload.workoutProgram.id}
+                    currDay={currDay}
                 />
             )}
         </>
