@@ -188,7 +188,7 @@ export const DaySchedule = ({
                                     key={dailyVideo.id}
                                     title={dailyVideo.name}
                                     initialStatus={dailyVideo.status}
-                                    videoUrl={dailyVideo.url}
+                                    url={dailyVideo.url}
                                 />
                             ))}
                             <Button variant='primary' className='my-4 ml-2'>
