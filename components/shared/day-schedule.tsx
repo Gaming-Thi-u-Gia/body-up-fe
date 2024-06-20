@@ -23,6 +23,7 @@ import { Button } from "../ui/button";
 import { date } from "zod";
 import { useAuthStore } from "../providers/auth-provider";
 import { getVideoChallenge } from "@/utils/user";
+import fetchVideos, { VideoItem } from "@/utils/dailyVideo";
 type Props = {
     title: string;
     releaseDate: string;
@@ -56,7 +57,7 @@ export const DaySchedule = ({
     banner,
 }: Props) => {
     const { sessionToken } = useAuthStore((store) => store);
-    const [dailyVideoData, setDailyVideoData] = useState([]);
+    const [dailyVideoData, setDailyVideoData] = useState<VideoItem[] | []>([]);
     const [day, setDay] = useState("1");
     //TODO: SET DATA WHEN CLICK ON SCHEDULE
     const onClick = (index: number) => {
@@ -65,8 +66,11 @@ export const DaySchedule = ({
     useEffect(() => {
         const getVideoData = async () => {
             const res = await getVideoChallenge(sessionToken!, day);
-            console.log(res);
-            setDailyVideoData(res?.payload);
+            const video = await fetchVideos(
+                res?.payload.map((item: any) => item.video)
+            );
+            console.log(video);
+            setDailyVideoData(video);
         };
         getVideoData();
     }, [day, sessionToken]);
