@@ -12,12 +12,10 @@ export type CookInfoType = {
     },
   ];
 };
-export type OtherImageSwipeType = [
-  {
-    id: number;
-    img: string;
-  },
-];
+export type OtherImageSwipeType = {
+  id: number;
+  img: string;
+};
 export type RecipeContentType = {
   id: number;
   name: string;
@@ -32,12 +30,10 @@ export type RecipeContentType = {
   bookmarked: boolean;
 };
 
-export type RecipesNoteType = [
-  {
-    id: number;
-    detail: string;
-  },
-];
+export type RecipesNoteType = {
+  id: number;
+  detail: string;
+};
 export type RecipesRatingType = [
   {
     id: number;
@@ -48,13 +44,11 @@ export type RecipesCategoriesType = {
   id: number;
   name: string;
 };
-export type IngredientRecipesType = [
-  {
-    id: number;
-    amount: string;
-    name: string;
-  },
-];
+export type IngredientRecipesType = {
+  id: number;
+  amount: string;
+  name: string;
+};
 export type HeaderInfoSortType = {
   name: string;
   description: string;
@@ -106,11 +100,11 @@ export type RecipeInformationType = {
   currentRating: number;
   totalRating: number;
   bookmarked: boolean;
-  noteRecipes: RecipesNoteType;
-  otherImageRecipes: OtherImageSwipeType;
-  recipeCategories: RecipesCategoriesType;
-  recipeRating: RecipesRatingType;
-  ingredientRecipes: IngredientRecipesType;
+  noteRecipes: RecipesNoteType[];
+  otherImageRecipes: OtherImageSwipeType[];
+  recipeCategories: RecipesCategoriesType[];
+  recipeRating: RecipesRatingType[];
+  ingredientRecipes: IngredientRecipesType[];
 };
 export type PopularCategoriesType = {
   id: number;

@@ -1,3 +1,5 @@
+import page from "@/app/(main)/recipes/page";
+
 export const fetchGetRecipeTopic = async () => {
   try {
     const response = await fetch(
@@ -15,14 +17,18 @@ export const fetchGetRecipeTopic = async () => {
     throw new Error(`Error while fetching data recipe collection`);
   }
 };
-export const fetchGetEachTopicWith4Recipe = async (sessionToken: string) => {
+export const fetchGetEachTopicWith4Recipe = async (
+  sessionToken: string,
+  pageNo: number,
+  pageSize: number
+) => {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
   };
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topic`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topic?pageNo=${pageNo}&pageSize=${pageSize}`,
       {
         method: "GET",
         headers: headers,
@@ -142,10 +148,12 @@ export const fetchPostBookmarkRecipe = async (
 };
 export const fetchGetTopicRecipeById = async (
   topicId: number,
+  pageNo: number,
+  pageSize: number,
   sessionToken: string | undefined
 ) => {
   try {
-    const url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topicId?topicId=${topicId}`;
+    const url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/topic-recipe/topicId?topicId=${topicId}&pageNo=${pageNo}&pageSize=${pageSize}`;
 
     const headers: HeadersInit = {
       "Content-Type": "application/json",
@@ -200,14 +208,20 @@ export const fetchGetRecipeLatest = async (
     throw new Error(`Error while get latest recipes`);
   }
 };
-export const fetchGetSavedRecipe = async (sessionToken: string | undefined) => {
+export const fetchGetSavedRecipe = async (
+  sessionToken: string | undefined,
+  pageNo: number,
+  pageSize: number
+) => {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
   };
+  console.log("hi");
+
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/saved-recipe`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/saved-recipe?pageNo=${pageNo}&pageSize=${pageSize}`,
       {
         method: "GET",
         headers: headers,
@@ -221,10 +235,12 @@ export const fetchGetSavedRecipe = async (sessionToken: string | undefined) => {
 };
 export const fetchGetRecipeByName = async (
   recipeName: string,
-  sessionToken: string | undefined
+  sessionToken: string | undefined,
+  pageNo: number,
+  pageSize: number
 ) => {
   try {
-    const url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/name?recipeName=${recipeName}`;
+    const url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/name?recipeName=${recipeName}&pageNo=${pageNo}&pageSize=${pageSize}`;
     const headers: HeadersInit = {
       "Content-Type": "application/json",
       ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
@@ -258,7 +274,9 @@ export const fetchGetTableFilter = async () => {
 };
 export const fetchGetRecipeByCategories = async (
   categoryIds: string[],
-  sessionToken: string | undefined
+  sessionToken: string | undefined,
+  pageNo: number,
+  pageSize: number
 ) => {
   try {
     let url = `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/category?`;
@@ -267,7 +285,7 @@ export const fetchGetRecipeByCategories = async (
         url += `categoryIds=${categoryId}&`;
       });
     }
-    console.log(url);
+    url += `pageNo=${pageNo}&pageSize=${pageSize}`;
     const headers: HeadersInit = {
       "Content-Type": "application/json",
       ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),

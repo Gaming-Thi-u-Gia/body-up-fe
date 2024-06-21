@@ -11,42 +11,43 @@ import { handleSort } from "@/utils/recipe/handle-data";
 
 const Search = () => {
   const [recipes, setRecipes] = useState<RecipeCardType[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const pathName = usePathname();
   const parts = pathName.split("=");
   const recipeName = parts[parts.length - 1];
   const { sessionToken } = useAuthStore((store) => store);
+  const [pageNo, setPageNo] = useState(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [hasMoreRecipe, setHasMoreRecipe] = useState(false);
+  const [totalSearchResult, setTotalSearchResult] = useState(0);
 
   useEffect(() => {
-    const fetchRecipes = async () => {
-      if (!recipeName) {
-        toast.error("Recipe Name Not Exists", {
-          description: `${new Date().toLocaleString()}`,
-          action: {
-            label: "Close",
-            onClick: () => console.log("Close"),
-          },
-        });
-      } else {
-        try {
-          const data = await fetchGetRecipeByName(recipeName, sessionToken!);
-          setRecipes(data.recipes);
-        } catch (error) {
-          toast.error("Fail to Fetch Recipe", {
-            description: `${new Date().toLocaleString()}`,
-            action: {
-              label: "Close",
-              onClick: () => console.log("Close"),
-            },
-          });
-        } finally {
-          setIsLoading(false);
-        }
+    GetRecipesSearch();
+  }, [sessionToken]);
+  const GetRecipesSearch = async () => {
+    try {
+      const pageSize = 4;
+      setIsLoading(true);
+      const data = await fetchGetRecipeByName(
+        recipeName,
+        sessionToken!,
+        pageNo,
+        pageSize
+      );
+      if (data.totalElements === 0) {
+        setHasMoreRecipe(false);
+        setIsLoading(false);
       }
-    };
-    fetchRecipes();
-  }, [recipeName, sessionToken]);
-
+      setRecipes((previousRecipes) => [...previousRecipes, ...data.content]);
+      setTotalSearchResult(data.totalElements);
+      console.log(data);
+      setPageNo((prev) => prev + 1);
+      setHasMoreRecipe(!data.last);
+    } catch (error) {
+      toast.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const handleSortType = (type: string) => {
     const sortedRecipes = handleSort(recipes, type);
     setRecipes([...sortedRecipes]);
@@ -55,10 +56,15 @@ const Search = () => {
   return (
     <div>
       <HeaderSearch
-        totalSearchResult={recipes.length}
+        totalSearchResult={totalSearchResult}
         handleSortType={handleSortType}
       />
-      <BodySearch recipes={recipes} isLoading={isLoading} />
+      <BodySearch
+        recipes={recipes}
+        isLoading={isLoading}
+        hasMoreRecipe={hasMoreRecipe}
+        GetRecipesSearch={GetRecipesSearch}
+      />
     </div>
   );
 };

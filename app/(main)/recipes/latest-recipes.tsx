@@ -66,14 +66,14 @@ const RecipesLatest = () => {
   if (isLoading) {
     return (
       <div>
-        <HeaderInfoSearch name="Latest Recipes" description="" id={1} />
+        <HeaderInfoSearch name="Latest Recipes" description="" id={0} />
         <LatestRecipesSkeleton />
       </div>
     );
   } else {
     return (
       <div className="max-w-7xl m-auto">
-        <HeaderInfoSearch name="Latest Recipes" description="" id={1} />
+        <HeaderInfoSearch name="Latest Recipes" description="" id={0} />
         {listLatestRecipes.length === 2 && (
           <div className="flex gap-5 ">
             {/* Recipe1 */}
@@ -95,7 +95,9 @@ const RecipesLatest = () => {
                           variant="secondary"
                           size="icon"
                         >
-                          <Link href={`/recipes/${listLatestRecipes[0].id}`}>
+                          <Link
+                            href={`/recipes/filter-recipe/categoryId${recipeCategory.id}`}
+                          >
                             <span>{splitName(recipeCategory.name)}</span>
                           </Link>
                         </Button>
@@ -104,9 +106,11 @@ const RecipesLatest = () => {
                           variant="secondary"
                           size="default"
                         >
-                          <a href="#">
+                          <Link
+                            href={`/recipes/filter-recipe/categoryId${recipeCategory.id}`}
+                          >
                             <span>{recipeCategory.name}</span>
-                          </a>
+                          </Link>
                         </Button>
                       </div>
                     )
@@ -122,7 +126,9 @@ const RecipesLatest = () => {
                 <div className="h-[10%] ">
                   <Star
                     id={listLatestRecipes[0].id}
-                    avgStar={listLatestRecipes[0].avgStar}
+                    avgStar={parseFloat(
+                      listLatestRecipes[0].avgStar.toFixed(2)
+                    )}
                     currentRating={listLatestRecipes[0].currentRating}
                   />
                 </div>
@@ -170,16 +176,20 @@ const RecipesLatest = () => {
                           variant="secondary"
                           size="icon"
                         >
-                          <a href="#">
+                          <Link
+                            href={`/recipes/filter-recipe/categoryId${recipeCategory.id}`}
+                          >
                             <span>{splitName(recipeCategory.name)}</span>
-                          </a>
+                          </Link>
                         </Button>
                         <Button
                           className="my-1 group-hover:flex hidden"
                           variant="secondary"
                           size="default"
                         >
-                          <Link href="#">
+                          <Link
+                            href={`/recipes/filter-recipe/categoryId${recipeCategory.id}`}
+                          >
                             <span>{recipeCategory.name}</span>
                           </Link>
                         </Button>
@@ -191,7 +201,9 @@ const RecipesLatest = () => {
                 <div className="absolute top-3 px-5 flex w-full justify-between">
                   <Star
                     id={listLatestRecipes[1].id}
-                    avgStar={listLatestRecipes[1].avgStar}
+                    avgStar={parseFloat(
+                      listLatestRecipes[1].avgStar.toFixed(2)
+                    )}
                     currentRating={listLatestRecipes[1].currentRating}
                   />
                   <Heart
@@ -223,6 +235,7 @@ const RecipesLatest = () => {
     );
   }
 };
+
 export default RecipesLatest;
 const LatestRecipesSkeleton = () => {
   return (

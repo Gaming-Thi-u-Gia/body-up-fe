@@ -9,7 +9,11 @@ import {
   fetchPostBookmarkRecipe,
   fetchPostRatingRecipe,
 } from "@/utils/recipe/fetch";
-import { RecipeInformationType } from "@/utils/recipe/type";
+import {
+  RecipeInformationType,
+  RecipesCategoriesType,
+} from "@/utils/recipe/type";
+import Link from "next/link";
 
 const RecipeContent = ({
   recipecontent,
@@ -93,15 +97,17 @@ const RecipeContent = ({
         <div className="grid grid-cols-2 w-full h-full items-center">
           <div className="w-full h-full border-r-2 border-[#C4C4C4]">
             <div className="mt-[10%]">
-              {recipecontent.recipeCategories.map((category) => (
-                <a
-                  key={category.id}
-                  href="#"
-                  className="inline-flex bg-black text-white rounded-[54px] px-3 py-1 text-[12px] mr-[10px]"
-                >
-                  {category.name}
-                </a>
-              ))}
+              {recipecontent.recipeCategories.map(
+                (category: RecipesCategoriesType) => (
+                  <Link
+                    key={category.id}
+                    href={`/recipes/filter-recipe/categoryId${category.id}`}
+                    className="inline-flex bg-black text-white rounded-[54px] px-3 py-1 text-[12px] mr-[10px]"
+                  >
+                    {category.name}
+                  </Link>
+                )
+              )}
             </div>
             <p className="text-[32px] leading-[45px] text-[#303033] my-10">
               {recipecontent.detail}

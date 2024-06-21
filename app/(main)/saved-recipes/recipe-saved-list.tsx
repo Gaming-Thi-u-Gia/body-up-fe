@@ -3,43 +3,46 @@
 import { ChevronDown, MoveLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import CardRecipe from "../recipes/recipe-card";
-import { toast } from "sonner";
 import { useAuthStore } from "@/components/providers/auth-provider";
-import { fetchGetSavedRecipe } from "@/utils/recipe/fetch";
 import { RecipeCardType } from "@/utils/recipe/type";
 import Link from "next/link";
 import { handleSort } from "@/utils/recipe/handle-data";
+import { fetchGetSavedRecipe } from "@/utils/recipe/fetch";
+import { set } from "zod";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const RecipeSavedList = () => {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [recipes, setRecipes] = useState<RecipeCardType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const typeSort = ["Most current", "Rating", "A to Z", "Z to A"];
   const { sessionToken } = useAuthStore((store) => store);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasMoreRecipe, setHasMoreRecipe] = useState(false);
+  const [pageNo, setPageNo] = useState(0);
 
   useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        const response = await fetchGetSavedRecipe(sessionToken!);
-        setRecipes(response);
-      } catch (error) {
-        toast.error("Please login account", {
-          description: `${new Date().toLocaleString()}`,
-          action: {
-            label: "Close",
-            onClick: () => console.log("Close"),
-          },
-        });
-        console.error("Error while fetching saved recipe:", error);
-      } finally {
+    getSavedRecipes();
+  }, [sessionToken]);
+  console.log("hi");
+
+  const getSavedRecipes = async () => {
+    try {
+      setIsLoading(true);
+      const pageSize = 8;
+      const data = await fetchGetSavedRecipe(sessionToken!, pageNo, pageSize);
+      if (data.totalElements === 0) {
+        setHasMoreRecipe(false);
         setIsLoading(false);
       }
-    };
-    if (sessionToken) {
-      fetchRecipes();
+      setRecipes((prev) => [...prev, ...data.content]);
+      setPageNo((previous) => previous + 1);
+      setHasMoreRecipe(!data.last);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [sessionToken]);
-
+  };
   return (
     <div className="max-w-7xl m-auto">
       <Link
@@ -78,31 +81,44 @@ const RecipeSavedList = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-4 gap-5">
-        {isLoading ? (
-          <>
-            <SkeletonCardRecipe />
-            <SkeletonCardRecipe />
-            <SkeletonCardRecipe />
-            <SkeletonCardRecipe />
-            <SkeletonCardRecipe />
-            <SkeletonCardRecipe />
-            <SkeletonCardRecipe />
-            <SkeletonCardRecipe />
-          </>
-        ) : (
-          recipes.map((recipe, index) => (
-            <CardRecipe key={index} recipe={recipe} />
-          ))
-        )}
-      </div>
+      {isLoading && recipes.length === 0 ? (
+        <div>
+          <RecipeSavedListSkeleton />
+          <RecipeSavedListSkeleton />
+        </div>
+      ) : (
+        <InfiniteScroll
+          dataLength={recipes.length}
+          next={getSavedRecipes}
+          hasMore={hasMoreRecipe}
+          loader={<RecipeSavedListSkeleton />}
+        >
+          <div className="grid grid-cols-4 gap-5">
+            {recipes.map((recipe, index) => (
+              <CardRecipe recipe={recipe} key={index} />
+            ))}
+          </div>
+        </InfiniteScroll>
+      )}
     </div>
   );
 };
 
 export default RecipeSavedList;
 
-const SkeletonCardRecipe = () => {
+export const RecipeSavedListSkeleton = () => {
+  return (
+    <div className="max-w-7xl m-auto">
+      <div className="grid grid-cols-4 gap-5">
+        <CardRecipeSkeleton />
+        <CardRecipeSkeleton />
+        <CardRecipeSkeleton />
+        <CardRecipeSkeleton />
+      </div>
+    </div>
+  );
+};
+const CardRecipeSkeleton = () => {
   return (
     <div className="relative bg-white border-solid border-[1px] border-[#E9E9EF] rounded-[15px] cursor-pointer h-[425px] animate-pulse">
       <div className="h-[87%] w-full bg-gray-300 rounded-[15px]"></div>

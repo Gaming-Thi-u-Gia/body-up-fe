@@ -6,54 +6,84 @@ import CardRecipe from "./recipe-card";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { fetchGetEachTopicWith4Recipe } from "@/utils/recipe/fetch";
 import { RecipesTopicType } from "@/utils/recipe/type";
-import { MoveLeft } from "lucide-react";
+import { Divide, MoveLeft } from "lucide-react";
 import Link from "next/link";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { usePathname } from "next/navigation";
 
 const RecipeCategoryList = () => {
   const { sessionToken } = useAuthStore((store) => store);
   const [topicRecipes, setTopicRecipes] = useState<RecipesTopicType[]>([]);
+  const [pageNo, setPageNo] = useState(0);
+  const pathName = usePathname();
   const [isLoading, setIsLoading] = useState(true);
-
+  const [hasMoreTopic, setHasMoreTopic] = useState(false);
   useEffect(() => {
-    const GetTopicRecipes = async () => {
-      try {
-        const data = await fetchGetEachTopicWith4Recipe(sessionToken as string);
-        setTopicRecipes(data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     GetTopicRecipes();
   }, [sessionToken]);
 
-  if (isLoading) {
-    return <RecipeCategoryListSkeleton />;
-  }
+  const GetTopicRecipes = async () => {
+    try {
+      setIsLoading(true);
+      const pageSize = 1;
+      const data = await fetchGetEachTopicWith4Recipe(
+        sessionToken!,
+        pageNo,
+        pageSize
+      );
+      if (data.totalElements === 0) {
+        setHasMoreTopic(false);
+        setIsLoading(false);
+      }
+      setTopicRecipes((prev) => [...prev, ...data.content]);
+      setPageNo((previous) => previous + 1);
+      setHasMoreTopic(!data.last);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  console.log(topicRecipes);
 
   return (
     <div className="max-w-7xl m-auto">
-      <Link
-        href="/recipes"
-        className="inline-flex items-center text-[15px] leading-5 font-semibold"
-      >
-        <MoveLeft /> <span className="pl-2">Back To Recipe Home</span>
-      </Link>
-      {topicRecipes.map((topicRecipe, index) => (
-        <div key={topicRecipe.id}>
-          <HeaderInfoViewAll
-            id={topicRecipe.id}
-            name={topicRecipe.name}
-            description={topicRecipe.description}
-          />
-          <div className="grid grid-cols-4 gap-5">
-            {topicRecipe.recipes.map((recipe, index) => (
-              <CardRecipe recipe={recipe} key={index} />
-            ))}
-          </div>
+      {pathName !== "/recipes" && (
+        <Link
+          href="/recipes"
+          className="inline-flex items-center text-[15px] leading-5 font-semibold"
+        >
+          <MoveLeft /> <span className="pl-2">Back To Recipe Home</span>
+        </Link>
+      )}
+      {isLoading && topicRecipes.length === 0 ? (
+        <div>
+          <RecipeCategoryListSkeleton />
+          <RecipeCategoryListSkeleton />
         </div>
-      ))}
+      ) : (
+        <InfiniteScroll
+          dataLength={topicRecipes.length}
+          next={GetTopicRecipes}
+          hasMore={hasMoreTopic}
+          loader={<RecipeCategoryListSkeleton />}
+        >
+          {topicRecipes.map((topicRecipe, index) => (
+            <div key={topicRecipe.id}>
+              <HeaderInfoViewAll
+                id={topicRecipe.id}
+                name={topicRecipe.name}
+                description={topicRecipe.description}
+              />
+              <div className="grid grid-cols-4 gap-5">
+                {topicRecipe.recipes.map((recipe, index) => (
+                  <CardRecipe recipe={recipe} key={index} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </InfiniteScroll>
+      )}
     </div>
   );
 };
@@ -61,15 +91,6 @@ const RecipeCategoryList = () => {
 export const RecipeCategoryListSkeleton = () => {
   return (
     <div className="max-w-7xl m-auto">
-      <div>
-        <HeaderInfoViewAllSkeleton />
-        <div className="grid grid-cols-4 gap-5">
-          <CardRecipeSkeleton />
-          <CardRecipeSkeleton />
-          <CardRecipeSkeleton />
-          <CardRecipeSkeleton />
-        </div>
-      </div>
       <div>
         <HeaderInfoViewAllSkeleton />
         <div className="grid grid-cols-4 gap-5">

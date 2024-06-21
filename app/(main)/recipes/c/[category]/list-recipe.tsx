@@ -8,12 +8,11 @@ const ListRecipe = ({ recipes }: { recipes: RecipeCardType[] }) => {
   if (!recipes) {
     return <div>Loading...</div>;
   }
-  console.log(recipes);
   return (
     <div className="max-w-7xl">
-      <div className="grid grid-cols-4 gap-5">
-        {recipes.map((recipe) => (
-          <CardRecipe recipe={recipe} />
+      <div className="grid grid-cols-4 gap-5 pb-10">
+        {recipes.map((recipe, index) => (
+          <CardRecipe key={index} recipe={recipe} />
         ))}
       </div>
     </div>

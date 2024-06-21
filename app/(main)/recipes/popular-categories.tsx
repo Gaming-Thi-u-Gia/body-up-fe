@@ -1,6 +1,7 @@
 "use client";
 import { fetchGetPopularCategoryRecipe } from "@/utils/recipe/fetch";
 import { PopularCategoriesType } from "@/utils/recipe/type";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -15,6 +16,9 @@ const PopularCategories = () => {
       try {
         const data = await fetchGetPopularCategoryRecipe();
         setPopularCategories(data);
+        setPopularCategories((popularCategory) =>
+          [...popularCategory].sort((a, b) => a.name.localeCompare(b.name))
+        );
       } catch (error) {
         toast.error("Failure to fetch Popular Categories", {
           description: `${new Date().toLocaleString()}`,
@@ -58,9 +62,10 @@ const PopularCategories = () => {
       <div>
         <div className="grid grid-cols-4 gap-5 h-[95px] box-border my-5">
           {popularCategories.map((category, index) => (
-            <div
+            <Link
               key={index}
               className="flex h-full items-center bg-white rounded-[15px] border border-[#EFF0F4] cursor-pointer"
+              href={`/recipes/filter-recipe/categoryId${category.id}`}
             >
               <img
                 className="h-full w-[95px] rounded-[15px] object-cover"
@@ -75,7 +80,7 @@ const PopularCategories = () => {
                   {category.totalRecipe} recipes
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

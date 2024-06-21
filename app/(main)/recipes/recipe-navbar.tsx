@@ -28,7 +28,6 @@ const RecipeNavbar = () => {
         setRecipeTopics([
           { id: -1, topic: "View All Collection", name: "View All Collection" },
           { id: 0, topic: "Latest Recipes", name: "Latest Recipes" },
-          ,
           ...data,
         ]);
       } catch (error) {
@@ -36,16 +35,15 @@ const RecipeNavbar = () => {
       }
     };
     getTopicRecipes();
-    console.log();
   }, []);
-  const router = useRouter();
 
+  const router = useRouter();
   const [showTopicCollection, setShowTopicCollection] =
     useState<boolean>(false);
 
   return (
     <div>
-      <div className="max-w-7xl  h-full mx-auto flex py-[20px] justify-between items-center border-b border-gray-300">
+      <div className="max-w-7xl h-full mx-auto flex py-[20px] justify-between items-center border-b border-gray-300">
         <div className="h-full relative">
           <Button
             color="bg-black"
@@ -58,24 +56,24 @@ const RecipeNavbar = () => {
             Browse By Collection
             <Image width={15} height={14} src="/more.svg" alt="More" />
           </Button>
-          <div
-            id="list__cate"
-            className="mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px]"
+          <ul
+            className={`transition-all duration-300 ease-in-out overflow-hidden mt-2 absolute bg-white z-10 rounded-[6px] leading-[22px] ${
+              showTopicCollection
+                ? "max-h-[500px] opacity-100"
+                : "max-h-0 opacity-0"
+            }`}
           >
-            <ul>
-              {showTopicCollection &&
-                recipeTopics.map((recipeTopic, index) => (
-                  <li
-                    className="py-[5px] px-5 hover:text-[#000000d9] hover:bg-[#F7F7F7] cursor-pointer whitespace-nowrap text-[14px]"
-                    key={index}
-                  >
-                    <Link href={`/recipes/c/id=${recipeTopic.id}`}>
-                      {recipeTopic.name}
-                    </Link>
-                  </li>
-                ))}
-            </ul>
-          </div>
+            {recipeTopics.map((recipeTopic, index) => (
+              <li
+                className="py-[5px] px-5 hover:text-[#000000d9] hover:bg-[#F7F7F7] cursor-pointer whitespace-nowrap text-[14px]"
+                key={index}
+              >
+                <Link href={`/recipes/c/id=${recipeTopic.id}`}>
+                  {recipeTopic.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="flex h-8">
           <div className="group inline-flex h-full">
@@ -85,7 +83,12 @@ const RecipeNavbar = () => {
                 Search
               </Button>
             </span>
-            <span className="relative inline-flex group-hover:w-[240px] items-center group-hover:opacity-100 transition-all ease-in-out duration-1000 h-full rounded-[15px] w-0 opacity-0">
+            <span
+              onMouseEnter={(e) =>
+                e.currentTarget.querySelector("input")?.focus()
+              }
+              className="relative inline-flex group-hover:w-[240px] items-center group-hover:opacity-100 transition-all ease-in-out duration-1000 h-full rounded-[15px] w-0 opacity-0"
+            >
               <Image
                 className="absolute left-[2px] cursor-pointer"
                 width={20}
@@ -112,7 +115,7 @@ const RecipeNavbar = () => {
           </div>
           <div>
             {sessionToken ? (
-              <Link href={`saved-recipes`}>
+              <Link href={`/saved-recipes`}>
                 <Button
                   className="bg-transparent mr-1"
                   variant="default"
@@ -141,7 +144,7 @@ const RecipeNavbar = () => {
           </div>
           <div>
             <Button
-              variant="default"
+              variant={`${isShowFilterTable ? "active" : "default"}`}
               size="default"
               onClick={() => setIsShowFilterTable(!isShowFilterTable)}
             >
@@ -151,8 +154,14 @@ const RecipeNavbar = () => {
           </div>
         </div>
       </div>
-      {isShowFilterTable && <FilterRecipe />}
+      {
+        <FilterRecipe
+          isShowTableFilter={isShowFilterTable}
+          setIsShowFilterTable={setIsShowFilterTable}
+        />
+      }
     </div>
   );
 };
+
 export default RecipeNavbar;

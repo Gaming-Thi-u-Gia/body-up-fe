@@ -3,21 +3,19 @@ import { ChevronDown, CircleX } from "lucide-react";
 import { useState } from "react";
 import RecipeNavbar from "../../recipe-navbar";
 import Link from "next/link";
+import { RecipesCategoriesType } from "@/utils/recipe/type";
 
 const HeaderSearch = ({
   totalSearchResult,
   handleSortType,
+  recipeCategories,
 }: {
   totalSearchResult: number;
   handleSortType: (type: string) => void;
+  recipeCategories: RecipesCategoriesType[];
 }) => {
   const [isSortOpen, setIsSortOpen] = useState<boolean>(false);
   const typeSort = ["Most current", "Rating", "A to Z", "Z to A"];
-  const category = [
-    "Daily Free Diatary Restriction",
-    "Daily Free Diatary Restriction",
-    "Daily Free Diatary Restriction",
-  ];
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -28,12 +26,12 @@ const HeaderSearch = ({
             <span className="whitespace-nowrap">
               Showing <b>{totalSearchResult} Recipes</b> Recipes matching
             </span>
-            {category.map((c, index) => (
+            {recipeCategories.map((recipeCatgory, index) => (
               <div
                 key={index}
                 className="relative flex justify-center items-center px-3 py-1 m-1 rounded-2xl bg-gray-200 text-gray-800 font-bold"
               >
-                <span>{c}</span>
+                <span>{recipeCatgory.name}</span>
                 <span>
                   <CircleX
                     className="absolute -top-2 -right-2"

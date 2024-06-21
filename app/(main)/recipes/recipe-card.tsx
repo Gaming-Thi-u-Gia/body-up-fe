@@ -68,7 +68,11 @@ const RecipeCard = ({ recipe }: { recipe: RecipeCardType }) => {
                   variant="secondary"
                   size="default"
                 >
-                  <a href="#">{recipeCategory.name}</a>
+                  <Link
+                    href={`/recipes/filter-recipe/categoryId${recipeCategory.id}`}
+                  >
+                    {recipeCategory.name}
+                  </Link>
                 </Button>
               </div>
             ))}
@@ -87,7 +91,7 @@ const RecipeCard = ({ recipe }: { recipe: RecipeCardType }) => {
                   strokeWidth={1}
                   width={24}
                   height={25}
-                  fill={`${currentBookmark === false ? "#D5D5D5" : "#FF0000"}`}
+                  fill={`${currentBookmark === false ? "transparent" : "#FF0000"}`}
                   onClick={() => handleBookmark()}
                 />
               </Button>

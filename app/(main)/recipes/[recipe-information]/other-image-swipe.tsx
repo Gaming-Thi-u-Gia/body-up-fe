@@ -8,7 +8,7 @@ import { Gallery, Item } from "react-photoswipe-gallery";
 const OtherImageSwipe = ({
   otherImageRecipes,
 }: {
-  otherImageRecipes: OtherImageSwipeType;
+  otherImageRecipes: OtherImageSwipeType[];
 }) => {
   return (
     <div>
