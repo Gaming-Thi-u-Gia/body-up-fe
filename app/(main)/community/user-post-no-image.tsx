@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import { useSharePostModal } from "@/stores/use-share-model";
 import { SharePostModal } from "@/components/modals/share-modal";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Comments } from "./view-post";
+import { Comments } from "./comment";
 export type Posts = {
     id: number;
     title: string;
@@ -68,7 +68,6 @@ const PostUser = ({ categoryId }: CategoryId) => {
     const [isBookmarked, setIsBookmarked] = useState<{
         [key: number]: boolean;
     }>({});
-    const [countComments, setCountComments] = useState<number>(0);
     useEffect(() => {
         const getPostsByCategory = async () => {
             try {
@@ -81,7 +80,6 @@ const PostUser = ({ categoryId }: CategoryId) => {
                 });
                 setIsBookmarked(bookmarkStatus);
                 console.log(data);
-                console.log("hello");
             } catch (error) {
                 console.log(error);
             } finally {

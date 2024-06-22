@@ -78,6 +78,7 @@ export const CommentSchema = z.object({
     detail: z.string().min(3, {
         message: "Please enter a comment!",
     }),
+    parentId: z.number().nullable(),
 
     // user: z.object({
     //     id: z.number(),

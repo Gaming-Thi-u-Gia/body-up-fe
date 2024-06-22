@@ -19,6 +19,7 @@ const MyCommentPage = () => {
             try {
                 setLoading(true);
                 const data = await fetchPostsCommented(sessionToken!);
+
                 setLoading(false);
                 setPosts(data);
                 console.log(data);

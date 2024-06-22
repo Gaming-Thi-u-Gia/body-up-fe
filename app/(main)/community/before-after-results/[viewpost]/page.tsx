@@ -27,7 +27,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Comment from "../../comment";
+import Comment, { Comments } from "../../comment";
 import {
     createComment,
     fetchBookmarkPost,
@@ -49,7 +49,7 @@ import { useForm } from "react-hook-form";
 import { CommentSchema } from "@/schemas";
 import { z } from "zod";
 import { SharePostModal } from "@/components/modals/share-modal";
-import { Comments } from "../../view-post";
+
 import moment from "moment";
 import { Skeleton } from "@/components/ui/skeleton";
 const BeforeAfterPost = () => {
@@ -67,6 +67,7 @@ const BeforeAfterPost = () => {
         resolver: zodResolver(CommentSchema),
         defaultValues: {
             detail: "",
+            parentId: null,
         },
     });
     const [posts, setPosts] = useState<Posts>();

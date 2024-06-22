@@ -37,7 +37,7 @@ import { toast } from "sonner";
 import { CommentSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { nullable, z } from "zod";
 import {
     Form,
     FormControl,
@@ -46,27 +46,11 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useAuthStore } from "@/components/providers/auth-provider";
-
 import { SharePostModal } from "@/components/modals/share-modal";
 import { Posts } from "./user-post-no-image";
-import Comment from "./comment";
+import Comment, { Comments } from "./comment";
 import moment from "moment";
 import { Skeleton } from "@/components/ui/skeleton";
-
-export type Comments = {
-    id: number;
-    detail: string;
-    upVote: number;
-    user: {
-        avatar: string;
-        firstName: string;
-        email: string;
-        lastName: string;
-        id: number;
-        username: string;
-    };
-    createAt: string;
-};
 
 const Post = () => {
     const pathname = usePathname();
@@ -83,6 +67,7 @@ const Post = () => {
         resolver: zodResolver(CommentSchema),
         defaultValues: {
             detail: "",
+            parentId: null,
         },
     });
     const [isBookmarked, setIsBookmarked] = useState(false);
@@ -93,8 +78,12 @@ const Post = () => {
                 console.log("render");
                 const res = await fetchCommentData(Number(postId));
                 console.log(res);
-                setComments(res);
-                setCountComments(comments.length);
+                // check if comment has parentId = null then add to comments array
+                const filteredComments = await res.filter(
+                    (comment: Comments) => comment.parentId === null
+                );
+                setComments(filteredComments);
+                setCountComments(res.length);
             } catch (error) {
                 console.log(error);
             }
@@ -177,8 +166,11 @@ const Post = () => {
                     Number(postId),
                     data
                 );
+                //Check if comment has parentId == null then add to comments array
+                if (data.parentId === null) {
+                    setComments((prev) => [res.payload, ...prev]);
+                }
 
-                setComments((prev) => [res.payload, ...prev]);
                 setCountComments(countComments + 1);
                 toast.success("Create Comment Successfully!", {
                     description: `${new Date().toLocaleString()}`,
@@ -426,7 +418,6 @@ const Post = () => {
                     </div>
                 </form>
             </Form>
-
             {/* comment section */}
             <div className="flex items-center mt-10 gap-2">
                 <DropdownMenu>
@@ -452,7 +443,7 @@ const Post = () => {
                 </DropdownMenu>
             </div>
             {comments.map((comment: Comments) => (
-                <div key={comment.id}>
+                <div key={comment.id} className="flex flex-col">
                     <Comment comment={comment} />
                 </div>
             ))}
