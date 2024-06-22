@@ -20,11 +20,11 @@ import { DailyCarousel, DailyExercise } from "./daily-carousel";
 import { useEffect, useState } from "react";
 import { VideoDailyCard } from "./video-daily-card";
 import { Button } from "../ui/button";
-import { date } from "zod";
 import { useAuthStore } from "../providers/auth-provider";
 import { getFirstUncompleted, getVideoChallenge } from "@/utils/user";
 import fetchVideos, { VideoItem } from "@/utils/dailyVideo";
-import { getAllDay } from "@/utils/dailyExercise";
+import { getAllDay, markDailyChallenge } from "@/utils/dailyExercise";
+import { toast } from "sonner";
 type Props = {
     title: string;
     releaseDate: string;
@@ -56,10 +56,23 @@ export const DaySchedule = ({
     const [day, setDay] = useState(currDay.dailyExercise.day || "1");
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingDay, setIsLoadingDay] = useState(false);
+    const [newCurrDay, setNewCurrDay] = useState<DailyExercise>(currDay);
     //TODO: SET DATA WHEN CLICK ON SCHEDULE
     const onClick = (index: number) => {
         if (isLoading) return;
         setDay("" + index);
+    };
+    const markComplete = async () => {
+        const res = await markDailyChallenge(
+            sessionToken!,
+            currDay.dailyExercise.id
+        );
+        if (res?.status === 200) {
+            toast.success("Day marked as complete");
+            const nextDay = await getFirstUncompleted(sessionToken!);
+            setDay(nextDay?.dailyExercise.day);
+            setNewCurrDay(nextDay!);
+        }
     };
     useEffect(() => {
         const getDay = async () => {
@@ -176,7 +189,7 @@ export const DaySchedule = ({
                     title='Test'
                     onClick={onClick}
                     allDay={allDay!}
-                    currDay={currDay!}
+                    currDay={newCurrDay!}
                     isLoading={isLoadingDay}
                 />
             </div>
@@ -195,7 +208,8 @@ export const DaySchedule = ({
                             {dailyVideoData.map(
                                 (dailyVideo: any, index: number) => (
                                     <VideoDailyCard
-                                        id={dailyVideo.id}
+                                        // @ts-ignore
+                                        id={videoData![index].id}
                                         key={dailyVideo.id}
                                         title={dailyVideo.title}
                                         // @ts-ignore
@@ -206,10 +220,17 @@ export const DaySchedule = ({
                                         releaseDate={dailyVideo.date}
                                         duration={dailyVideo.duration}
                                         isLoading={isLoading}
+                                        currDay={newCurrDay.dailyExercise.day}
+                                        day={day}
                                     />
                                 )
                             )}
-                            <Button variant='primary' className='my-4 ml-2'>
+                            <Button
+                                variant='primary'
+                                className='my-4 ml-2'
+                                onClick={markComplete}
+                                disabled={newCurrDay.dailyExercise.day !== day}
+                            >
                                 Mark day {day} as Complete
                             </Button>
                         </AccordionContent>

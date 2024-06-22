@@ -9,6 +9,8 @@ import {
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
+import { useAuthStore } from "../providers/auth-provider";
+import { markVideoDailyChallenge } from "@/utils/dailyExercise";
 
 type Props = {
     id: number;
@@ -20,6 +22,8 @@ type Props = {
     img: string;
     initialStatus: "incomplete" | "complete";
     isLoading: boolean;
+    currDay: string;
+    day: string;
 };
 export const VideoDailyCard = ({
     id,
@@ -31,15 +35,22 @@ export const VideoDailyCard = ({
     img,
     duration,
     isLoading,
+    day,
+    currDay,
 }: Props) => {
+    const { sessionToken } = useAuthStore((store) => store);
     const validatedStatus =
         initialStatus === "complete" || initialStatus === "incomplete"
             ? initialStatus
             : "incomplete";
     const [status, setStatus] = useState(validatedStatus);
 
-    const onClick = () => {
-        setStatus("complete");
+    const onClick = async () => {
+        if (status === "complete" || day !== currDay) return;
+        const res = await markVideoDailyChallenge(sessionToken!, id);
+        if (res?.status === 200) {
+            setStatus("complete");
+        }
     };
     if (isLoading) {
         return <VideoDailyCardSkeleton />;
