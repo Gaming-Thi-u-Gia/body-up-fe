@@ -8,11 +8,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { useBmiModal } from "@/stores/use-bmi-model";
 import { Button } from "../ui/button";
 import ProgramCard from "@/app/(main)/program/program-card";
 import Link from "next/link";
 import { fetchWorkoutProgramData } from "@/utils/video/workoutVideoCollection";
+import { useBmiModal } from "@/stores/use-bmi-model";
 
 interface WorkoutProgram {
     id: number;
@@ -63,9 +63,9 @@ export const BmiModal = () => {
         if (weightStatus === "Underweight") {
             return program.id >= 0 && program.id <= 4;
         } else if (weightStatus === "Normal weight") {
-            return program.id >= 5 && program.id <= 9;
+            return program.id >= 5 && program.id <= 8;
         } else if (weightStatus === "Overweight") {
-            return program.id >= 10 && program.id <= 12;
+            return program.id >= 9 && program.id <= 12;
         }
         return false;
     });
@@ -96,15 +96,13 @@ export const BmiModal = () => {
                         </h1>
                     </div>
                     <DialogTitle>
-                        <div className="grid grid-cols-2 w-full gap-8 border border-solid  rounded-lg">
+                        <div className="grid grid-cols-2 w-full gap-8 border border-solid rounded-lg">
                             <div className="bg-bmi-gradient rounded-lg px-3">
                                 <span className="inline-block text-black font-semibold text-3xl py-4">
                                     Calculate Your BMI
                                 </span>
                                 <p className="text-black font-normal text-[16px] leading-6">
-                                    Gymatan unknown printer took lle type
-                                    anscraey reteabled maketype area facilities
-                                    specimen bookayurvived
+                                    Enter your weight and height to calculate your BMI and find a suitable workout program.
                                 </p>
                             </div>
                             <div className="px-3">
@@ -144,7 +142,7 @@ export const BmiModal = () => {
                                     <div className="flex gap-4 py-4">
                                         <input
                                             type="text"
-                                            placeholder="Weight/kg"
+                                            placeholder="Weight (kg)"
                                             className="w-[50%] border border-[#000] rounded-md p-2"
                                             value={weight}
                                             onChange={(e) =>
@@ -153,7 +151,7 @@ export const BmiModal = () => {
                                         />
                                         <input
                                             type="text"
-                                            placeholder="Height/cm"
+                                            placeholder="Height (cm)"
                                             className="w-[50%] border border-[#000] rounded-md p-2"
                                             value={height}
                                             onChange={(e) =>
@@ -165,7 +163,7 @@ export const BmiModal = () => {
                                     <div className="grid grid-cols-3 gap-2 py-4">
                                         <input
                                             type="text"
-                                            placeholder="Weight/lbs"
+                                            placeholder="Weight (lbs)"
                                             className="border border-[#000] rounded-md p-2"
                                             value={weight}
                                             onChange={(e) =>
@@ -174,7 +172,7 @@ export const BmiModal = () => {
                                         />
                                         <input
                                             type="text"
-                                            placeholder="Height/feet"
+                                            placeholder="Height (feet)"
                                             className="border border-[#000] rounded-md p-2"
                                             value={height}
                                             onChange={(e) =>
@@ -183,7 +181,7 @@ export const BmiModal = () => {
                                         />
                                         <input
                                             type="text"
-                                            placeholder="Height/inches"
+                                            placeholder="Height (inches)"
                                             className="border border-[#000] rounded-md p-2"
                                             value={height}
                                             onChange={(e) =>
@@ -228,6 +226,7 @@ export const BmiModal = () => {
                                                 onClick={close}
                                             >
                                                 <ProgramCard
+                                                    img={program.img}
                                                     name={program.name}
                                                     type={program.type}
                                                     equipment={

@@ -86,7 +86,7 @@ const Page = () => {
             setWorkoutProgramById(workoutProgram);
         };
         getWorkoutProgramById();
-    }, []);
+    }, [pathName]);
 
     const getTypes = (categories: Category[] | undefined): string => {
         if (!categories) return '';

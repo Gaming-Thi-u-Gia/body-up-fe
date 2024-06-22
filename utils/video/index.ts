@@ -14,7 +14,7 @@ const fetchVideoIdsFromDatabase = async () => {
             id: item.id,
             name: item.name,
             url: item.url
-        })); // Trả về mảng các đối tượng chứa id, name và url
+        })); 
     } catch (error) {
         console.error("Error fetching videoIds from database:", error);
         return [];
@@ -40,7 +40,7 @@ const fetchVideos = async () => {
         }
 
         const playlistId = "UUCgLoMYIyP0U56dEhEL1wXQ";
-        const apiKey = "AIzaSyADY8e4ihQaU9XL0iZLDQMKZoAo5Qg3NOQ"; 
+        const apiKey = "AIzaSyArQ1iWhQcx3ultL8DphwYFiEfsi1PI5QE"; 
 
         let matchedVideos: VideoItem[] = [];
         let nextPageToken = "";

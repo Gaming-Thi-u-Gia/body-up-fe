@@ -1,7 +1,7 @@
-export const fetchAllTopic = async () => {
+export const fetchAllFilterCategory = async () => {
     try {
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/workout-video/getTopicAll`
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/workout-video/videoTable`
         );
         console.log(process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1);
 
@@ -12,4 +12,3 @@ export const fetchAllTopic = async () => {
         return [];
     }
 }
-

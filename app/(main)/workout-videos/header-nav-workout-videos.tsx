@@ -1,9 +1,11 @@
-'use client'
+"use client";
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { fetchVideoCategoryData } from "@/utils/video/workoutVideoCollection";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/components/providers/auth-provider";
 
 interface VideoCategory {
   id: number;
@@ -11,15 +13,22 @@ interface VideoCategory {
   name: string;
 }
 
-const HeaderNavWorkoutVideos = () => {
+interface HeaderNavWorkoutVideosProps {
+  onCategoryChange: (categoryName: string) => void;
+}
+
+const HeaderNavWorkoutVideos: React.FC<HeaderNavWorkoutVideosProps> = ({ onCategoryChange }) => {
   const [titleWorkoutVideos, setTitleWorkoutVideos] = useState<VideoCategory[]>([]);
   const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
+  const [searchVideo, setSearchProgram] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<VideoCategory | null>(null);
+  const { sessionToken } = useAuthStore((store) => store);
+  const router = useRouter();
 
   useEffect(() => {
     const getVideoCategories = async () => {
       const categories = await fetchVideoCategoryData();
       setTitleWorkoutVideos([
-        ...titleWorkoutVideos,
         { id: -1, topic: "workout", name: "View All Collections" },
         { id: 0, topic: "workout", name: "Latest Workouts" },
         ...categories,
@@ -28,8 +37,26 @@ const HeaderNavWorkoutVideos = () => {
     getVideoCategories();
   }, []);
 
-  function handleOnOrOfCategories() {
+  const handleOnOrOfCategories = () => {
     setIsCategoriesVisible(!isCategoriesVisible);
+  };
+
+  const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      router.push(`/workout-videos/search/${searchVideo}`);
+    }
+  };
+
+  const handleCategoryClick = (category: VideoCategory) => {
+    setSelectedCategory(category);
+    setIsCategoriesVisible(false);
+    router.push(`/workout-videos/c/${category.id}`);
+  };
+
+  const handleFavoriteClick = () => {
+    if(sessionToken) {
+      router.push(`/workout-videos/favorite/isFavorite`);
+    }
   }
 
   return (
@@ -43,7 +70,7 @@ const HeaderNavWorkoutVideos = () => {
             className="px-5"
             size="default"
           >
-            Browse By Collection
+            {selectedCategory ? selectedCategory.name : 'Browse By Collection'}
             <Image width={15} height={14} src="/more.svg" alt="More" />
           </Button>
           <div
@@ -53,8 +80,9 @@ const HeaderNavWorkoutVideos = () => {
             <ul>
               {titleWorkoutVideos.map((category) => (
                 <li
-                  className="pl-6 py-[5px] hover:text-[gray] hover:bg-slate-400 "
+                  className="pl-6 py-[5px] hover:text-[gray] hover:bg-slate-400 cursor-pointer"
                   key={category.id}
+                  onClick={() => handleCategoryClick(category)}
                 >
                   {category.name}
                 </li>
@@ -62,7 +90,38 @@ const HeaderNavWorkoutVideos = () => {
             </ul>
           </div>
         </div>
-        <div className="flex h-8">
+        <div className="flex h-8 space-x-2">
+          <div className="group relative">
+            <Button
+              className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out"
+              variant="defaultOutline"
+              size="default"
+            >
+              <Image width={20} height={20} src="/search.svg" alt="Search" />
+            </Button>
+            <input
+              className="absolute top-0 left-0 group-hover:w-[240px] group-hover:opacity-100 opacity-0 w-[0px] transition-all duration-500 ease-in-out rounded-[15px] border-solid border-[1px] border-[#E9E9EF] px-3 py-2"
+              placeholder="Search"
+              onChange={(e) => setSearchProgram(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
+            />
+          </div>
+          <div>
+            <Button
+              className={`bg-transparent mr-1 ${sessionToken ? 'bg-transparent cursor-pointer' : 'cursor-not-allowed'}`}
+              variant={sessionToken ? 'default' : 'disabled'}
+              size="default"
+              onClick={handleFavoriteClick}
+            >
+              <Image width={20} height={20} src="/heart.svg" alt="Favorites" />
+              Favorites
+            </Button>
+          </div>
+          <div>
+            <Button variant="default" size="default">
+              <Image width={20} height={20} src="/filter.svg" alt="Filter" /> Filter
+            </Button>
+          </div>
         </div>
       </div>
     </div>

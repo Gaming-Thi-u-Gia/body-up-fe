@@ -39,6 +39,7 @@ const CategoryModelProgram = () => {
         const getWorkoutProgram = async () => {
             try {
                 const data = await fetchWorkoutProgramWithTopicData();
+                console.log("Data loaded:", data);
                 if (data && data.length > 0) {
                     console.log("Data loaded:", data);
                     setWorkoutProgramsTopic(data);
@@ -61,17 +62,19 @@ const CategoryModelProgram = () => {
             {workoutProgramsTopic.map((programTopic) => (
                 <div key={programTopic.id}>
                     <ProgramTitle
+                        id={programTopic.id}
                         name={programTopic.name}
                         description={programTopic.description}
                     />
                     <div className="grid grid-cols-5 gap-4 h-[430px]">
-                        {programTopic.workoutPrograms.map((program) => (
+                        {programTopic.workoutPrograms.slice(0,5).map((program) => (
                             <Link href={`/program/${program.id}`} key={program.id}>
                                 <ProgramCard
+                                    key={program.id}
                                     id={program.id}
                                     name={program.name}
-                                    type={program.workoutProgramCategories.filter(cat => cat.type === 'FOCUS AREA').map(cat => cat.name).join(',')}
-                                    equipment={program.workoutProgramCategories.filter(cat => cat.type === 'EQUIPMENT').map(cat => cat.name).join(',')}
+                                    type={program.type}
+                                    equipment={program.equipment}
                                     detail={program.detail}
                                     day={program.day}
                                     time={program.time}
