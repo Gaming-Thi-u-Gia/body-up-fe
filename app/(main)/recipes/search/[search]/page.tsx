@@ -43,7 +43,7 @@ const Search = () => {
       setPageNo((prev) => prev + 1);
       setHasMoreRecipe(!data.last);
     } catch (error) {
-      toast.error(error);
+      toast.error(" Not found");
     } finally {
       setIsLoading(false);
     }

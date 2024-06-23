@@ -1,8 +1,6 @@
 import React from "react";
 import CardRecipe from "../../recipe-card";
 import { RecipeCardType } from "@/utils/recipe/type";
-import Link from "next/link";
-import { MoveLeft } from "lucide-react";
 
 const ListRecipe = ({ recipes }: { recipes: RecipeCardType[] }) => {
   if (!recipes) {

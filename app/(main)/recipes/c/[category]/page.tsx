@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import HeaderInfoSort from "./header-info-sort";
 import ListRecipe from "./list-recipe";
 import { usePathname } from "next/navigation";
-import { toast } from "sonner";
 import { handleSort as sortRecipes } from "@/utils/recipe/handle-data";
 import { fetchGetTopicRecipeById } from "@/utils/recipe/fetch";
 import { RecipesTopicType, RecipeCardType } from "@/utils/recipe/type";

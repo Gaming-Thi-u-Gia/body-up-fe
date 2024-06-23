@@ -23,7 +23,6 @@ const RecipeSavedList = () => {
   useEffect(() => {
     getSavedRecipes();
   }, [sessionToken]);
-  console.log("hi");
 
   const getSavedRecipes = async () => {
     try {
