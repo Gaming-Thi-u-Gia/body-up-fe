@@ -156,7 +156,7 @@ export const getAllProgressPhotoByUserId = async (
         }
     );
     if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+        return;
     }
     const payload = await res.json();
     const result = {

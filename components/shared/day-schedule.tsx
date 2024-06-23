@@ -65,11 +65,22 @@ export const DaySchedule = ({
     const markComplete = async () => {
         const res = await markDailyChallenge(
             sessionToken!,
-            currDay.dailyExercise.id
+            newCurrDay.dailyExercise.id
         );
         if (res?.status === 200) {
             toast.success("Day marked as complete");
             const nextDay = await getFirstUncompleted(sessionToken!);
+            // set status day to complete in all day
+            const newAllDay = allDay.map((item) => {
+                if (item.dailyExercise.day === newCurrDay.dailyExercise.day) {
+                    return {
+                        ...item,
+                        status: "complete",
+                    };
+                }
+                return item;
+            });
+            setAllDay(newAllDay);
             setDay(nextDay?.dailyExercise.day);
             setNewCurrDay(nextDay!);
         }
@@ -125,11 +136,24 @@ export const DaySchedule = ({
                             </h3>
                             <div className='mr-2'>
                                 <div className='flex text-[10px] text-[#6C6F78] justify-between mt-1'>
-                                    <span>DAY {day}/28</span>
-                                    <span>25%</span>
+                                    <span>
+                                        DAY {day}/{allDay.length}
+                                    </span>
+                                    <span>
+                                        {Math.floor(
+                                            (+newCurrDay.dailyExercise.day /
+                                                allDay.length) *
+                                                100
+                                        )}
+                                        %
+                                    </span>
                                 </div>
                                 <Progress
-                                    value={25}
+                                    value={
+                                        (+newCurrDay.dailyExercise.day /
+                                            allDay.length) *
+                                        100
+                                    }
                                     className='w-[350px] h-[6px]'
                                 />
                             </div>

@@ -2,6 +2,7 @@ import { useDeletePhotoModal } from "@/stores/use-delete-photo-modal";
 import { useUploadPhotoModal } from "@/stores/use-upload-photo";
 import { Edit, X } from "lucide-react";
 import { use } from "react";
+import { Skeleton } from "../ui/skeleton";
 type Props = {
     id: number;
     imgUrl: string;
@@ -36,5 +37,16 @@ export const ImageCard = ({
                 </div>
             </div>
         </div>
+    );
+};
+
+export const ImageCardSkeleton = () => {
+    return (
+        <Skeleton className='w-[234px] h-[312px] rounded-xl bg-gray-300 animate-pulse'>
+            <div className='absolute top-2 right-2 flex gap-2'>
+                <Skeleton className='w-8 h-8 p-2 bg-gray-400 rounded-full animate-pulse'></Skeleton>
+                <Skeleton className='w-8 h-8 p-2 bg-gray-400 rounded-full animate-pulse'></Skeleton>
+            </div>
+        </Skeleton>
     );
 };

@@ -5,7 +5,7 @@ import { useUploadPhotoModal } from "@/stores/use-upload-photo";
 import { getAllProgressPhoto } from "@/utils/user";
 import { Plus, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ImageCard } from "@/components/shared/image-card";
+import { ImageCard, ImageCardSkeleton } from "@/components/shared/image-card";
 
 export type PhotoProps = {
     id: number;
@@ -18,9 +18,14 @@ export const ProgressPhoto = () => {
     const [activeTab, setActiveTab] = useState("all");
     const { sessionToken } = useAuthStore((store) => store);
     const { open, update, photos } = useUploadPhotoModal((store) => store);
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
-        const res = getAllProgressPhoto(sessionToken!, activeTab).then(
-            (res) => {
+        const fetchImage = async () => {
+            setIsLoading(true);
+            const res = await getAllProgressPhoto(
+                sessionToken!,
+                activeTab
+            ).then((res) => {
                 //sort by date
                 res.payload.sort((a: PhotoProps, b: PhotoProps) => {
                     return (
@@ -28,8 +33,10 @@ export const ProgressPhoto = () => {
                     );
                 });
                 update(res.payload);
-            }
-        );
+            });
+            setIsLoading(false);
+        };
+        fetchImage();
     }, [activeTab, sessionToken]);
     return (
         <div>
@@ -86,16 +93,22 @@ export const ProgressPhoto = () => {
             </div>
             <div className='flex flex-wrap gap-4 my-4'>
                 {/* TODO: Fetch IMAGE */}
-                {photos.map((photo: PhotoProps) => (
-                    <ImageCard
-                        key={photo.id}
-                        date={photo.date}
-                        id={photo.id}
-                        imgUrl={photo.imgUrl}
-                        photoAngle={photo.photoAngle}
-                        visibility={photo.visibility}
-                    />
-                ))}
+                {isLoading
+                    ? Array.from({ length: 2 }).map((_, index) => (
+                          <div key={index} className='w-[234px] h-[312px]'>
+                              <ImageCardSkeleton />
+                          </div>
+                      ))
+                    : photos.map((photo: PhotoProps) => (
+                          <ImageCard
+                              key={photo.id}
+                              id={photo.id}
+                              imgUrl={photo.imgUrl}
+                              photoAngle={photo.photoAngle}
+                              visibility={photo.visibility}
+                              date={photo.date}
+                          />
+                      ))}
                 <div
                     className='flex flex-col justify-center items-center w-[234px] h-[312px] py-[37px] px-[21px] border-dashed border-[#D9D9D9] hover:border-[#c1e2ff] border-2 rounded-xl cursor-pointer group '
                     onClick={() => open()}
