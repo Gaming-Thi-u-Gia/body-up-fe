@@ -155,6 +155,9 @@ const Post = () => {
             });
         }
     };
+    const handleCommentCountChange = (increment: number) => {
+        setCountComments((prevCount) => prevCount + increment);
+    };
 
     const onSubmit = (data: z.infer<typeof CommentSchema>) => {
         console.log(data);
@@ -443,8 +446,12 @@ const Post = () => {
                 </DropdownMenu>
             </div>
             {comments.map((comment: Comments) => (
-                <div key={comment.id} className="flex flex-col">
-                    <Comment comment={comment} />
+                <div key={comment.id} className="flex flex-col mt-3">
+                    <Comment
+                        comment={comment}
+                        countComments={countComments}
+                        onCommentAdded={() => handleCommentCountChange(1)}
+                    />
                 </div>
             ))}
         </>

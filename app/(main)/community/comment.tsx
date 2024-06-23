@@ -52,7 +52,15 @@ export type Comments = {
     parentId: number;
     children: Comments[];
 };
-const Comment = ({ comment }: { comment: Comments }) => {
+const Comment = ({
+    comment,
+    countComments,
+    onCommentAdded,
+}: {
+    comment: Comments;
+    countComments: number;
+    onCommentAdded: () => void;
+}) => {
     const [isOpennedReply, setIsOpennedReply] = useState(false);
     const { sessionToken } = useAuthStore((store) => store);
     const [isPending, startTransition] = useTransition();
@@ -63,6 +71,7 @@ const Comment = ({ comment }: { comment: Comments }) => {
     const postId = pathParts[3];
     const [parentComment, setParentComment] = useState<Comments>();
     const [rootComment, setRootComment] = useState<Comments>();
+    const [commentCheck, setCommentCheck] = useState<Comments>(comment);
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -99,7 +108,11 @@ const Comment = ({ comment }: { comment: Comments }) => {
         const getChildComments = async () => {
             try {
                 const childComment = await fetchChildCommentData(comment.id);
-                setChildrenComments(childComment);
+                const validChildren = childComment.filter(
+                    (child: Comments) =>
+                        child.parentId === comment.id && child.parentId != null
+                );
+                setChildrenComments(validChildren);
                 console.log(childComment);
             } catch (error) {
                 console.log(error);
@@ -114,28 +127,6 @@ const Comment = ({ comment }: { comment: Comments }) => {
         };
         getChildComments();
     }, [comment.id]);
-
-    useEffect(() => {
-        const getRootComment = async () => {
-            try {
-                const rootComment = await fetchRootComment(comment.id);
-                setRootComment(rootComment);
-            } catch (error) {
-                toast.error(
-                    "Something went wrong fetching the parent comment!",
-                    {
-                        description: `${new Date().toLocaleString()}`,
-                        action: {
-                            label: "Close",
-                            onClick: () => console.log("Close"),
-                        },
-                    }
-                );
-            }
-        };
-        getRootComment();
-    }, [comment.id]);
-
     const onSubmit = (data: z.infer<typeof CommentSchema>) => {
         console.log(data);
         startTransition(async () => {
@@ -148,7 +139,14 @@ const Comment = ({ comment }: { comment: Comments }) => {
                 );
                 setIsOpennedReply(false);
                 console.log("Data add:", res.payload);
+                if (comment.parentId !== null && comment) {
+                }
+                onCommentAdded();
                 setChildrenComments((prev) => [...prev, res.payload]);
+                // set root comment to update length of children comment
+                // if (rootComment) {
+                //     rootComment.children.push(res.payload);
+                // }
                 form.reset();
                 toast.success("Create Comment Successfully!", {
                     description: `${new Date().toLocaleString()}`,
@@ -396,17 +394,24 @@ const Comment = ({ comment }: { comment: Comments }) => {
             </div>
 
             <div className="flex flex-row gap-4 w-full">
-                {rootComment && rootComment.parentId === null && (
-                    <CornerDownRight
-                        width={20}
-                        height={20}
-                        className="flex items-start"
-                    />
-                )}
+                {(comment.children?.length > 0 ||
+                    childrenComments.length > 0) &&
+                    comment.parentId === null && (
+                        <CornerDownRight
+                            width={20}
+                            height={20}
+                            className="flex items-start"
+                        />
+                    )}
                 {/* Comment Children */}
                 <div className="flex flex-col w-full">
                     {childrenComments.map((child) => (
-                        <Comment key={child.id} comment={child} />
+                        <Comment
+                            key={child.id}
+                            comment={child}
+                            countComments={countComments}
+                            onCommentAdded={onCommentAdded}
+                        />
                     ))}
                 </div>
             </div>
