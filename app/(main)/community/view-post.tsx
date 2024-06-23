@@ -446,7 +446,7 @@ const Post = () => {
                 </DropdownMenu>
             </div>
             {comments.map((comment: Comments) => (
-                <div key={comment.id} className="flex flex-col mt-3">
+                <div key={comment.id} className="flex flex-col mt-3 mr-2">
                     <Comment
                         comment={comment}
                         countComments={countComments}

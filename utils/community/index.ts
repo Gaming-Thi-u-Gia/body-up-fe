@@ -387,24 +387,3 @@ export const fetchCommentById = async (parentId: number) => {
         throw new Error("Error while fetching comments");
     }
 };
-
-export const fetchRootComment = async (commentId: number) => {
-    try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/comments/getRootById?commentId=${commentId}`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        const data = res.json();
-        return data;
-    } catch (error) {
-        throw new Error("Error while fetching comments");
-    }
-};

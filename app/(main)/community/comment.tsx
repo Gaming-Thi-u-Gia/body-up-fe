@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useRef, useState, useTransition } from "react";
 import before_after from "/public/before-after-icon.svg";
 import challenges_icon from "/public/challenges-icon.svg";
 import {
@@ -31,7 +31,6 @@ import {
     createComment,
     fetchChildCommentData,
     fetchCommentById,
-    fetchRootComment,
 } from "@/utils/community";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -70,8 +69,6 @@ const Comment = ({
     const pathParts = pathname.split("/");
     const postId = pathParts[3];
     const [parentComment, setParentComment] = useState<Comments>();
-    const [rootComment, setRootComment] = useState<Comments>();
-    const [commentCheck, setCommentCheck] = useState<Comments>(comment);
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -79,7 +76,6 @@ const Comment = ({
             parentId: comment.id,
         },
     });
-
     useEffect(() => {
         if (comment.parentId !== null) {
             const fetchParentComment = async () => {
@@ -142,11 +138,7 @@ const Comment = ({
                 if (comment.parentId !== null && comment) {
                 }
                 onCommentAdded();
-                setChildrenComments((prev) => [...prev, res.payload]);
-                // set root comment to update length of children comment
-                // if (rootComment) {
-                //     rootComment.children.push(res.payload);
-                // }
+                setChildrenComments((prev) => [res.payload, ...prev]);
                 form.reset();
                 toast.success("Create Comment Successfully!", {
                     description: `${new Date().toLocaleString()}`,
