@@ -346,7 +346,7 @@ const Post = () => {
                 >
                     {posts?.title}
                 </Link>
-                <div className="text-[#303033] text-[16px] mt-2">
+                <div className="text-[#303033] text-[16px] mt-2 break-all">
                     {posts?.description}
                 </div>
                 <div className="flex gap-2 items-center mt-6">

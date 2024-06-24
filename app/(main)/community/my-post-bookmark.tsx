@@ -340,7 +340,7 @@ const MyPostsBookmark = () => {
                             ) : (
                                 <Link
                                     href={`/community/${post.categoryCommunity.name}/${post.id}`}
-                                    className="text-[#303033] text-[16px] h-[48px] mt-1 line-clamp-2 "
+                                    className="text-[#303033] text-[16px] h-[48px] mt-1 line-clamp-2 break-all "
                                 >
                                     {post.description}
                                 </Link>

@@ -353,9 +353,11 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                 </Link>
                                 <Link
                                     href={`/community/${title}/${post.id}`}
-                                    className="text-[#303033] text-[16px] h-[48px] mt-2 line-clamp-2 "
+                                    className="text-[#303033] text-[16px]  "
                                 >
-                                    {post.description}
+                                    <span className="line-clamp-2 break-all">
+                                        {post.description}
+                                    </span>
                                 </Link>
                                 <div className="flex gap-2 items-center mt-3">
                                     <Button
