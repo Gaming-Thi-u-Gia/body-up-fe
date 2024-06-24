@@ -140,6 +140,59 @@ export const createComment = async (
     }
 };
 
+export const fetchEditComment = async (
+    commentId: number,
+    data: z.infer<typeof CommentSchema>,
+    sessionToken: string
+) => {
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/comments/editComment?commentId=${commentId}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+                body: JSON.stringify(data),
+            }
+        ).then(async (res) => {
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return data;
+        });
+        return res;
+    } catch (error) {
+        throw new Error("Something went wrong");
+    }
+};
+
+export const fetchDeleteComment = async (
+    commentId: number,
+    sessionToken: string
+) => {
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/comments/deleteComment?commentId=${commentId}`,
+        {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+        }
+    );
+    if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    return res;
+};
+
 export const fetchCommentData = async (postId: number) => {
     try {
         const res = await fetch(

@@ -31,8 +31,10 @@ import {
     createComment,
     fetchChildCommentData,
     fetchCommentById,
+    fetchDeleteComment,
+    fetchEditComment,
 } from "@/utils/community";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { z } from "zod";
 export type Comments = {
@@ -61,7 +63,8 @@ const Comment = ({
     onCommentAdded: () => void;
 }) => {
     const [isOpennedReply, setIsOpennedReply] = useState(false);
-    const { sessionToken } = useAuthStore((store) => store);
+    const [isOpennedEdit, setIsOpennedEdit] = useState(false);
+    const { sessionToken, user } = useAuthStore((store) => store);
     const [isPending, startTransition] = useTransition();
     const [childrenComments, setChildrenComments] = useState<Comments[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -69,6 +72,7 @@ const Comment = ({
     const pathParts = pathname.split("/");
     const postId = pathParts[3];
     const [parentComment, setParentComment] = useState<Comments>();
+    const router = useRouter();
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -95,7 +99,6 @@ const Comment = ({
                     );
                 }
             };
-
             fetchParentComment();
         }
     }, [comment.parentId]);
@@ -105,11 +108,9 @@ const Comment = ({
             try {
                 const childComment = await fetchChildCommentData(comment.id);
                 const validChildren = childComment.filter(
-                    (child: Comments) =>
-                        child.parentId === comment.id && child.parentId != null
+                    (child: Comments) => child.parentId != null
                 );
                 setChildrenComments(validChildren);
-                console.log(childComment);
             } catch (error) {
                 console.log(error);
                 toast.error("Something Went Wrong!", {
@@ -122,7 +123,28 @@ const Comment = ({
             }
         };
         getChildComments();
-    }, [comment.id]);
+    }, []);
+
+    const deleteComment = async (commentId: number) => {
+        startTransition(async () => {
+            try {
+                const res = await fetchDeleteComment(commentId, sessionToken!);
+                setChildrenComments((prev) =>
+                    prev.filter((child) => child.id !== commentId)
+                );
+                toast.success("Delete Success!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        });
+    };
+
     const onSubmit = (data: z.infer<typeof CommentSchema>) => {
         console.log(data);
         startTransition(async () => {
@@ -135,8 +157,6 @@ const Comment = ({
                 );
                 setIsOpennedReply(false);
                 console.log("Data add:", res.payload);
-                if (comment.parentId !== null && comment) {
-                }
                 onCommentAdded();
                 setChildrenComments((prev) => [res.payload, ...prev]);
                 form.reset();
@@ -160,10 +180,54 @@ const Comment = ({
             }
         });
     };
+    const onSubmit1 = (
+        data: z.infer<typeof CommentSchema>,
+        commentId: number
+    ) => {
+        startTransition(async () => {
+            try {
+                setIsLoading(true);
+                const res = await fetchEditComment(
+                    commentId,
+                    data,
+                    sessionToken!
+                );
+                console.log("CommentID: ", commentId);
 
-    if (isLoading) {
-        return null;
-    }
+                setIsOpennedEdit(false);
+                console.log("Data add:", res.payload);
+                setChildrenComments((prevComments) => {
+                    console.log("Previous Comments:", prevComments);
+                    console.log("Payload:", res.payload);
+                    const updatedComments = prevComments.map((comment) => {
+                        if (commentId === comment.id) {
+                            console.log(comment);
+                            return { ...comment, ...res.payload };
+                        }
+                        return comment;
+                    });
+                    console.log("Updated Comments:", updatedComments);
+                    return [...updatedComments];
+                });
+                form.reset();
+                toast.success("Update Comment Successfully!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            } catch (error) {
+                toast.error("Something Went Wrong", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+            }
+        });
+    };
 
     return (
         <div className="flex flex-col gap-3 items-center ">
@@ -291,42 +355,41 @@ const Comment = ({
                         </span>
                     </div>
                     <div className="flex gap-2 items-center">
-                        <div className="flex gap-2 items-center">
-                            <Button
-                                variant="secondary"
-                                className="flex gap-1 rounded-full bg-[#EFF0F4] p-5 justify-center items-center"
-                                onClick={() =>
-                                    setIsOpennedReply(
-                                        (isOpennedReply) => !isOpennedReply
-                                    )
-                                }
-                            >
-                                <Pencil
-                                    width={13}
-                                    height={12}
-                                    strokeWidth={1}
-                                    fill="black"
-                                />
+                        {user?.id === comment.user.id && (
+                            <div className="flex gap-2 items-center">
+                                <Button
+                                    variant="secondary"
+                                    className="flex gap-1 rounded-full bg-[#EFF0F4] p-5 justify-center items-center"
+                                    onClick={() =>
+                                        setIsOpennedEdit(
+                                            (isOpennedEdit) => !isOpennedEdit
+                                        )
+                                    }
+                                >
+                                    <Pencil
+                                        width={13}
+                                        height={12}
+                                        strokeWidth={1}
+                                        fill="black"
+                                    />
 
-                                <span className="text-[12px]">Edit</span>
-                            </Button>
-                            <Button
-                                variant="secondary"
-                                className="flex rounded-full gap-1 bg-[#EFF0F4] p-5 justify-center items-center"
-                                onClick={() =>
-                                    setIsOpennedReply(
-                                        (isOpennedReply) => !isOpennedReply
-                                    )
-                                }
-                            >
-                                <Trash2
-                                    width={13}
-                                    height={12}
-                                    strokeWidth={1}
-                                />
-                                <span className="text-[12px]">Delete</span>
-                            </Button>
-                        </div>
+                                    <span className="text-[12px]">Edit</span>
+                                </Button>
+                                <Button
+                                    variant="secondary"
+                                    className="flex rounded-full gap-1 bg-[#EFF0F4] p-5 justify-center items-center"
+                                    onClick={() => deleteComment(comment.id)}
+                                >
+                                    <Trash2
+                                        width={13}
+                                        height={12}
+                                        strokeWidth={1}
+                                    />
+                                    <span className="text-[12px]">Delete</span>
+                                </Button>
+                            </div>
+                        )}
+
                         <Button
                             variant="secondary"
                             className="flex gap-1 rounded-full bg-[#EFF0F4] p-5 justify-center items-center"
@@ -403,6 +466,58 @@ const Comment = ({
                                     <Button
                                         variant="default"
                                         onClick={() => setIsOpennedReply(false)}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        className="w-[188px] h-9 flex"
+                                        disabled={isPending}
+                                    >
+                                        Reply
+                                    </Button>
+                                </div>
+                                <hr className="mt-3" />
+                            </div>
+                        </form>
+                    </Form>
+                )}
+                {isOpennedEdit && (
+                    <Form {...form}>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                form.handleSubmit((data) =>
+                                    onSubmit1(data, comment.id)
+                                )(e);
+                            }}
+                            className="space-y-5 mt-2 w-full"
+                        >
+                            <div className="w-full flex flex-col gap-1">
+                                <h1 className="flex items-center p-1 font-semibold">
+                                    Edit Comment
+                                </h1>
+                                <FormField
+                                    control={form.control}
+                                    name="detail"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Textarea
+                                                    {...field}
+                                                    placeholder="Write a reply"
+                                                    className="rounded-lg bg-transparent p-3 text-[16px]"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                ></FormField>
+
+                                <div className=" flex items-center justify-end gap-2 mt-3">
+                                    <Button
+                                        variant="default"
+                                        onClick={() => setIsOpennedEdit(false)}
                                     >
                                         Cancel
                                     </Button>
