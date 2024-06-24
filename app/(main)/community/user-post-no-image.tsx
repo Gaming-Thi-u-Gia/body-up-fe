@@ -353,7 +353,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                 </Link>
                                 <Link
                                     href={`/community/${title}/${post.id}`}
-                                    className="text-[#303033] text-[16px]  "
+                                    className="text-[#303033] text-[16px] mt-2  "
                                 >
                                     <span className="line-clamp-2 break-all">
                                         {post.description}

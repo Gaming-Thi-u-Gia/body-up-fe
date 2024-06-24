@@ -175,6 +175,7 @@ const Post = () => {
                 }
 
                 setCountComments(countComments + 1);
+                form.reset();
                 toast.success("Create Comment Successfully!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {

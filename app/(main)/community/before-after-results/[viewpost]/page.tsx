@@ -156,7 +156,6 @@ const BeforeAfterPost = () => {
     };
     const onSubmit = (data: z.infer<typeof CommentSchema>) => {
         console.log(data);
-
         startTransition(async () => {
             try {
                 const res = await createComment(
@@ -173,6 +172,7 @@ const BeforeAfterPost = () => {
                 });
                 setComments((prev) => [res.payload, ...prev]);
                 setCountComments(countComments + 1);
+                form.reset();
             } catch (error) {
                 toast.error("You Need To Sign In To Comment!", {
                     description: `${new Date().toLocaleString()}`,
