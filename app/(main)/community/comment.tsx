@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import defaultProfile from "/public/default-iProfile.png";
 import reply_icon from "/public/reply-icon.svg";
-import { CornerDownRight } from "lucide-react";
+import { CornerDownRight, Pencil, Trash2 } from "lucide-react";
 import moment from "moment";
 import {
     Form,
@@ -291,9 +291,45 @@ const Comment = ({
                         </span>
                     </div>
                     <div className="flex gap-2 items-center">
+                        <div className="flex gap-2 items-center">
+                            <Button
+                                variant="secondary"
+                                className="flex gap-1 rounded-full bg-[#EFF0F4] p-5 justify-center items-center"
+                                onClick={() =>
+                                    setIsOpennedReply(
+                                        (isOpennedReply) => !isOpennedReply
+                                    )
+                                }
+                            >
+                                <Pencil
+                                    width={13}
+                                    height={12}
+                                    strokeWidth={1}
+                                    fill="black"
+                                />
+
+                                <span className="text-[12px]">Edit</span>
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                className="flex rounded-full gap-1 bg-[#EFF0F4] p-5 justify-center items-center"
+                                onClick={() =>
+                                    setIsOpennedReply(
+                                        (isOpennedReply) => !isOpennedReply
+                                    )
+                                }
+                            >
+                                <Trash2
+                                    width={13}
+                                    height={12}
+                                    strokeWidth={1}
+                                />
+                                <span className="text-[12px]">Delete</span>
+                            </Button>
+                        </div>
                         <Button
                             variant="secondary"
-                            className="flex gap-1 rounded-full bg-[#EFF0F4] w-[81.64px] p-2 justify-center items-center"
+                            className="flex gap-1 rounded-full bg-[#EFF0F4] p-5 justify-center items-center"
                             onClick={() =>
                                 setIsOpennedReply(
                                     (isOpennedReply) => !isOpennedReply
