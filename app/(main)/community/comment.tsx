@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import before_after from "/public/before-after-icon.svg";
 import challenges_icon from "/public/challenges-icon.svg";
 import {
@@ -310,8 +310,6 @@ const Comment = ({
                         </Button>
                     </div>
                 </div>
-
-                {/* Nội dung của bình luận cha khi Reply */}
                 {comment.parentId !== null && (
                     <div className="w-full flex flex-col break-all  bg-[#ebf4ff] p-2 border-l-2 border-[#1890ff]">
                         <div className="flex gap-2">

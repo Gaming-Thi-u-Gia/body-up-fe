@@ -33,9 +33,6 @@ const CommunityFilter = () => {
                     <Button type="button" variant="primary" size="sm">
                         Latest
                     </Button>
-                    <Button type="button" variant="default" size="sm">
-                        Last Active
-                    </Button>
                 </div>
                 <div className="flex items-center justify-center flex-end gap-2 cursor-pointer">
                     <DropdownMenu>

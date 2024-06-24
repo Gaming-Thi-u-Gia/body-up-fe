@@ -51,7 +51,9 @@ export const createPostNoImage = async (
 
 export const fetchPostData = async (
     categoryId: number,
-    sessionToken: string
+    sessionToken: string,
+    page: number,
+    size: number
 ) => {
     const headers: HeadersInit = {
         "Content-Type": "application/json",
@@ -59,7 +61,7 @@ export const fetchPostData = async (
     };
     try {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/getAllPostByCategory?categoryId=${categoryId}`,
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/getAllPostByCategory?categoryId=${categoryId}&page=${page}&size=${size}`,
             {
                 method: "GET",
                 headers: headers,
@@ -276,10 +278,14 @@ export const createBeforeAfterPost = async (
     }
 };
 
-export const fetchMyPosts = async (sessionToken: string) => {
+export const fetchMyPosts = async (
+    sessionToken: string,
+    page: number,
+    size: number
+) => {
     try {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/getAllPostByUser`,
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/getAllPostByUser?page=${page}&size=${size}`,
             {
                 method: "GET",
                 headers: {

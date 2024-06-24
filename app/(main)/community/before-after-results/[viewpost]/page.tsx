@@ -78,9 +78,11 @@ const BeforeAfterPost = () => {
                 setIsLoading(true);
                 const res = await fetchCommentData(Number(postId));
                 console.log(res);
-
-                setComments(res);
-                setCountComments(comments.length);
+                const filteredComments = await res.filter(
+                    (comment: Comments) => comment.parentId === null
+                );
+                setComments(filteredComments);
+                setCountComments(res.length);
             } catch (error) {
                 console.log(error);
             } finally {
@@ -106,6 +108,9 @@ const BeforeAfterPost = () => {
         };
         fetchFullPost();
     }, [sessionToken, postId]);
+    const handleCommentCountChange = (increment: number) => {
+        setCountComments((prevCount) => prevCount + increment);
+    };
     const handleBookmark = async () => {
         try {
             if (!sessionToken)
@@ -494,10 +499,13 @@ const BeforeAfterPost = () => {
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-
                 {comments.map((comment: Comments) => (
-                    <div key={comment.id}>
-                        <Comment comment={comment} />
+                    <div key={comment.id} className="flex flex-col mt-3 mr-2">
+                        <Comment
+                            comment={comment}
+                            countComments={countComments}
+                            onCommentAdded={() => handleCommentCountChange(1)}
+                        />
                     </div>
                 ))}
             </div>
