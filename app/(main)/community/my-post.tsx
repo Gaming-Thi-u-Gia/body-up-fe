@@ -9,7 +9,9 @@ import {
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Bookmark } from "lucide-react";
+import { Bookmark, Pencil, Trash2 } from "lucide-react";
+import share_icon from "/public/share-icon.svg";
+
 import {
     Sheet,
     SheetContent,
@@ -29,6 +31,9 @@ import Link from "next/link";
 import { SharePostModal } from "@/components/modals/share-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { DeletePostModal } from "@/components/modals/delete-post-modal";
+import { useDeletePost } from "@/stores/use-delete-post-model";
+import { useSharePostModal } from "@/stores/use-share-model";
 const MyPost = () => {
     const [posts, setPosts] = useState<Posts[]>([]);
     const [isBookmarked, setIsBookmarked] = useState<{
@@ -39,11 +44,18 @@ const MyPost = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [hasMorePosts, setHasMorePosts] = useState(false);
+    const {
+        open,
+        setPosts: updatedPost,
+        posts: postsDelete,
+    } = useDeletePost((store) => store);
+    const { open: openShare, setPosts: setPostsShare } = useSharePostModal(
+        (store) => store
+    );
     useEffect(() => {
         fetchPosts();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionToken]);
-
     const fetchPosts = async () => {
         try {
             setIsLoading(true);
@@ -66,7 +78,7 @@ const MyPost = () => {
             //* Filter out duplicate posts
             setPosts((prevPosts) => {
                 const newPosts = [...prevPosts, ...sortPosts];
-                const uniquePosts = newPosts.filter(
+                const uniquePosts: Posts[] = newPosts.filter(
                     (post, index, self) =>
                         index === self.findIndex((p) => p.id === post.id)
                 );
@@ -75,6 +87,8 @@ const MyPost = () => {
                     bookmarkStatus[post.id] = post.bookmarked;
                     setIsBookmarked(bookmarkStatus);
                 });
+                setPostsShare(uniquePosts);
+                updatedPost(uniquePosts);
                 return uniquePosts;
             });
             setHasMorePosts(res.length > 0);
@@ -116,6 +130,7 @@ const MyPost = () => {
                         ? { ...post, bookmarked: response.bookmarked }
                         : post
                 );
+                updatedPost(updatedPosts);
                 setPosts(updatedPosts);
                 setIsBookmarked({
                     ...isBookmarked,
@@ -187,7 +202,7 @@ const MyPost = () => {
                         </p>
                     }
                 >
-                    {posts.map((post) => (
+                    {postsDelete.map((post) => (
                         <div
                             key={post.id}
                             className="w-full mb-10 flex flex-col p-2 gap-2 bor hover:bg-[#f5f5f5] rounded-lg"
@@ -331,6 +346,37 @@ const MyPost = () => {
                                             {post.badge.name}
                                         </span>
                                     </div>
+                                    <Link
+                                        href={`/community/my-posts/${post.id}`}
+                                        className="flex gap-1 rounded-full bg-[#EFF0F4] hover:bg-[#d0d0d1] py-2 px-3 justify-center items-center"
+                                    >
+                                        <Pencil
+                                            width={13}
+                                            height={12}
+                                            strokeWidth={1}
+                                            fill="black"
+                                        />
+
+                                        <span className="text-[12px]">
+                                            Edit
+                                        </span>
+                                    </Link>
+
+                                    <Button
+                                        variant="secondary"
+                                        className="flex gap-1 rounded-full bg-[#EFF0F4] hover:bg-[#d0d0d1] py-2 px-3 justify-center items-center"
+                                        onClick={() => open(post.id)}
+                                    >
+                                        <Trash2
+                                            width={13}
+                                            height={12}
+                                            strokeWidth={1}
+                                        />
+
+                                        <span className="text-[12px]">
+                                            Remove
+                                        </span>
+                                    </Button>
                                 </div>
                             </div>
                             <Link
@@ -411,7 +457,21 @@ const MyPost = () => {
                                     />
                                     <span className="text-[12px]">Saved</span>
                                 </Button>
-                                {post && <SharePostModal post={post} />}
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="default"
+                                    className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
+                                    onClick={() => openShare(post.id)}
+                                >
+                                    <Image
+                                        src={share_icon}
+                                        alt="logo"
+                                        width={20}
+                                        height={20}
+                                    />
+                                    <span className="text-[12px]">Share</span>
+                                </Button>
                             </div>
 
                             <hr className="mt-3" />

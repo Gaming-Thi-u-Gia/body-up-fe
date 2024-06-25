@@ -21,6 +21,7 @@ import moment from "moment";
 import { Skeleton } from "@/components/ui/skeleton";
 import { category } from "@/constants";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { useSharePostModal } from "@/stores/use-share-model";
 const BeforAfterPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
@@ -30,6 +31,9 @@ const BeforAfterPost = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMorePosts, setHasMorePosts] = useState(false);
+    const { open, setPosts: setPostsZustand } = useSharePostModal(
+        (store) => store
+    );
     useEffect(() => {
         getPostsByCategory();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -51,6 +55,7 @@ const BeforAfterPost = () => {
                     (post, index, self) =>
                         index === self.findIndex((p) => p.id === post.id)
                 );
+                setPostsZustand(uniquePosts);
                 return uniquePosts;
             });
             setHasMorePosts(data.length > 0);
@@ -61,22 +66,6 @@ const BeforAfterPost = () => {
             setIsLoading(false);
         }
     };
-
-    // if (isLoading) {
-    //     return (
-    //         <div className="flex flex-col istems-center gap-4">
-    //             <div className="flex items-center justify-between gap-4">
-    //                 <BeforeAfterPostSkeleton />
-    //                 <BeforeAfterPostSkeleton />
-    //             </div>
-    //             <div className="flex items-center justify-between gap-4">
-    //                 <BeforeAfterPostSkeleton />
-    //                 <BeforeAfterPostSkeleton />
-    //             </div>
-    //         </div>
-    //     );
-    // }
-
     return (
         <>
             {isLoading && posts.length === 0 ? (

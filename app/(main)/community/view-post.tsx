@@ -51,7 +51,8 @@ import { Posts } from "./user-post-no-image";
 import Comment, { Comments } from "./comment";
 import moment from "moment";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import share_icon from "/public/share-icon.svg";
+import { useSharePostModal } from "@/stores/use-share-model";
 const Post = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
@@ -63,6 +64,11 @@ const Post = () => {
     const [comments, setComments] = useState<Comments[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [countComments, setCountComments] = useState(0);
+    const {
+        open,
+        posts: postsShare,
+        setPosts: setPostsShare,
+    } = useSharePostModal((store) => store);
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -98,6 +104,9 @@ const Post = () => {
                 const data = await fetchPostById(Number(postId), sessionToken!);
                 console.log(data);
                 setIsBookmarked(data.bookmarked);
+                //add post to share modal
+                const post = [data];
+                setPostsShare(post);
                 setPosts(data);
             } catch (error) {
                 toast.error("Something went wrong");
@@ -106,6 +115,7 @@ const Post = () => {
             }
         };
         fetchFullPost();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionToken, postId]);
 
     if (isLoading) {
@@ -377,7 +387,25 @@ const Post = () => {
                         />
                         <span className="text-[12px]">Saved</span>
                     </Button>
-                    {posts && <SharePostModal post={posts} />}
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="default"
+                        className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
+                        onClick={() => {
+                            if (posts) {
+                                open(posts.id);
+                            }
+                        }}
+                    >
+                        <Image
+                            src={share_icon}
+                            alt="logo"
+                            width={20}
+                            height={20}
+                        />
+                        <span className="text-[12px]">Share</span>
+                    </Button>
                 </div>
 
                 <hr className="mt-3" />

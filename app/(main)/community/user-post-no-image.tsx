@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import before_after from "/public/before-after-icon.svg";
 import challenges_icon from "/public/challenges-icon.svg";
+import share_icon from "/public/share-icon.svg";
+
 import moment from "moment";
 import {
     Sheet,
@@ -71,6 +73,11 @@ const PostUser = ({ categoryId }: CategoryId) => {
     }>({});
     const [page, setPage] = useState(0);
     const [hasMorePosts, setHasMorePosts] = useState(false);
+    const {
+        open,
+        setPosts: setPostsZustand,
+        posts: postZustand,
+    } = useSharePostModal((store) => store);
     useEffect(() => {
         getPostsByCategory();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,6 +111,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
                     bookmarkStatus[post.id] = post.bookmarked;
                     setIsBookmarked(bookmarkStatus);
                 });
+                setPostsZustand(uniquePosts);
                 return uniquePosts;
             });
             setHasMorePosts(data.length > 0);
@@ -136,6 +144,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
                         ? { ...post, bookmarked: response.bookmarked }
                         : post
                 );
+                setPostsZustand(updatedPosts);
                 setPosts(updatedPosts);
                 setIsBookmarked({
                     ...isBookmarked,
@@ -396,7 +405,23 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                             Saved
                                         </span>
                                     </Button>
-                                    {post && <SharePostModal post={post} />}
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="default"
+                                        className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
+                                        onClick={() => open(post.id)}
+                                    >
+                                        <Image
+                                            src={share_icon}
+                                            alt="logo"
+                                            width={20}
+                                            height={20}
+                                        />
+                                        <span className="text-[12px]">
+                                            Share
+                                        </span>
+                                    </Button>
                                 </div>
 
                                 <hr className="mt-3" />

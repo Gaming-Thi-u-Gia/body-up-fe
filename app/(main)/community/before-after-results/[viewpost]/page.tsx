@@ -20,6 +20,8 @@ import back_Icon from "/public/back-icon.svg";
 import { usePathname } from "next/navigation";
 import { Bookmark, ChevronDown } from "lucide-react";
 import { Gallery, Item } from "react-photoswipe-gallery";
+import share_icon from "/public/share-icon.svg";
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -52,6 +54,7 @@ import { SharePostModal } from "@/components/modals/share-modal";
 
 import moment from "moment";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSharePostModal } from "@/stores/use-share-model";
 const BeforeAfterPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
@@ -63,6 +66,9 @@ const BeforeAfterPost = () => {
     const [isPending, startTransition] = useTransition();
     const [isLoading, setIsLoading] = useState(false);
     const [countComments, setCountComments] = useState(0);
+    const { open, setPosts: setPostsShare } = useSharePostModal(
+        (store) => store
+    );
     const form = useForm({
         resolver: zodResolver(CommentSchema),
         defaultValues: {
@@ -98,6 +104,7 @@ const BeforeAfterPost = () => {
                 const data = await fetchPostById(Number(postId), sessionToken!);
                 console.log(data);
                 setIsBookmarked(data.bookmarked);
+                setPostsShare([data]);
                 setPosts(data);
                 setIsLoading(false);
             } catch (error) {
@@ -107,6 +114,7 @@ const BeforeAfterPost = () => {
             }
         };
         fetchFullPost();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionToken, postId]);
     const handleCommentCountChange = (increment: number) => {
         setCountComments((prevCount) => prevCount + increment);
@@ -429,7 +437,25 @@ const BeforeAfterPost = () => {
                             />
                             <span className="text-[12px]">Saved</span>
                         </Button>
-                        {posts && <SharePostModal post={posts} />}
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="default"
+                            className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
+                            onClick={() => {
+                                if (posts) {
+                                    open(posts.id);
+                                }
+                            }}
+                        >
+                            <Image
+                                src={share_icon}
+                                alt="logo"
+                                width={20}
+                                height={20}
+                            />
+                            <span className="text-[12px]">Share</span>
+                        </Button>
                     </div>
 
                     <hr className="mt-3" />

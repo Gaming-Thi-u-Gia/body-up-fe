@@ -49,6 +49,27 @@ export const createPostNoImage = async (
     }
 };
 
+export const fetchDeletePost = async (postId: number, sessionToken: string) => {
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/deletePost?postId=${postId}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+            }
+        );
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res;
+    } catch (error) {
+        throw new Error("Error while deleting post");
+    }
+};
+
 export const fetchPostData = async (
     categoryId: number,
     sessionToken: string,
@@ -330,6 +351,71 @@ export const createBeforeAfterPost = async (
         throw new Error("Something went wrong");
     }
 };
+export const editBeforeAfterPost = async (
+    sessionToken: string,
+    postId: number,
+    data: z.infer<typeof BeforeAfterPostSchema>,
+    preview: string,
+    preview2: string
+) => {
+    const { imgBefore, imgAfter, ...rest } = data;
+    const resultFromSv = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/before-after-image/`,
+        {
+            method: "POST",
+            body: JSON.stringify({
+                base64Img: preview,
+                base64Img1: preview2,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+    ).then(async (res) => {
+        const payload = await res.json();
+        const datas = {
+            status: res.status,
+            payload,
+        };
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        console.log(datas);
+
+        return datas;
+    });
+    try {
+        console.log(resultFromSv.payload.results.secure_url);
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/editPost?postId=${postId}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+                body: JSON.stringify({
+                    ...rest,
+                    imgBefore: resultFromSv.payload.results.secure_url,
+                    imgAfter: resultFromSv.payload.results1.secure_url,
+                }),
+            }
+        ).then(async (res) => {
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return data;
+        });
+    } catch (error) {
+        throw new Error("Something went wrong");
+    }
+};
 
 export const fetchMyPosts = async (
     sessionToken: string,
@@ -444,5 +530,38 @@ export const fetchCommentById = async (parentId: number) => {
         return data;
     } catch (error) {
         throw new Error("Error while fetching comments");
+    }
+};
+
+export const fetchEditPost = async (
+    sessionToken: string,
+    postId: number,
+    data: z.infer<typeof PostSchema>
+) => {
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/editPost?postId=${postId}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${sessionToken}`,
+                },
+                body: JSON.stringify(data),
+            }
+        ).then(async (res) => {
+            const payload = await res.json();
+            const data = {
+                status: res.status,
+                payload,
+            };
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return data;
+        });
+        return res;
+    } catch (error) {
+        throw new Error("Something went wrong");
     }
 };

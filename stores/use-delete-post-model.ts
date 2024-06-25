@@ -1,7 +1,7 @@
 import { Posts } from "@/app/(main)/community/user-post-no-image";
 import { create } from "zustand";
 
-type ShareModel = {
+type DeletePostModel = {
     isOpen: boolean;
     postId: number;
     posts: Posts[];
@@ -10,7 +10,7 @@ type ShareModel = {
     close: () => void;
 };
 
-export const useSharePostModal = create<ShareModel>((set) => ({
+export const useDeletePost = create<DeletePostModel>((set) => ({
     isOpen: false,
     postId: 0,
     posts: [],

@@ -14,6 +14,8 @@ import { VerifyCodeModel } from "@/components/modals/verify-code-modal";
 import { VerifyResetCodeModel } from "@/components/modals/verify-reset-code-modal";
 import logo from "@/public/Logo_BODYUP.png";
 import "photoswipe/dist/photoswipe.css";
+import { DeletePostModal } from "@/components/modals/delete-post-modal";
+import { SharePostModal } from "@/components/modals/share-modal";
 const font = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -48,6 +50,8 @@ export default async function RootLayout({
                         <VerifyResetCodeModel />
                         <AvatarModal />
                         <DeleteAvatarModal />
+                        <DeletePostModal />
+                        <SharePostModal />
                         {children}
                     </main>
 

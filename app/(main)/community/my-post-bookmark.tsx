@@ -25,6 +25,9 @@ import Link from "next/link";
 import { SharePostModal } from "@/components/modals/share-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import InfiniteScroll from "react-infinite-scroll-component";
+import share_icon from "/public/share-icon.svg";
+import { useSharePostModal } from "@/stores/use-share-model";
+
 const MyPostsBookmark = () => {
     const [posts, setPosts] = useState<Posts[]>([]);
     const [isBookmarked, setIsBookmarked] = useState<{
@@ -39,6 +42,11 @@ const MyPostsBookmark = () => {
         fetchPosts();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionToken]);
+    const {
+        open,
+        posts: postZustand,
+        setPosts: setPostsZustand,
+    } = useSharePostModal((store) => store);
 
     const fetchPosts = async () => {
         try {
@@ -71,6 +79,7 @@ const MyPostsBookmark = () => {
                     bookmarkStatus[post.id] = post.bookmarked;
                     setIsBookmarked(bookmarkStatus);
                 });
+                setPostsZustand(uniquePosts);
                 return uniquePosts;
             });
             setHasMorePosts(res.length > 0);
@@ -407,7 +416,21 @@ const MyPostsBookmark = () => {
                                     />
                                     <span className="text-[12px]">Saved</span>
                                 </Button>
-                                {post && <SharePostModal post={post} />}
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="default"
+                                    className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
+                                    onClick={() => open(post.id)}
+                                >
+                                    <Image
+                                        src={share_icon}
+                                        alt="logo"
+                                        width={20}
+                                        height={20}
+                                    />
+                                    <span className="text-[12px]">Share</span>
+                                </Button>
                             </div>
 
                             <hr className="mt-3" />
