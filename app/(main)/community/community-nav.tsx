@@ -33,16 +33,22 @@ const CommunityNavbar = () => {
                         </svg>
                         <span className="text-sm">Search</span>
                     </div>
-                    <Link href={`/community/${title}/create`}>
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            size="full"
-                            className="h-[29px] px-[17px] text-sm"
-                        >
-                            Create Post
-                        </Button>
-                    </Link>
+                    {title === "saved-posts" ||
+                    title === "my-posts" ||
+                    title === "my-comments" ? (
+                        <div></div>
+                    ) : (
+                        <Link href={`/community/${title}/create`}>
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                size="full"
+                                className="h-[29px] px-[17px] text-sm"
+                            >
+                                Create Post
+                            </Button>
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>

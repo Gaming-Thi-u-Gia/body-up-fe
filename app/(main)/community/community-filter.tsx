@@ -26,6 +26,14 @@ const CommunityFilter = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const showFilter = pathParts.length <= 3;
+    const title = pathParts[2];
+    // if (
+    //     title === "my-posts" ||
+    //     title === "saved-posts" ||
+    //     title === "my-comments"
+    // ) {
+    //     return null;
+    // }
     return (
         showFilter && (
             <nav className="flex ml-[22%] gap-3 w-[828px] mt-[70px] justify-between h-10">
