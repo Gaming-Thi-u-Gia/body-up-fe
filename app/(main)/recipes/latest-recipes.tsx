@@ -18,7 +18,8 @@ import { RecipeCardType } from "@/utils/recipe/type";
 const RecipesLatest = () => {
   const [listLatestRecipes, setListLatestRecipes] = useState<RecipeCardType[]>(
     []
-  );
+  );  
+
   const { sessionToken } = useAuthStore((store) => store);
   const [currentBookmarks, setCurrentBookmarks] = useState<{
     [key: number]: boolean;

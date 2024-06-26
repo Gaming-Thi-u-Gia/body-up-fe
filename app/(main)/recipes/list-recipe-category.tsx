@@ -134,5 +134,4 @@ const CardRecipeSkeleton = () => {
     </div>
   );
 };
-
 export default RecipeCategoryList;

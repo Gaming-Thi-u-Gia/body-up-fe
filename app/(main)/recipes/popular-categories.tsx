@@ -34,6 +34,8 @@ const PopularCategories = () => {
     fetchPopularCategory();
   }, []);
 
+
+  
   if (isLoading) {
     return (
       <div className="max-w-7xl flex flex-col mx-auto">
