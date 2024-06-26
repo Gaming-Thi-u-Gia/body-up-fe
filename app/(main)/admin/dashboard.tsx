@@ -1,13 +1,14 @@
 "use client"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ResponsiveBar } from "@nivo/bar"
-import { ResponsiveLine } from "@nivo/line"
-import { Computer, Highlighter, Mails, Tags, User, Users, Video } from "lucide-react"
+import { Computer, Highlighter, Tags, Users, Video } from "lucide-react"
 import { useEffect, useState } from "react"
 import { fetchGetMonthlyUserCount, fetchGetTotalElements } from "@/utils/admin/fetch"
 import { useAuthStore } from "@/components/providers/auth-provider"
 import Link from "next/link"
+import { Card } from "@/components/ui/cart"
+import { ResponsiveBar } from '@nivo/bar';
+import { ResponsiveLine } from '@nivo/line';
+
 
 export type TotalElementsType = {
   totalUser: number;
@@ -193,7 +194,7 @@ function BarChart({ monthlyUserCount }: { monthlyUserCount: MonthlyUserCountType
             },
           },
         }}
-        tooltipLabel={({ id }) => `${id}`}
+        tooltipLabel={({ id}) => `${id}`}
         enableLabel={false}
         role="application"
         ariaLabel="A bar chart showing data"

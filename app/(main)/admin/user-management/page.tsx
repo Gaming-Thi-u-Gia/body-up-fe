@@ -1,9 +1,9 @@
-import { ManageUser } from './manage-user'
+import { ManagementUser } from './management-user'
 
 const page = () => {
   return (
     <div>
-    <ManageUser />
+    <ManagementUser />
     </div>
   )
 }
