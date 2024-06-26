@@ -1,13 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 import React from "react";
-import {
-    CreditCard,
-    Keyboard,
-    Settings,
-    User,
-    ChevronDown,
-} from "lucide-react";
+import { Keyboard, User, ChevronDown } from "lucide-react";
 import { Utensils, Calendar } from "lucide-react";
 
 import {
@@ -21,19 +15,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
+import { useFilterStore } from "@/stores/use-filter-community";
 
 const CommunityFilter = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const showFilter = pathParts.length <= 3;
+    const { setSelectedFilter } = useFilterStore();
     const title = pathParts[2];
-    // if (
-    //     title === "my-posts" ||
-    //     title === "saved-posts" ||
-    //     title === "my-comments"
-    // ) {
-    //     return null;
-    // }
+    const handleSelectedFilter = (
+        filter: "Workout" | "Food" | "Chloe's Programs" | "Misc"
+    ) => {
+        setSelectedFilter(filter);
+    };
     return (
         showFilter && (
             <nav className="flex ml-[22%] gap-3 w-[828px] mt-[70px] justify-between h-10">
@@ -59,19 +53,31 @@ const CommunityFilter = () => {
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup className="text-sm flex flex-col font-light">
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        handleSelectedFilter("Workout")
+                                    }
+                                >
                                     <User className="mr-2 h-4 w-4" />
                                     <span>Workout</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => handleSelectedFilter("Food")}
+                                >
                                     <Utensils className="mr-2 h-4 w-4" />
                                     <span>Food</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        handleSelectedFilter("Chloe's Programs")
+                                    }
+                                >
                                     <Calendar className="mr-2 h-4 w-4" />
                                     <span>Chloe's Programs</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => handleSelectedFilter("Misc")}
+                                >
                                     <Keyboard className="mr-2 h-4 w-4" />
                                     <span>Misc</span>
                                 </DropdownMenuItem>
