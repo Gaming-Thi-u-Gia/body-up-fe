@@ -13,7 +13,11 @@ interface VideoCategory {
   name: string;
 }
 
-const HeaderNavWorkoutPrograms = () => {
+interface HeaderNavWorkoutProgramsProps {
+  onFilterClick: () => void;
+}
+
+const HeaderNavWorkoutPrograms: React.FC<HeaderNavWorkoutProgramsProps> = ({onFilterClick}) => {
   const [titleWorkoutVideos, setTitleWorkoutVideos] = useState<VideoCategory[]>([]);
   const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
   const [searchProgram, setSearchProgram] = useState('');
@@ -56,6 +60,7 @@ const HeaderNavWorkoutPrograms = () => {
     setIsCategoriesVisible(false);
     router.push(`/program/c/${category.id}`);
   };
+  
 
   return (
     <div className="border-b border-[#E3E4EB]">
@@ -89,21 +94,22 @@ const HeaderNavWorkoutPrograms = () => {
           </div>
         </div>
         <div className="flex h-8 space-x-2">
-          <div className="group relative">
-            <Button
-              className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out"
-              variant="defaultOutline"
-              size="default"
-            >
-              <Image width={20} height={20} src="/search.svg" alt="Search" />
-            </Button>
-            <input
-              className="absolute top-0 left-0 group-hover:w-[240px] group-hover:opacity-100 opacity-0 w-[0px] transition-all duration-500 ease-in-out rounded-[15px] border-solid border-[1px] border-[#E9E9EF] px-3 py-2"
-              placeholder="Search"
-              onChange={(e) => setSearchProgram(e.target.value)}
-              onKeyDown={handleSearchKeyDown}
-            />
-          </div>
+        <div className="group relative">
+    <Button
+      className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out"
+      variant="defaultOutline"
+      size="default"
+    >
+      <Image width={20} height={20} src="/search.svg" alt="Search" /> Search
+    </Button>
+    <input
+      className="absolute top-0 right-0 group-hover:w-[240px] group-hover:opacity-100 opacity-0 w-[0px] transition-all duration-500 ease-in-out rounded-[15px] border-solid border-[1px] border-[#E9E9EF] px-3 py-2"
+      placeholder="Search"
+      onChange={(e) => setSearchProgram(e.target.value)}
+      onKeyDown={handleSearchKeyDown}
+    />
+</div>
+
           <div>
             <Button
               className="bg-transparent mr-1 cursor-not-allowed"
@@ -115,7 +121,7 @@ const HeaderNavWorkoutPrograms = () => {
             </Button>
           </div>
           <div>
-            <Button variant="default" size="default">
+            <Button variant="default" size="default" onClick={onFilterClick}>
               <Image width={20} height={20} src="/filter.svg" alt="Filter" /> Filter
             </Button>
           </div>

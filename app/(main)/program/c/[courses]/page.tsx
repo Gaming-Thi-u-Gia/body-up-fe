@@ -10,6 +10,7 @@ import ProgramCard from "../../program-card";
 import { usePathname } from "next/navigation";
 import HeaderNavWorkoutPrograms from "../../header-nav-workout-program";
 import SkeletonProgramCard from "../../skeleton-program";
+import TableProgramCategory from "../../filter-workout-program";
 
 type WorkoutProgramCategory = {
     id: number;
@@ -38,11 +39,16 @@ type TopicType = {
     workoutPrograms: WorkoutProgram[];
 };
 
-const CategoryModelProgramById = () => {
+interface HeaderNavWorkoutProgramsProps {
+    onFilterClick: () => void;
+}
+
+const CategoryModelProgramById: React.FC<HeaderNavWorkoutProgramsProps> = ({onFilterClick}) => {
     const [workoutProgramsTopic, setWorkoutProgramsTopic] = useState<TopicType[]>([]);
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(true);
     const pathname = usePathname();
+    const [showFilterModal, setShowFilterModal] = useState(false);
 
     useEffect(() => {
         if (pathname) {
@@ -61,7 +67,7 @@ const CategoryModelProgramById = () => {
         const getWorkoutProgram = async () => {
             setLoading(true);
             try {
-                const data = await fetchWorkoutProgramWithTopicByTopicIdData(parseInt(query, 10));
+                const data = await fetchWorkoutProgramWithTopicByTopicIdData(parseInt(query, 10) || 0);
                 if (data && data.length > 0) {
                     console.log("Data loaded:", data);
                     setWorkoutProgramsTopic(data);
@@ -85,9 +91,17 @@ const CategoryModelProgramById = () => {
             .toUpperCase();
     }
 
+    const toggleFilterModal = () => setShowFilterModal(!showFilterModal);
+
     return (
-        <div className="w-full px-[140px] pb-[47px]">
-            <HeaderNavWorkoutPrograms />
+        <div className="max-w-7xl mx-auto">
+            <HeaderNavWorkoutPrograms onFilterClick={toggleFilterModal} />
+            {showFilterModal && (
+                <TableProgramCategory
+                    onClose={() => setShowFilterModal(false)}
+                    onFilterClick={toggleFilterModal}
+                />
+            )}
             {loading ? (
                 <div className="grid grid-cols-5 gap-4 h-[430px]">
                     <SkeletonProgramCard />

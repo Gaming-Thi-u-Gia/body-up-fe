@@ -15,9 +15,10 @@ interface VideoCategory {
 
 interface HeaderNavWorkoutVideosProps {
   onCategoryChange: (categoryName: string) => void;
+  onFilterClick: () => void;
 }
 
-const HeaderNavWorkoutVideos: React.FC<HeaderNavWorkoutVideosProps> = ({ onCategoryChange }) => {
+const HeaderNavWorkoutVideos: React.FC<HeaderNavWorkoutVideosProps> = ({ onCategoryChange, onFilterClick }) => {
   const [titleWorkoutVideos, setTitleWorkoutVideos] = useState<VideoCategory[]>([]);
   const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
   const [searchVideo, setSearchProgram] = useState("");
@@ -118,9 +119,9 @@ const HeaderNavWorkoutVideos: React.FC<HeaderNavWorkoutVideosProps> = ({ onCateg
             </Button>
           </div>
           <div>
-            <Button variant="default" size="default">
-              <Image width={20} height={20} src="/filter.svg" alt="Filter" /> Filter
-            </Button>
+          <Button variant="default" size="default" onClick={onFilterClick}>
+            <Image width={20} height={20} src="/filter.svg" alt="Filter" /> Filter
+          </Button>
           </div>
         </div>
       </div>

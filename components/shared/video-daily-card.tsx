@@ -20,7 +20,7 @@ type Props = {
     bannerUrl: string;
     isOptional: boolean;
     url: string;
-    initialStatus: "incomplete" | "complete";
+    initialStatus: string;
 };
 
 export const VideoDailyCard = ({
@@ -38,7 +38,7 @@ export const VideoDailyCard = ({
     const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
     const [watchTime, setWatchTime] = useState(0);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
-    const requiredWatchTime = 10 * 1000; // 10 seconds
+    const requiredWatchTime = 10 * 1000;
 
     const handleThumbnailClick = (videoId: string) => {
         setSelectedVideoId(videoId);
@@ -73,18 +73,17 @@ export const VideoDailyCard = ({
             clearInterval(timerRef.current!);
         };
     }, []);
-
     return (
         <>
             <div className="flex p-[20px] bg-[#F7F7F7] rounded-lg mt-4">
                 <div
-                    onClick={() => handleThumbnailClick("cSLU3msDWxQ")}
+                    onClick={() => handleThumbnailClick(url)}
                     className="pb-[12%] min-w-[180px] bg-contain bg-center rounded-md relative bg-no-repeat cursor-pointer group overflow-hidden"
-                    style={{ backgroundImage: `url(${bannerUrl})` }}
+                    style={{ backgroundImage: `url(${bannerUrl})`}}
                 >
                     <div>
                         <div className="bg-black opacity-0 absolute left-0 bottom-0 right-0 top-0 z-1 group-hover:opacity-20 transition-all duration-300" />
-                        <Badge className="absolute right-2 bottom-3">
+                        <Badge className="absolute right-8 bottom-3">
                             {duration}
                         </Badge>
                     </div>
@@ -153,7 +152,7 @@ export const VideoDailyCard = ({
                                 className="pb-[12%] min-w-[180px] bg-contain bg-center rounded-md relative bg-no-repeat cursor-pointer group overflow-hidden"
                             >
                                 <div className="bg-black opacity-0 absolute left-0 bottom-0 right-0 top-0 z-1 group-hover:opacity-20 transition-all duration-300" />
-                                <Badge className="absolute right-2 bottom-3">
+                                <Badge className="absolute right-8 bottom-3">
                                     {duration}
                                 </Badge>
                             </Link>

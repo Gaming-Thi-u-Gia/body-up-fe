@@ -1,9 +1,12 @@
+'use client'
+
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { fetchBookmarkVideo } from "@/utils/video/workoutVideoCollection";
 import { Heart } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import Modal from "./video";
+import { toast } from "sonner";
 
 type VideoItem = {
     id: string;
@@ -26,13 +29,16 @@ const VideoCard = ({ video }: { video: VideoItem }) => {
 
     const handleBookmarkClick = async () => {
         try {
-            console.log("User ID:", user?.id);
-            console.log("Video ID:", video?.id);
-            console.log("Session Token:", sessionToken);
             const data = await fetchBookmarkVideo(user?.id!, video?.id!, sessionToken!);
             setBookmarkedVideos(data.bookmarked);
+            if (data.bookmarked) {
+                toast.success('Video bookmarked successfully!');
+            } else {
+                toast.info('Video removed from bookmarks.');
+            }
         } catch (error) {
             console.error("Error while bookmarking video:", error);
+            toast.error('Error while bookmarking video.');
         }
     }
 

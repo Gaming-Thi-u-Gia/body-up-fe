@@ -40,7 +40,7 @@ const fetchVideos = async () => {
         }
 
         const playlistId = "UUCgLoMYIyP0U56dEhEL1wXQ";
-        const apiKey = "AIzaSyArQ1iWhQcx3ultL8DphwYFiEfsi1PI5QE"; 
+        const apiKey = "AIzaSyC7RV-Yf4DiF8L4Xj4DprWjceASn5r-S6s"; 
 
         let matchedVideos: VideoItem[] = [];
         let nextPageToken = "";
@@ -70,7 +70,7 @@ const fetchVideos = async () => {
 
                         return {
                             id: videoId,
-                            title: videoData.name, // Sử dụng name làm title
+                            title: videoData.name,
                             img: item.snippet.thumbnails.high.url,
                             views: formatViews(videoInfo.statistics.viewCount),
                             date: formatDate(new Date(item.snippet.publishedAt)),

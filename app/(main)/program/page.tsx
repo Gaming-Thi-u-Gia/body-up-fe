@@ -12,6 +12,7 @@ import { fetchAllTopic } from "@/utils/video/topic";
 import SkeletonProgramCard from "./skeleton-program";
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import TableProgramCategory from "./filter-workout-program";
 
 interface WorkoutProgramCategory {
     id: number;
@@ -39,6 +40,7 @@ const ProgramPage = () => {
     const [workoutPrograms, setWorkoutPrograms] = useState<WorkoutProgram[]>([]);
     const [topicIds, setTopicIds] = useState<number[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [showFilterModal, setShowFilterModal] = useState(false);
 
     useEffect(() => {
         const getWorkoutProgram = async () => {
@@ -57,10 +59,14 @@ const ProgramPage = () => {
     }
 
     const firstProgram = workoutPrograms[0];
+    const toggleFilterModal = () => setShowFilterModal(!showFilterModal);
 
     return (
-        <div className="w-full px-[140px] pb-[47px]">
-            <HeaderNavWorkoutPrograms />
+        <div className="w-full max-w-7xl mx-auto">
+            <HeaderNavWorkoutPrograms onFilterClick={toggleFilterModal} />
+            {showFilterModal && (
+                <TableProgramCategory onClose={() => setShowFilterModal(false)} onFilterClick={toggleFilterModal}/>
+            )}
             <div className="flex w-full gap-5 pb-5 pt-8">
                 <div className="flex w-[60%] justify-between">
                     {loading ? (
