@@ -15,7 +15,11 @@ import challenges_icon from "/public/challenges-icon.svg";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Posts } from "./user-post-no-image";
-import { fetchFilterPost, fetchPostData } from "@/utils/community";
+import {
+    fetchFilterPost,
+    fetchPostData,
+    fetchSearchPost,
+} from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import moment from "moment";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,6 +27,7 @@ import { category } from "@/constants";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useSharePostModal } from "@/stores/use-share-model";
 import { useFilterStore } from "@/stores/use-filter-community";
+import useSearchStore from "@/stores/use-search-post";
 const BeforAfterPost = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
@@ -35,34 +40,47 @@ const BeforAfterPost = () => {
     const { open, setPosts: setPostsZustand } = useSharePostModal(
         (store) => store
     );
-    const { selectedFilter } = useFilterStore((store) => store);
+    const { selectedFilter } = useFilterStore();
+    const { searchText } = useSearchStore();
+
     useEffect(() => {
         setPosts([]);
         setPage(0);
-    }, [selectedFilter]);
+    }, [selectedFilter, searchText]);
 
     useEffect(() => {
         if (page === 0) {
             getPostsByCategory();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, selectedFilter]);
+    }, [page, selectedFilter, searchText]);
 
     const getPostsByCategory = async () => {
         try {
             setIsLoading(true);
             const size = 4;
-
-            const data =
-                selectedFilter === "All"
-                    ? await fetchPostData(2, sessionToken!, page, size)
-                    : await await fetchFilterPost(
-                          sessionToken!,
-                          selectedFilter,
-                          2,
-                          page,
-                          size
-                      );
+            let data: Posts[] = [];
+            if (searchText === "") {
+                if (selectedFilter === "All") {
+                    data = await fetchPostData(2, sessionToken!, page, size);
+                } else {
+                    data = await fetchFilterPost(
+                        sessionToken!,
+                        selectedFilter,
+                        2,
+                        page,
+                        size
+                    );
+                }
+            } else {
+                data = await fetchSearchPost(
+                    sessionToken!,
+                    searchText,
+                    2,
+                    page,
+                    size
+                );
+            }
             console.log(data);
 
             if (data.length === 0) {

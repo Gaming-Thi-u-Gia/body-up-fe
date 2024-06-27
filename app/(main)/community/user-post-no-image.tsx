@@ -24,6 +24,7 @@ import {
     fetchBookmarkPost,
     fetchFilterPost,
     fetchPostData,
+    fetchSearchPost,
 } from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
@@ -33,6 +34,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Comments } from "./comment";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useFilterStore } from "@/stores/use-filter-community";
+import useSearchStore from "@/stores/use-search-post";
 export type Posts = {
     id: number;
     title: string;
@@ -78,39 +80,56 @@ const PostUser = ({ categoryId }: CategoryId) => {
     }>({});
     const [page, setPage] = useState(0);
     const [hasMorePosts, setHasMorePosts] = useState(false);
-    const {
-        open,
-        setPosts: setPostsZustand,
-        posts: postZustand,
-    } = useSharePostModal((store) => store);
-    const { selectedFilter } = useFilterStore((store) => store);
+    const { open, setPosts: setPostsZustand } = useSharePostModal(
+        (store) => store
+    );
+    const { selectedFilter, setSelectedFilter } = useFilterStore();
+    const { searchText } = useSearchStore();
+    console.log("Search:", searchText);
 
     useEffect(() => {
         setPosts([]);
         setPage(0);
-    }, [selectedFilter]);
+    }, [selectedFilter, searchText]);
 
     useEffect(() => {
         if (page === 0) {
             getPostsByCategory();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, selectedFilter, categoryId]);
+    }, [page, selectedFilter, categoryId, searchText]);
     const getPostsByCategory = async () => {
         try {
             setIsLoading(true);
             const size = 3;
-            const data =
-                selectedFilter === "All"
-                    ? await fetchPostData(categoryId, sessionToken!, page, size)
-                    : await await fetchFilterPost(
-                          sessionToken!,
-                          selectedFilter,
-                          categoryId,
-                          page,
-                          size
-                      );
-            console.log(data);
+            let data: Posts[] = [];
+            if (searchText === "") {
+                if (selectedFilter === "All") {
+                    data = await fetchPostData(
+                        categoryId,
+                        sessionToken!,
+                        page,
+                        size
+                    );
+                } else {
+                    data = await fetchFilterPost(
+                        sessionToken!,
+                        selectedFilter,
+                        categoryId,
+                        page,
+                        size
+                    );
+                }
+            } else {
+                data = await fetchSearchPost(
+                    sessionToken!,
+                    searchText,
+                    categoryId,
+                    page,
+                    size
+                );
+                setSelectedFilter("All");
+            }
 
             if (data.length === 0) {
                 setHasMorePosts(false);

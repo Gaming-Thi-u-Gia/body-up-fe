@@ -1,16 +1,29 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import useSearchStore from "@/stores/use-search-post";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 const CommunityNavbar = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const title = pathParts[2];
     const router = useRouter();
+    const { searchText, setSearchText } = useSearchStore();
+    const [localSearchText, setLocalSearchText] = useState("");
+
+    const handleSearch = () => {
+        // Update Zustand store with the local state
+        setSearchText(localSearchText);
+    };
+    const handleKeyPress = (event: any) => {
+        if (event.key === "Enter") {
+            handleSearch();
+        }
+    };
     return (
         <div className="w-full fixed top-15 left-0 z-20 bg-[#F9F9FA] h-[57px] flex items-center border-b border-gray-200/100 ">
             <div className="w-[333px] flex items-center pr-[200px] pl-[15px] border-r border-gray-200/100 h-[57px]">
@@ -47,10 +60,16 @@ const CommunityNavbar = () => {
                                 width={20}
                                 height={20}
                                 className="absolute left-[2px] cursor-pointer"
+                                onClick={handleSearch}
                             />
                             <input
                                 className="pl-7 w-full rounded-[15px] border-1 border-gray-200/100"
                                 placeholder="Search"
+                                value={localSearchText}
+                                onChange={(e) =>
+                                    setLocalSearchText(e.target.value)
+                                }
+                                onKeyDown={handleKeyPress}
                             />
                         </span>
                     </div>

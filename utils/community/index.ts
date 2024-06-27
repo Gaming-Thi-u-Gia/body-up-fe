@@ -565,6 +565,36 @@ export const fetchEditPost = async (
         throw new Error("Something went wrong");
     }
 };
+export const fetchSearchPost = async (
+    sessionToken: string,
+    searchText: string,
+    categoryId: number,
+    page: number,
+    size: number
+) => {
+    const headers: HeadersInit = {
+        "Content-Type": "application/json",
+        ...(sessionToken && { Authorization: `Bearer ${sessionToken}` }),
+    };
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/posts/searchPost?title=${searchText}&categoryId=${categoryId}&page=${page}&size=${size}`,
+            {
+                method: "GET",
+                headers: headers,
+            }
+        ).then(async (res) => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            const data = res.json();
+            return data;
+        });
+        return res;
+    } catch (error) {
+        throw new Error("Error while fetching posts");
+    }
+};
 
 export const fetchFilterPost = async (
     sessionToken: string,
