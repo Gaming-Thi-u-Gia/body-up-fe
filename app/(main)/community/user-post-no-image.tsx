@@ -20,7 +20,11 @@ import {
 } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
 import { Bookmark } from "lucide-react";
-import { fetchBookmarkPost, fetchPostData } from "@/utils/community";
+import {
+    fetchBookmarkPost,
+    fetchFilterPost,
+    fetchPostData,
+} from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
 import { useSharePostModal } from "@/stores/use-share-model";
@@ -28,6 +32,7 @@ import { SharePostModal } from "@/components/modals/share-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Comments } from "./comment";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { useFilterStore } from "@/stores/use-filter-community";
 export type Posts = {
     id: number;
     title: string;
@@ -78,20 +83,33 @@ const PostUser = ({ categoryId }: CategoryId) => {
         setPosts: setPostsZustand,
         posts: postZustand,
     } = useSharePostModal((store) => store);
+    const { selectedFilter } = useFilterStore((store) => store);
+
     useEffect(() => {
-        getPostsByCategory();
+        setPosts([]);
+        setPage(0);
+    }, [selectedFilter]);
+
+    useEffect(() => {
+        if (page === 0) {
+            getPostsByCategory();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [categoryId]);
+    }, [page, selectedFilter, categoryId]);
     const getPostsByCategory = async () => {
         try {
             setIsLoading(true);
             const size = 3;
-            const data = await fetchPostData(
-                categoryId,
-                sessionToken!,
-                page,
-                size
-            );
+            const data =
+                selectedFilter === "All"
+                    ? await fetchPostData(categoryId, sessionToken!, page, size)
+                    : await await fetchFilterPost(
+                          sessionToken!,
+                          selectedFilter,
+                          categoryId,
+                          page,
+                          size
+                      );
             console.log(data);
 
             if (data.length === 0) {

@@ -21,10 +21,10 @@ const CommunityFilter = () => {
     const pathname = usePathname();
     const pathParts = pathname.split("/");
     const showFilter = pathParts.length <= 3;
-    const { setSelectedFilter } = useFilterStore();
+    const { setSelectedFilter, selectedFilter } = useFilterStore();
     const title = pathParts[2];
     const handleSelectedFilter = (
-        filter: "Workout" | "Food" | "Chloe's Programs" | "Misc"
+        filter: "All" | "Workout" | "Food" | "Chloe's Programs" | "Misc"
     ) => {
         setSelectedFilter(filter);
     };
@@ -40,7 +40,9 @@ const CommunityFilter = () => {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <div className="flex items-center ">
-                                <span className="text-sm">All</span>
+                                <span className="text-sm">
+                                    {selectedFilter}
+                                </span>
                                 <ChevronDown className="text-sm w-[18.72px]" />
                             </div>
                         </DropdownMenuTrigger>
@@ -49,10 +51,15 @@ const CommunityFilter = () => {
                             side="left"
                         >
                             <DropdownMenuLabel className="bg-[#ebf4ff]">
-                                All
+                                <span>{selectedFilter}</span>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup className="text-sm flex flex-col font-light">
+                                <DropdownMenuItem
+                                    onClick={() => handleSelectedFilter("All")}
+                                >
+                                    <span>All</span>
+                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() =>
                                         handleSelectedFilter("Workout")
