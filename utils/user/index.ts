@@ -421,3 +421,21 @@ export const getFirstUncompleted = async (sessionToken: string) => {
     const payload = await res.json();
     return payload;
 };
+
+export const getAllCompleted = async (sessionToken: string) => {
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/userChallenge/getCompletedChallenge`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+        }
+    );
+    if (!res.ok) {
+        return null;
+    }
+    const payload = await res.json();
+    return payload;
+};
