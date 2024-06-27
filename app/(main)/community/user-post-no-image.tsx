@@ -21,6 +21,7 @@ import {
 import { usePathname } from "next/navigation";
 import { Bookmark } from "lucide-react";
 import {
+    countCommentByUserId,
     fetchBookmarkPost,
     fetchFilterPost,
     fetchPostData,
@@ -98,6 +99,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page, selectedFilter, categoryId, searchText]);
+
     const getPostsByCategory = async () => {
         try {
             setIsLoading(true);
@@ -334,31 +336,6 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                                         >
                                                             Send Message
                                                         </Button>
-                                                    </div>
-                                                    <div className="mt-7 flex gap-5 justify-center items-center">
-                                                        <div className="flex items-center gap-1 flex-col w-[40%]">
-                                                            <label
-                                                                htmlFor=""
-                                                                className="text-[#868A93] text-sm "
-                                                            >
-                                                                Comments
-                                                            </label>
-                                                            <span className="text-[18px]">
-                                                                752
-                                                            </span>
-                                                        </div>
-                                                        <hr className="bg-[#CDD5DE] mx-2 min-h-7 w-[1px] shrink-0 flex" />
-                                                        <div className="flex items-center gap-1 flex-col w-[40%]">
-                                                            <label
-                                                                htmlFor=""
-                                                                className="text-[#868A93] text-sm"
-                                                            >
-                                                                Posts
-                                                            </label>
-                                                            <span className="text-[18px]">
-                                                                752
-                                                            </span>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </SheetContent>
