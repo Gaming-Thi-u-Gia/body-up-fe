@@ -1,4 +1,4 @@
-import { AddNewRecipe } from "./add-new-recipe"
+import  AddNewRecipe  from "./add-new-recipe"
 
 const page = () => {
   return (

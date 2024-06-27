@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { Computer, Highlighter, Tags, Users, Video } from "lucide-react"
+import { Computer, CookingPot, Highlighter, Tags, Users, Video } from "lucide-react"
 import { useEffect, useState } from "react"
 import { fetchGetMonthlyUserCount, fetchGetTotalElements } from "@/utils/admin/fetch"
 import { useAuthStore } from "@/components/providers/auth-provider"
@@ -61,7 +61,7 @@ const Dashboard = () =>{
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <main className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-4">
-        <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="flex items-center justify-center p-4">
             <div className="text-center">
               <Users className="h-6 w-6 mx-auto mb-2" />
@@ -80,6 +80,13 @@ const Dashboard = () =>{
             <div className="text-center">
               <Video className="h-6 w-6 mx-auto mb-2" />
               <h2 className="text-xl font-bold">Total Workout Videos</h2>
+              <p className="text-2xl font-bold">60</p>
+            </div>
+          </Card>
+          <Card className="flex items-center justify-center p-4">
+            <div className="text-center">
+              <CookingPot className="h-6 w-6 mx-auto mb-2" />
+              <h2 className="text-xl font-bold">Total Recipes</h2>
               <p className="text-2xl font-bold">60</p>
             </div>
           </Card>

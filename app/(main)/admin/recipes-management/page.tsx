@@ -1,4 +1,4 @@
-import {RecipeManagement} from"./recipe-management"
+import RecipeManagement from"./recipe-management"
 const page = () => {
   return (
     <div>
