@@ -59,7 +59,7 @@ export function ChattingPage() {
               <div className="flex-1 overflow-hidden">
                 <div className="font-medium truncate">Olivia Smith</div>
                 <div className="text-sm text-muted-foreground line-clamp-1 break-all">
-                  Hey, how's it going? aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                  Hey, how's it going?
                 </div>
               </div>
               <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -140,6 +140,15 @@ export function ChattingPage() {
           </DropdownMenu>
         </div>
         <div className="flex-1 overflow-auto p-4">
+          <div className="h-[50%] w-full flex justify-center items-center">
+            <div className="flex items-center justify-center w-full gap-2 pt-[200px]">
+              <hr className="w-[45%] h-1" />
+              <span className="text-gray-400 text-sm font-medium">
+                11th Jun 2024
+              </span>
+              <hr className="w-[45%] h-1" />
+            </div>
+          </div>
           <div className="grid gap-4">
             <div className="flex items-start gap-3">
               <Avatar className="h-8 w-8 border">
