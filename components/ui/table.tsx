@@ -114,4 +114,8 @@ export {
   TableRow,
   TableCell,
   TableCaption,
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 2-recipes-page

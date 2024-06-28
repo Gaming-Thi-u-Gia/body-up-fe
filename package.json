@@ -12,7 +12,10 @@
     "@hookform/resolvers": "^3.4.0",
     "@nivo/bar": "^0.87.0",
     "@nivo/line": "^0.87.0",
+<<<<<<< HEAD
     "@nivo/pie": "^0.87.0",
+=======
+>>>>>>> 2-recipes-page
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.0.5",
@@ -20,6 +23,7 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
+    "@react-icons/all-files": "^4.1.0",
     "class-variance-authority": "^0.7.0",
     "cloudinary": "^2.2.0",
     "clsx": "^2.1.1",
@@ -30,10 +34,18 @@
     "next": "14.2.3",
     "next-auth": "^4.24.7",
     "next-themes": "^0.3.0",
+<<<<<<< HEAD
     "react": "^18.3.1",
+=======
+    "photoswipe": "^5.4.3",
+    "react": "^18",
+>>>>>>> 2-recipes-page
     "react-avatar-edit": "^1.2.0",
     "react-dom": "^18",
     "react-hook-form": "^7.51.4",
+    "react-infinite-scroll-component": "^6.1.0",
+    "react-photoswipe": "^1.3.0",
+    "react-photoswipe-gallery": "^3.0.1",
     "sonner": "^1.4.41",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
@@ -47,6 +59,8 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
