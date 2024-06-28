@@ -95,20 +95,20 @@ const HeaderNavWorkoutPrograms: React.FC<HeaderNavWorkoutProgramsProps> = ({onFi
         </div>
         <div className="flex h-8 space-x-2">
         <div className="group relative">
-    <Button
-      className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out"
-      variant="defaultOutline"
-      size="default"
-    >
-      <Image width={20} height={20} src="/search.svg" alt="Search" /> Search
-    </Button>
-    <input
-      className="absolute top-0 right-0 group-hover:w-[240px] group-hover:opacity-100 opacity-0 w-[0px] transition-all duration-500 ease-in-out rounded-[15px] border-solid border-[1px] border-[#E9E9EF] px-3 py-2"
-      placeholder="Search"
-      onChange={(e) => setSearchProgram(e.target.value)}
-      onKeyDown={handleSearchKeyDown}
-    />
-</div>
+            <Button
+              className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out"
+              variant="defaultOutline"
+              size="default"
+            >
+              <Image width={20} height={20} src="/search.svg" alt="Search" /> Search
+            </Button>
+            <input
+              className="absolute top-0 right-0 group-hover:w-[240px] group-hover:opacity-100 opacity-0 w-[0px] transition-all duration-500 ease-in-out rounded-[15px] border-solid border-[1px] border-[#E9E9EF] px-3 py-2"
+              placeholder="Search"
+              onChange={(e) => setSearchProgram(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
+            />
+        </div>
 
           <div>
             <Button

@@ -118,6 +118,40 @@ const DailyCourses: React.FC<DailyCoursesProps> = ({ workoutProgramId }) => {
                     </Accordion>
                 </div>
             )}
+            {filteredExercise && (
+                <div className="w-full py-[30px] px-[18px] bg-white border-[#c4c4c4] border-[1px] rounded-lg items-start my-4">
+                    <Accordion type="single" collapsible>
+                        <AccordionItem value={`day-${filteredExercise.day}`} className="border-none">
+                            <AccordionTrigger className="flex justify-between w-full text-center items-center">
+                                <h4 className="text-[22px] font-semibold">
+                                    Day {filteredExercise.day} Recipes
+                                </h4>
+                                <p className="text-[14px] text-[#868A93]">
+                                    3 Meals
+                                </p>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                {filteredExercise.dailyVideos.map((video, index) => (
+                                    <VideoDaily
+                                        videoId={video.id}
+                                        key={index}
+                                        title={video.title}
+                                        bannerUrl={video.img}
+                                        duration={video.duration}
+                                        releaseDate={video.date}
+                                        target=""
+                                        view={video.views}
+                                        isOptional={video.bookmarked}
+                                        url={video.url}
+                                        initialStatus={video.status}
+                                        category={video.category}
+                                    />
+                                ))}
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </div>
+            )}
         </div>
     );
 };
