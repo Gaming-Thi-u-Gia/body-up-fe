@@ -12,6 +12,9 @@ import { DeleteAvatarModal } from "@/components/modals/delete-avatar-modal";
 import { Toaster } from "@/components/ui/sonner";
 import { VerifyCodeModel } from "@/components/modals/verify-code-modal";
 import { VerifyResetCodeModel } from "@/components/modals/verify-reset-code-modal";
+import { UploadPhotoModal } from "@/components/modals/upload-photo-modal";
+import BmiCaculate from "@/components/shared/bmi-calculate";
+import { BmiModal } from "@/components/modals/bmi-modal";
 import logo from "@/public/Logo_BODYUP.png";
 const font = Manrope({ subsets: ["latin"] });
 
@@ -51,6 +54,25 @@ export default async function RootLayout({
             <DeleteAvatarModal />
             {children}
           </main>
+    return (
+        <html lang='en'>
+            <body className={cn("flex flex-col min-h-screen", font.className)}>
+                <AuthStoreProvider
+                    initialToken={userCookie?.value}
+                    initialLoggedIn={!!userCookie?.value}
+                    initialUser={res?.payload}
+                >
+                    <Navbar />
+                    <main className='relative mt-[56px] flex-1'>
+                        <VerifyCodeModel />
+                        <VerifyResetCodeModel />
+                        <AvatarModal />
+                        <DeleteAvatarModal />
+                        <UploadPhotoModal />
+                        <BmiModal/>
+                        {children}
+                        <BmiCaculate />
+                    </main>
 
           <Toaster position="top-right" />
           <Footer />
@@ -58,4 +80,10 @@ export default async function RootLayout({
       </body>
     </html>
   );
+                    <Toaster position='top-right' />
+                    <Footer />
+                </AuthStoreProvider>
+            </body>
+        </html>
+    );
 }

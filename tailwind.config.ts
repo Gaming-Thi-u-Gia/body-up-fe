@@ -1,6 +1,29 @@
 import type { Config } from "tailwindcss";
 
 const config = {
+    darkMode: ["class"],
+    content: [
+        "./pages/**/*.{ts,tsx}",
+        "./components/**/*.{ts,tsx}",
+        "./app/**/*.{ts,tsx}",
+        "./src/**/*.{ts,tsx}",
+    ],
+    prefix: "",
+    theme: {
+        container: {
+            center: true,
+            padding: "2rem",
+            screens: {
+                "2xl": "1400px",
+            },
+        },
+        extend: {
+            backgroundImage: {
+                "login-pattern1": "url('/login-pattern1.png')",
+                "login-pattern2": "url('/login-pattern2.png')",
+                "login-pattern3": "url('/login-pattern3.png')",
+                'bmi-gradient': 'linear-gradient(to right, #fbd3e9, #bb377d)',
+            },
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",

@@ -54,6 +54,7 @@ const PreferencesPage = () => {
                     values,
                     sessionToken!
                 );
+                updateProfile(result?.payload);
                 toast.success("Save Profile Success!", {
                     description: `${new Date().toLocaleString()}`,
                     action: {
