@@ -1,3 +1,5 @@
+import { AddNewRecipeType } from "./type";
+
 export const fetchGetTotalElements = async (sessionToken: string) => {
   try {
     const response = await fetch(
@@ -51,7 +53,7 @@ export const fetchGetRecipeTopic = async () => {
     throw new Error(`Error while fetching data recipe collection`);
   }
 };
-export const fetchGetTableFilter = async () => {
+export const fetchGetTableFilterRecipe = async () => {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/recipe-category/table`,
@@ -68,3 +70,23 @@ export const fetchGetTableFilter = async () => {
     throw new Error(`Error while get table filter`);
   }
 };
+  export const fetchPostRecipe = async (recipe:AddNewRecipeType) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(recipe),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const data = await response.text();
+      return data;
+    } catch (error) {
+      throw new Error(`Error while fetching post recipe`);
+    }
+  };

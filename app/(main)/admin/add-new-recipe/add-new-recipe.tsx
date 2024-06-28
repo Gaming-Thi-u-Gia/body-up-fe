@@ -4,79 +4,39 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Plus, X } from "lucide-react"
-import { IngredientType, NoteRecipeType } from "@/utils/admin/type"
-import { fetchGetRecipeTopic, fetchGetTableFilter } from "@/utils/admin/fetch"
-
-export type AddNewRecipeType = {
-  name: string;
-  detail: string;
-  prepTime: number;
-  cookTime: number;
-  img: string;
-  cookingInstruction: string;
-  ingredientRecipes: IngredientRecipeType[];
-  otherImageRecipes: OtherImageRecipeType[];
-  noteRecipes: NoteRecipeType[];
-  recipeTopics: TopicType[];
-  recipeCategories: RecipeCategoryType[];
-}
-
-type TableFilterType = {
-  length: number;
-  type: string;
-  recipeCategories: RecipeCategoryType[];
-}
-
-export type IngredientRecipeType = {
-  amount: string;
-  name: string;
-}
-
-export type OtherImageRecipeType = {
-  img: string;
-}
-
-export type RecipeCategoryType = {
-  id: number;
-  name: string;
-  type: string;
-  img: string;
-  totalRecipe: number;
-}
-
-export type TopicType = {
-  id: number;
-  name: string;
-}
+import { AddNewRecipeType, IngredientRecipeType, NoteRecipeType, OtherImageRecipeType, RecipeCategoryType, TableFilterType, TopicType } from "@/utils/admin/type"
+import { fetchGetRecipeTopic, fetchGetTableFilterRecipe, fetchPostRecipe } from "@/utils/admin/fetch"
+import { toast } from "sonner"
 
 const AddNewRecipe = () => {
-  const [recipe, setRecipe] = useState({
+  const [recipe, setRecipe] = useState<AddNewRecipeType>({
     name: "",
     detail: "",
-    prepTime: "",
-    cookTime: "",
+    prepTime: 0,
+    cookTime: 0,
     img: "",
     cookingInstruction: "",
-    ingredients: [{ name: "", amount: "" }],
-    notes: [{ detail: "" }],
-    categorieRecipes: [] as RecipeCategoryType[],
+    ingredientRecipes: [{ name: "", amount: "" }] as IngredientRecipeType[],
+    noteRecipes: [{ detail: "" }] as NoteRecipeType[],
+    recipeCategories: [] as RecipeCategoryType[],
     recipeTopics: [] as TopicType[],
     otherImageRecipes: [] as OtherImageRecipeType[]
-  })
+  });
 
-  const [topics, setTopics] = useState<TopicType[]>([])
+  const [topics, setTopics] = useState<TopicType[]>([]);
   const [tableFilter, setTableFilter] = useState<TableFilterType[]>([]);
-  const [imagePreview, setImagePreview] = useState("")
+  const [imagePreview, setImagePreview] = useState("");
   const [errors, setErrors] = useState({
     notes: "",
     ingredients: "",
-    otherImageRecipes: ""
-  })
+    otherImageRecipes: "",
+    general: ""
+  });
 
   useEffect(() => {
     const getTableFilter = async () => {
       try {
-        const response = await fetchGetTableFilter();
+        const response = await fetchGetTableFilterRecipe();
         const sortedResponse = response
           .sort((a: TableFilterType, b: TableFilterType) =>
             a.type.localeCompare(b.type)
@@ -108,170 +68,208 @@ const AddNewRecipe = () => {
   }, [])
 
   const handleAddNote = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    if (recipe.notes.some(note => note.detail === "")) {
-      setErrors(prevErrors => ({ ...prevErrors, notes: "Please fill in all note details before adding a new note." }))
-      return
+    e.preventDefault();
+    if (recipe.noteRecipes.some(note => note.detail === "")) {
+      setErrors(prevErrors => ({ ...prevErrors, notes: "Please fill in all note details before adding a new note." }));
+      return;
     }
     setRecipe(prevRecipe => ({
       ...prevRecipe,
-      notes: [...prevRecipe.notes, { detail: "" }]
-    }))
-    setErrors(prevErrors => ({ ...prevErrors, notes: "" }))
+      noteRecipes: [...prevRecipe.noteRecipes, { detail: "" }]
+    }));
+    setErrors(prevErrors => ({ ...prevErrors, notes: "" }));
   }
 
   const handleNoteDetailChange = (index: number, detail: string) => {
-    const updatedNotes = [...recipe.notes]
-    updatedNotes[index].detail = detail
+    const updatedNotes = [...recipe.noteRecipes];
+    updatedNotes[index].detail = detail;
     setRecipe(prevRecipe => ({
       ...prevRecipe,
-      notes: updatedNotes
-    }))
+      noteRecipes: updatedNotes
+    }));
   }
 
   const handleRemoveNote = (index: number) => {
-    const updatedNotes = [...recipe.notes]
-    updatedNotes.splice(index, 1)
+    const updatedNotes = [...recipe.noteRecipes];
+    updatedNotes.splice(index, 1);
     setRecipe(prevRecipe => ({
       ...prevRecipe,
-      notes: updatedNotes
-    }))
+      noteRecipes: updatedNotes
+    }));
   }
 
   const handleAddIngredient = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    if (recipe.ingredients.some(ingredient => ingredient.name === "" || ingredient.amount === "")) {
-      setErrors(prevErrors => ({ ...prevErrors, ingredients: "Please fill in all ingredient details before adding a new ingredient." }))
-      return
+    e.preventDefault();
+    if (recipe.ingredientRecipes.some(ingredient => ingredient.name === "" || ingredient.amount === "")) {
+      setErrors(prevErrors => ({ ...prevErrors, ingredients: "Please fill in all ingredient details before adding a new ingredient." }));
+      return;
     }
     setRecipe(prevRecipe => ({
       ...prevRecipe,
-      ingredients: [...prevRecipe.ingredients, { name: "", amount: "" }]
-    }))
-    setErrors(prevErrors => ({ ...prevErrors, ingredients: "" }))
+      ingredientRecipes: [...prevRecipe.ingredientRecipes, { name: "", amount: "" }]
+    }));
+    setErrors(prevErrors => ({ ...prevErrors, ingredients: "" }));
   }
 
   const handleIngredientChange = (index: number, field: keyof IngredientRecipeType, value: string) => {
-    const updatedIngredients = [...recipe.ingredients]
-    updatedIngredients[index][field] = value
+    const updatedIngredients = [...recipe.ingredientRecipes];
+    updatedIngredients[index][field] = value;
     setRecipe(prevRecipe => ({
       ...prevRecipe,
-      ingredients: updatedIngredients
-    }))
+      ingredientRecipes: updatedIngredients
+    }));
   }
 
   const handleRemoveIngredient = (index: number) => {
-    const updatedIngredients = [...recipe.ingredients]
-    updatedIngredients.splice(index, 1)
+    const updatedIngredients = [...recipe.ingredientRecipes];
+    updatedIngredients.splice(index, 1);
     setRecipe(prevRecipe => ({
       ...prevRecipe,
-      ingredients: updatedIngredients
-    }))
+      ingredientRecipes: updatedIngredients
+    }));
   }
 
   const handleInputChange = (field: string, value: string) => {
     setRecipe(prevRecipe => ({
       ...prevRecipe,
       [field]: value
-    }))
+    }));
+    console.log(recipe);
   }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string)
+        setImagePreview(reader.result as string);
         setRecipe(prevRecipe => ({
           ...prevRecipe,
           img: reader.result as string
-        }))
+        }));
       }
-      reader.readAsDataURL(file)
+      reader.readAsDataURL(file);
     }
   }
 
   const handleAddOtherImage = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     if (recipe.otherImageRecipes.some(image => image.img === "")) {
-      setErrors(prevErrors => ({ ...prevErrors, otherImageRecipes: "Please fill in all other image details before adding a new image." }))
-      return
+      setErrors(prevErrors => ({ ...prevErrors, otherImageRecipes: "Please fill in all other image details before adding a new image." }));
+      return;
     }
     if (recipe.otherImageRecipes.length < 3) {
       setRecipe(prevRecipe => ({
         ...prevRecipe,
         otherImageRecipes: [...prevRecipe.otherImageRecipes, { img: "" }]
-      }))
-      setErrors(prevErrors => ({ ...prevErrors, otherImageRecipes: "" }))
+      }));
+      setErrors(prevErrors => ({ ...prevErrors, otherImageRecipes: "" }));
     }
   }
 
   const handleOtherImageChange = (index: number, file: File) => {
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onloadend = () => {
-      const updatedOtherImages = [...recipe.otherImageRecipes]
-      updatedOtherImages[index].img = reader.result as string
+      const updatedOtherImages = [...recipe.otherImageRecipes];
+      updatedOtherImages[index].img = reader.result as string;
       setRecipe(prevRecipe => ({
         ...prevRecipe,
         otherImageRecipes: updatedOtherImages
-      }))
+      }));
     }
-    reader.readAsDataURL(file)
+    reader.readAsDataURL(file);
   }
 
   const handleRemoveOtherImage = (index: number) => {
-    const updatedOtherImages = [...recipe.otherImageRecipes]
-    updatedOtherImages.splice(index, 1)
+    const updatedOtherImages = [...recipe.otherImageRecipes];
+    updatedOtherImages.splice(index, 1);
     setRecipe(prevRecipe => ({
       ...prevRecipe,
       otherImageRecipes: updatedOtherImages
-    }))
+    }));
   }
 
   const handleCategoryChange = (type: string, value: string) => {
     const selectedCategory = tableFilter
       .find(table => table.type === type)
-      ?.recipeCategories.find(category => category.name === value)
+      ?.recipeCategories.find(category => category.name === value);
     if (selectedCategory) {
-      const updatedCategories = recipe.categorieRecipes.filter(category => category.type !== type)
+      const updatedCategories = recipe.recipeCategories.filter(category => category.type !== type);
       setRecipe(prevRecipe => ({
         ...prevRecipe,
-        categorieRecipes: [...updatedCategories, selectedCategory]
-      }))
+        recipeCategories: [...updatedCategories, selectedCategory]
+      }));
     }
   }
 
   const handleRemoveCategory = (type: string) => {
-    const updatedCategories = recipe.categorieRecipes.filter(category => category.type !== type)
+    const updatedCategories = recipe.recipeCategories.filter(category => category.type !== type);
     setRecipe(prevRecipe => ({
       ...prevRecipe,
-      categorieRecipes: updatedCategories
-    }))
+      recipeCategories: updatedCategories
+    }));
   }
 
   const handleTopicChange = (value: string) => {
-    const selectedTopic = topics.find(topic => topic.name === value)
+    const selectedTopic = topics.find(topic => topic.name === value);
     if (selectedTopic && !recipe.recipeTopics.some(topic => topic.id === selectedTopic.id)) {
       setRecipe(prevRecipe => ({
         ...prevRecipe,
         recipeTopics: [...prevRecipe.recipeTopics, selectedTopic]
-      }))
+      }));
     }
   }
 
   const handleRemoveTopic = (index: number) => {
-    const updatedTopics = [...recipe.recipeTopics]
-    updatedTopics.splice(index, 1)
+    const updatedTopics = [...recipe.recipeTopics];
+    updatedTopics.splice(index, 1);
     setRecipe(prevRecipe => ({
       ...prevRecipe,
       recipeTopics: updatedTopics
-    }))
+    }));
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    // Handle form submission logic here
-    console.log('Recipe submitted:', recipe)
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const checkEmptyFields = () => {
+      let hasError = false;
+      // if (!recipe.name || !recipe.detail || !recipe.cookingInstruction || !recipe.img) {
+      if (!recipe.name || !recipe.detail || !recipe.cookingInstruction ) {
+        setErrors(prevErrors => ({ ...prevErrors, general: "Please fill in all the required fields ." }));
+        hasError = true;
+      }
+      if(recipe.prepTime <= 0 || recipe.cookTime <= 0){
+        setErrors(prevErrors => ({ ...prevErrors, general: "Please fill in all the required fields and ensure times are greater than 0." }));
+        hasError = true;
+      }
+      if (recipe.ingredientRecipes.some(ingredient => !ingredient.name || !ingredient.amount)) {
+        setErrors(prevErrors => ({ ...prevErrors, ingredients: "Please fill in all ingredient details." }));
+        hasError = true;
+      }
+      if (recipe.noteRecipes.some(note => !note.detail)) {
+        setErrors(prevErrors => ({ ...prevErrors, notes: "Please fill in all note details." }));
+        hasError = true;
+      }
+      // if (recipe.otherImageRecipes.some(image => !image.img)) {
+      //   setErrors(prevErrors => ({ ...prevErrors, otherImageRecipes: "Please fill in all other image details." }));
+      //   hasError = true;
+      // }
+      return hasError;
+    }
+
+    if (checkEmptyFields()) {
+      return;
+    }
+
+    try {
+      const response = await fetchPostRecipe(recipe);
+      toast.success("Recipe submitted successfully!");
+      console.log(response);
+    } catch (error) {
+      toast.error("Failed to submit recipe");
+      console.error(error);
+    }
   }
 
   return (
@@ -291,6 +289,7 @@ const AddNewRecipe = () => {
             onChange={(e) => handleInputChange("name", e.target.value)}
           />
         </div>
+        {errors.general && <p className="text-red-500">{errors.general}</p>}
         <div>
           <label htmlFor="detail" className="block text-lg font-medium mb-2">
             Recipe Detail
@@ -360,7 +359,7 @@ const AddNewRecipe = () => {
             Ingredients
           </label>
           <div className="space-y-4">
-            {recipe.ingredients.map((ingredient, index) => (
+            {recipe.ingredientRecipes.map((ingredient, index) => (
               <div key={index} className="flex items-start gap-4">
                 <input
                   type="text"
@@ -395,7 +394,7 @@ const AddNewRecipe = () => {
             Notes
           </label>
           <div className="space-y-4">
-            {recipe.notes.map((note, index) => (
+            {recipe.noteRecipes.map((note, index) => (
               <div key={index} className="flex items-start gap-4">
                 <textarea
                   id={`note-${index}`}
@@ -470,7 +469,7 @@ const AddNewRecipe = () => {
                   </SelectContent>
                 </Select>
                 <div className="flex flex-wrap gap-4 mt-4">
-                  {recipe.categorieRecipes.filter(cat => cat.type === table.type).map((category, index) => (
+                  {recipe.recipeCategories.filter(cat => cat.type === table.type).map((category, index) => (
                     <div key={index} className="bg-gray-100 rounded-md p-4 flex items-center space-x-2">
                       <span className="font-medium">{category.name}</span>
                       <Button variant="default" size="icon" onClick={() => handleRemoveCategory(category.type)}>
@@ -523,4 +522,4 @@ const AddNewRecipe = () => {
   )
 }
 
-export default AddNewRecipe;
+export default AddNewRecipe
