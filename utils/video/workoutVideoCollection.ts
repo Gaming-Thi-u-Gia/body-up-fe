@@ -224,10 +224,10 @@ export const fetchSearchVideoData = async (name: string) => {
     }
 }
 
-export const fetchDailyExerciseData = async (workoutProgramId: number) => {
+export const fetchDailyExerciseData = async (workoutProgramId: number, selectDay: number) => {
     try {
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/workout-video/getDailyExercisesByWorkoutProgramId?workoutProgramId=${workoutProgramId}`
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/workout-video/getVideosByDay?workoutProgramId=${workoutProgramId}&day=${selectDay}`
         );
         console.log(process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1);
 
