@@ -347,6 +347,7 @@ export const getUncompletedChallenge = async (sessionToken: string) => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${sessionToken}`,
             },
+            cache: "no-cache",
         }
     );
     if (!res.ok) {
@@ -360,9 +361,13 @@ export const getUncompletedChallenge = async (sessionToken: string) => {
     return result;
 };
 
-export const getVideoChallenge = async (sessionToken: string, day: string) => {
+export const getVideoChallenge = async (
+    sessionToken: string,
+    day: string,
+    workoutProgramId: number
+) => {
     const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/userChallenge/getDailyVideoByDay?day=${day}`,
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/userChallenge/getDailyVideoByDay?day=${day}&workoutProgramId=${workoutProgramId}`,
         {
             method: "GET",
             headers: {
@@ -438,4 +443,20 @@ export const getAllCompleted = async (sessionToken: string) => {
     }
     const payload = await res.json();
     return payload;
+};
+
+export const markFinishChallenge = async (
+    sessionToken: string,
+    challengeId: number
+) => {
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/userChallenge/markCompletedUserChallenge?challengeId=${challengeId}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+        }
+    );
 };

@@ -21,10 +21,26 @@ import { useEffect, useState } from "react";
 import { VideoDailyCard } from "./video-daily-card";
 import { Button } from "../ui/button";
 import { useAuthStore } from "../providers/auth-provider";
-import { getFirstUncompleted, getVideoChallenge } from "@/utils/user";
+import {
+    getFirstUncompleted,
+    getVideoChallenge,
+    markFinishChallenge,
+} from "@/utils/user";
 import fetchVideos, { VideoItem } from "@/utils/dailyVideo";
 import { getAllDay, markDailyChallenge } from "@/utils/dailyExercise";
 import { toast } from "sonner";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "../ui/alert-dialog";
+import { redirect, useRouter } from "next/navigation";
 type Props = {
     title: string;
     releaseDate: string;
@@ -35,6 +51,7 @@ type Props = {
     banner: string;
     challenge: string;
     currDay: DailyExercise;
+    setChallenge: any;
 };
 //TODO: fetch API
 
@@ -48,7 +65,10 @@ export const DaySchedule = ({
     banner,
     challenge,
     currDay,
+    setChallenge,
 }: Props) => {
+    const router = useRouter();
+    const [isLoadingUI, setIsLoadingUI] = useState(false);
     const { sessionToken } = useAuthStore((store) => store);
     const [dailyVideoData, setDailyVideoData] = useState<VideoItem[] | []>([]);
     const [videoData, setVideoData] = useState();
@@ -61,6 +81,19 @@ export const DaySchedule = ({
     const onClick = (index: number) => {
         if (isLoading) return;
         setDay("" + index);
+    };
+    const markFinish = async () => {
+        setIsLoadingUI(true);
+        const res = await markDailyChallenge(
+            sessionToken!,
+            newCurrDay.dailyExercise.id
+        );
+        await markFinishChallenge(sessionToken!, +challenge);
+        if (res?.status === 200) {
+            toast.success("Challenge finished");
+            setChallenge(null);
+        }
+        setIsLoadingUI(false);
     };
     const markComplete = async () => {
         const res = await markDailyChallenge(
@@ -89,7 +122,6 @@ export const DaySchedule = ({
         const getDay = async () => {
             setIsLoadingDay(true);
             const res = await getAllDay(sessionToken!, challenge);
-            console.log(res?.payload);
             const sortDay = res?.payload.sort(
                 (a: any, b: any) => a.dailyExercise.day - b.dailyExercise.day
             );
@@ -101,7 +133,7 @@ export const DaySchedule = ({
     useEffect(() => {
         const getVideoData = async () => {
             setIsLoading(true);
-            const res = await getVideoChallenge(sessionToken!, day);
+            const res = await getVideoChallenge(sessionToken!, day, +challenge);
             const video = await fetchVideos(
                 res?.payload.map((item: any) => item.video)
             );
@@ -110,7 +142,10 @@ export const DaySchedule = ({
             setIsLoading(false);
         };
         getVideoData();
-    }, [day, sessionToken]);
+    }, [day, sessionToken, challenge]);
+    if (isLoadingUI) {
+        return <LoadingSpinner />;
+    }
     return (
         <div>
             <div className='flex justify-between items-center'>
@@ -249,18 +284,59 @@ export const DaySchedule = ({
                                     />
                                 )
                             )}
-                            <Button
-                                variant='primary'
-                                className='my-4 ml-2'
-                                onClick={markComplete}
-                                disabled={newCurrDay.dailyExercise.day !== day}
-                            >
-                                Mark day {day} as Complete
-                            </Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant='primary'
+                                        className='my-4 ml-2'
+                                        disabled={
+                                            newCurrDay.dailyExercise.day !== day
+                                        }
+                                    >
+                                        {+newCurrDay.dailyExercise.day ===
+                                        allDay.length
+                                            ? "Finish Challenge"
+                                            : `Mark day ${day} as Complete`}
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                            Are you absolutely sure?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action cannot be undone.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                            Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={
+                                                +newCurrDay.dailyExercise
+                                                    .day === allDay.length
+                                                    ? markFinish
+                                                    : markComplete
+                                            }
+                                        >
+                                            Continue
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
             </div>
+        </div>
+    );
+};
+
+const LoadingSpinner = () => {
+    return (
+        <div className='flex items-center justify-center min-h-screen'>
+            <div className='loader'></div>
         </div>
     );
 };
