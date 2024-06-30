@@ -51,7 +51,7 @@ const Page = () => {
             setLoading(false);
         };
         getWorkoutProgramById();
-    }, [pathName]);
+    }, [workoutProgramId]);
 
     const getTypes = (categories: Category[] | undefined): string => {
         if (!categories) return '';

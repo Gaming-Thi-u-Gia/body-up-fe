@@ -5,8 +5,9 @@ import { fetchDailyExerciseData } from "@/utils/video/workoutVideoCollection";
 import { DailyCarousel } from "@/components/shared/daily-carousel";
 import { VideoDaily } from "./daily-video";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@radix-ui/react-accordion";
-import fetchVideos from "@/utils/video";
+
 import DailyExerciseSkeleton from "./skeleton-video";
+import fetchVideos from "@/utils/video/fetchDailyVideo";
 
 interface VideoItem {
     id: string;
