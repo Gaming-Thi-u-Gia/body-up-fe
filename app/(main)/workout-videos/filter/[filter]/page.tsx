@@ -96,7 +96,7 @@ const VideoFilter = () => {
                 </div>
                 <div>
                     <Link
-                        href="http://localhost:3000/program"
+                        href="http://localhost:3000/workout-videos"
                         className="text-red-500 cursor-pointer"
                     >
                         Clear

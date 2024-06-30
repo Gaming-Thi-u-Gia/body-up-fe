@@ -1,3 +1,5 @@
+import { category } from "@/constants";
+
 const fetchVideoIdsFromDatabase = async () => {
     try {
         const response = await fetch("http://localhost:8080/api/v1/workout-video/getVideoAll");
@@ -31,9 +33,10 @@ interface VideoItem {
     duration: string;
 }
 
-const fetchVideos = async () => {
+const fetchVideos = async (fetchVideo) => {
     try {
-        const videoDataFromDb = await fetchVideoIdsFromDatabase();
+        const videoDataFromDb = await fetchVideo;
+        console.log(videoDataFromDb);
         if (!videoDataFromDb.length) {
             console.error("No video data found");
             return [];
@@ -57,24 +60,26 @@ const fetchVideos = async () => {
             const videoDetails = await Promise.all(
                 playlistData.items.map(async (item: any) => {
                     const videoId = item.snippet.resourceId.videoId;
-                    const videoData = videoDataFromDb.find(video => video.url === videoId);
+                    const videoData = videoDataFromDb.find(video => video.video.url === videoId);
                     if (videoData) {
                         const videoResponse = await fetch(
-                            `https://youtube.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoId}&key=${apiKey}`
+                            `https://youtube.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoData.video.url}&key=${apiKey}`
                         );
                         if (!videoResponse.ok) {
                             throw new Error(`HTTP error! status: ${videoResponse.status}`);
                         }
                         const videoResponseData = await videoResponse.json();
                         const videoInfo = videoResponseData.items[0];
+                        const categories = videoData.video.videoCategories.map(cat => cat.name).join(', ');
 
                         return {
                             id: videoId,
-                            title: videoData.name,
+                            title: videoData.video.name,
                             img: item.snippet.thumbnails.high.url,
                             views: formatViews(videoInfo.statistics.viewCount),
                             date: formatDate(new Date(item.snippet.publishedAt)),
                             duration: convertDuration(videoInfo.contentDetails.duration),
+                            categories: categories
                         };
                     }
                     return null; 

@@ -72,6 +72,8 @@ const Page = () => {
         return <SkeletonLoader />;
     }
 
+    console.log("workoutProgramById", workoutProgramById);
+
     return (
         <div className="max-w-7xl flex items-center justify-center mx-auto my-8">
             <div className="w-full flex">
@@ -108,7 +110,7 @@ const Page = () => {
                                     alt="conflict"
                                 />
                                 <span className="text-[14px]">
-                                    {getTypes(workoutProgramById?.workoutProgramCategories)}
+                                    {workoutProgramById?.type}
                                 </span>
                             </div>
                             <div className="flex gap-2 my-2">
@@ -121,7 +123,7 @@ const Page = () => {
                                     />
                                 </div>
                                 <p className="text-[14px]">
-                                    {getEquipment(workoutProgramById?.workoutProgramCategories)}
+                                    {workoutProgramById?.equipment}
                                 </p>
                             </div>
 

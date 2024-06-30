@@ -18,7 +18,7 @@ interface VideoItem {
     bookmarked: boolean;
     url: string;
     status: string;
-    category: VideoCategories[];
+    category: VideoCategories;
 }
 
 interface VideoCategories {
@@ -27,19 +27,14 @@ interface VideoCategories {
     type: string;
 }
 
-interface DailyExerciseData {
-    id: number;
-    day: string;
-    dailyVideos: VideoItem[];
-}
 
 interface DailyCoursesProps {
     workoutProgramId: number;
 }
 
 const DailyCourses: React.FC<DailyCoursesProps> = ({ workoutProgramId }) => {
-    const [dailyExercise, setDailyExercise] = useState<DailyExerciseData | null>(null);
-    const [selectedDay, setSelectedDay] = useState<number | null>(null);
+    const [dailyExercise, setDailyExercise] = useState<VideoItem[]>([]);
+    const [selectedDay, setSelectedDay] = useState<number | 1>(1);
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -47,37 +42,8 @@ const DailyCourses: React.FC<DailyCoursesProps> = ({ workoutProgramId }) => {
             setLoading(true);
 
             if (workoutProgramId && selectedDay !== null) {
-                try {
-                    const dailyData = await fetchDailyExerciseData(workoutProgramId, selectedDay);
-                    console.log("Fetched daily data:", dailyData);
-                    const fetchedVideos = await fetchVideos();
-                    console.log("Fetched videos:", fetchedVideos);
-
-                    if (dailyData) {
-                        const dailyVideos = dailyData.map(dv => {
-                            const videoDetails = fetchedVideos.find(video => video.id === dv.video.url);
-                            if (videoDetails) {
-                                console.log("Mapped video details:", videoDetails);
-                            } else {
-                                console.warn("Video details not found for video id:", dv.video.url);
-                            }
-                            return {
-                                ...dv.video,
-                                ...videoDetails,
-                                category: dv.video.videoCategories ? dv.video.videoCategories.map(vc => vc.type).join(", ") : ""
-                            };
-                        });
-
-                        setDailyExercise({ ...dailyData, dailyVideos });
-                    } else {
-                        setDailyExercise({ id: -1, day: selectedDay.toString(), dailyVideos: [] });
-                    }
-                } catch (error) {
-                    console.error("Error fetching data:", error);
-                    setDailyExercise({ id: -1, day: selectedDay.toString(), dailyVideos: [] });
-                }
-            } else {
-                setDailyExercise({ id: -1, day: (selectedDay ?? 1).toString(), dailyVideos: [] });
+                    const fetchedVideos = await fetchVideos(fetchDailyExerciseData(workoutProgramId, selectedDay));
+                    setDailyExercise(fetchedVideos);
             }
             setLoading(false);
         };
@@ -89,8 +55,6 @@ const DailyCourses: React.FC<DailyCoursesProps> = ({ workoutProgramId }) => {
         setSelectedDay(day);
     };
 
-    console.log("Selected day:", selectedDay);
-
     return (
         <div>
             <DailyCarousel
@@ -98,41 +62,37 @@ const DailyCourses: React.FC<DailyCoursesProps> = ({ workoutProgramId }) => {
                 title="Test"
                 onClick={handleDayClick}
             />
-            {loading ? (
-                <DailyExerciseSkeleton />
-            ) : (
+            {
                 dailyExercise && (
                     <div className="w-full py-[30px] px-[18px] bg-white border-[#c4c4c4] border-[1px] rounded-lg items-start my-4">
                         <Accordion type="single" collapsible>
                             <AccordionItem value={`day-${dailyExercise.day}`} className="border-none">
                                 <AccordionTrigger className="flex justify-between w-full text-center items-center">
-                                    <h4 className="text-[22px] font-semibold">Day {dailyExercise.day} Workout</h4>
+                                    <h4 className="text-[22px] font-semibold">Day {selectedDay} Workout</h4>
                                     <p className="text-[14px] text-[#868A93]">
-                                        {dailyExercise.dailyVideos.length} Workouts
+                                       {dailyExercise.length} Workouts
                                     </p>
                                 </AccordionTrigger>
                                 <AccordionContent>
-                                    {dailyExercise.dailyVideos.map((video, index) => (
-                                        <VideoDaily
-                                            key={index}
-                                            videoId={video.id}
-                                            title={video.title}
-                                            bannerUrl={video.img}
-                                            duration={video.duration}
-                                            releaseDate={video.date}
-                                            view={video.views}
-                                            isOptional={video.bookmarked}
-                                            url={video.url}
-                                            initialStatus={video.status}
-                                            category={video.category}
-                                        />
+                                    {dailyExercise.map((video, index) => (
+                                        <div key={index}>
+                                            <VideoDaily
+                                                title={video.title}
+                                                bannerUrl={video.img}
+                                                view={video.views}
+                                                releaseDate={video.date}
+                                                duration={video.duration}
+                                                url={video.url}
+                                                category={video.categories}
+                                            />
+                                        </div>
                                     ))}
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>
                     </div>
                 )
-            )}
+            }
         </div>
     );
 };
