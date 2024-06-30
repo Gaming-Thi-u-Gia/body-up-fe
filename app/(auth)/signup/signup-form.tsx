@@ -19,9 +19,6 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import { useVerifyCode } from "@/stores/use-verify-models";
 import { signIn } from "next-auth/react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/firebase";
-import { doc, setDoc } from "firebase/firestore";
 export const SignupForm = () => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -42,23 +39,6 @@ export const SignupForm = () => {
     startTransition(async () => {
       try {
         const response = await handleRegister(data);
-        if (response.status === 200) {
-          const res = await createUserWithEmailAndPassword(
-            auth,
-            data.email,
-            data.password
-          );
-          const username = data.email.split("@")[0];
-          await setDoc(doc(db, "users", res.user.uid), {
-            username,
-            email: data.email,
-            id: res.user.uid,
-            blocked: [],
-          });
-          await setDoc(doc(db, "userchats", res.user.uid), {
-            chat: [],
-          });
-        }
         toast.success(response.payload.token, {
           description: `${new Date().toLocaleString()}`,
           action: {
