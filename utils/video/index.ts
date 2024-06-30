@@ -1,5 +1,3 @@
-import { category } from "@/constants";
-
 const fetchVideoIdsFromDatabase = async () => {
     try {
         const response = await fetch("http://localhost:8080/api/v1/workout-video/getVideoAll");
@@ -33,23 +31,18 @@ interface VideoItem {
     duration: string;
 }
 
-const fetchVideoss = async (fetchVideo: Promise<any>) => {
+const fetchVideos = async () => {
     try {
-        const videoDataFromDb = await fetchVideo;
-        console.log("videoDataFromDb", videoDataFromDb);
-
-        const allVideoUrls = videoDataFromDb.flatMap(topic => topic.videos.map(video => video.url));
-        console.log("allVideoUrls", allVideoUrls);
-
+        const videoDataFromDb = await fetchVideoIdsFromDatabase();
         if (!videoDataFromDb.length) {
             console.error("No video data found");
             return [];
         }
 
         const playlistId = "UUCgLoMYIyP0U56dEhEL1wXQ";
-        const apiKey = "AIzaSyCK_pKQdZhpHFnBgXDxslUsjdP3QJyNOCU"; 
+        const apiKey = "AIzaSyC7RV-Yf4DiF8L4Xj4DprWjceASn5r-S6s"; 
 
-        let matchedVideos = [];
+        let matchedVideos: VideoItem[] = [];
         let nextPageToken = "";
 
         do {
@@ -62,11 +55,9 @@ const fetchVideoss = async (fetchVideo: Promise<any>) => {
             const playlistData = await playlistResponse.json();
 
             const videoDetails = await Promise.all(
-                playlistData.items.map(async (item) => {
+                playlistData.items.map(async (item: any) => {
                     const videoId = item.snippet.resourceId.videoId;
-                    
-                    const videoData = videoDataFromDb.flatMap(topic => topic.videos).find(video => video.url === videoId);
-                    console.log("videoData", videoData);
+                    const videoData = videoDataFromDb.find(video => video.url === videoId);
                     if (videoData) {
                         const videoResponse = await fetch(
                             `https://youtube.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoId}&key=${apiKey}`
@@ -77,20 +68,14 @@ const fetchVideoss = async (fetchVideo: Promise<any>) => {
                         const videoResponseData = await videoResponse.json();
                         const videoInfo = videoResponseData.items[0];
 
-                        if (videoInfo && videoData.videoCategories) {
-                            return {
-                                id: videoId,
-                                name: videoData.name,
-                                img: item.snippet.thumbnails.high.url,
-                                views: formatViews(videoInfo.statistics.viewCount),
-                                date: formatDate(new Date(item.snippet.publishedAt)),
-                                duration: convertDuration(videoInfo.contentDetails.duration),
-                                bookmark: videoData.bookmarked,
-                                url: videoData.url,
-                            };
-                        }
-                    } else {
-                        console.log("No matching videoData found for videoId:", videoId);
+                        return {
+                            id: videoId,
+                            title: videoData.name,
+                            img: item.snippet.thumbnails.high.url,
+                            views: formatViews(videoInfo.statistics.viewCount),
+                            date: formatDate(new Date(item.snippet.publishedAt)),
+                            duration: convertDuration(videoInfo.contentDetails.duration),
+                        };
                     }
                     return null; 
                 })
@@ -100,14 +85,13 @@ const fetchVideoss = async (fetchVideo: Promise<any>) => {
             nextPageToken = playlistData.nextPageToken;
         } while (nextPageToken);
 
+        console.log(matchedVideos);
         return matchedVideos;
     } catch (error) {
         console.error("Error fetching videos:", error);
         return [];
     }
 };
-
-
 
 const convertDuration = (duration: string) => {
     const regex = /PT(\d+H)?(\d+M)?(\d+S)?/;
@@ -144,4 +128,4 @@ const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', options);
 };
 
-export default fetchVideoss;
+export default fetchVideos;
