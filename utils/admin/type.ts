@@ -7,27 +7,32 @@ export type AddNewRecipeType = {
   cookingInstruction: string;
   ingredientRecipes: IngredientRecipeType[];
   otherImageRecipes: OtherImageRecipeType[];
-  noteRecipes: NoteRecipeType[];
+  noteRecipes: recipeNoteType[];
   recipeTopics: TopicType[];
   recipeCategories: RecipeCategoryType[];
-}
-export type NoteRecipeType = {
+};
+export type recipeNoteType = {
   detail: string;
-}
-export type TableFilterType = {
+};
+export type TableFilterRecipeType = {
   length: number;
   type: string;
   recipeCategories: RecipeCategoryType[];
-}
+};
+export type TableFilterVideoType = {
+  length: number;
+  type: string;
+  videoCategories: VideoCategoryType[];
+};
 
 export type IngredientRecipeType = {
   amount: string;
   name: string;
-}
+};
 
 export type OtherImageRecipeType = {
   img: string;
-}
+};
 
 export type RecipeCategoryType = {
   id: number;
@@ -35,22 +40,38 @@ export type RecipeCategoryType = {
   type: string;
   img: string;
   totalRecipe: number;
-}
+};
 export type VideoCategoryType = {
   id: number;
   name: string;
   type: string;
-  img: string;
-}
+};
 
 export type TopicType = {
   id: number;
   name: string;
-}
-export type AddNewVideoType={
+};
+export type AddNewVideoType = {
   name: string;
   url: string;
   isFeatured: boolean;
-  topics: TopicType[];
-  categories: VideoCategoryType[];
-}
+  videoTopics: TopicType[];
+  videoCategories: VideoCategoryType[];
+};
+export type RecipeDetailType = {
+  id: number;
+  name: string;
+  detail: string;
+  avgStar: number;
+  prepTime: number;
+  cookTime: number;
+  totalRating: number;
+  img: string;
+  cookingInstruction: string;
+  createAt: Date;
+  ingredientRecipes: IngredientRecipeType[];
+  otherImageRecipes: OtherImageRecipeType[];
+  recipeNotes: recipeNoteType[];
+  recipeTopics: TopicType[];
+  recipeCategories: RecipeCategoryType[];
+};

@@ -46,7 +46,7 @@ const TableVideoCategory: React.FC<HeaderNavWorkoutVideosProps> = ({onClose}) =>
     const groupCategoriesByName = (categories: CategoryType[]): GroupedCategories => {
         let grouped = categories.reduce<GroupedCategories>((acc, category) => {
             category.videoCategories.forEach((videoCategory) => {
-                const groupName = videoCategory.name;
+                const groupName = videoCategory.type;
                 if (!acc[groupName]) {
                     acc[groupName] = [];
                 }
@@ -103,7 +103,7 @@ const TableVideoCategory: React.FC<HeaderNavWorkoutVideosProps> = ({onClose}) =>
                                         onChange={() => handleCheckboxChange(name, category.id)}
                                     />
                                     <label htmlFor={`checkbox-${category.id}`} className="flex items-center cursor-pointer w-full justify-between">
-                                        <span>{category.type}</span>
+                                        <span>{category.name}</span>
                                         {selectedIdPerGroup[name] === category.id && <Check color="#7065cd" width={18} height={18} />}
                                     </label>
                                 </div>

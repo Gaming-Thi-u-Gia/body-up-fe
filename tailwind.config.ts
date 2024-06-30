@@ -1,8 +1,6 @@
 import type { Config } from "tailwindcss";
 
 const config = {
-<<<<<<< HEAD
-=======
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
@@ -24,57 +22,8 @@ const config = {
         "login-pattern1": "url('/login-pattern1.png')",
         "login-pattern2": "url('/login-pattern2.png')",
         "login-pattern3": "url('/login-pattern3.png')",
+        "bmi-gradient": "linear-gradient(to right, #fbd3e9, #bb377d)",
       },
->>>>>>> aebdbf052e1c896f679bdb1bd3e626bdddd62d59
-    darkMode: ["class"],
-    content: [
-        "./pages/**/*.{ts,tsx}",
-        "./components/**/*.{ts,tsx}",
-        "./app/**/*.{ts,tsx}",
-        "./src/**/*.{ts,tsx}",
-    ],
-    prefix: "",
-    theme: {
-        container: {
-            center: true,
-            padding: "2rem",
-            screens: {
-                "2xl": "1400px",
-            },
-        },
-        extend: {
-            backgroundImage: {
-                "login-pattern1": "url('/login-pattern1.png')",
-                "login-pattern2": "url('/login-pattern2.png')",
-                "login-pattern3": "url('/login-pattern3.png')",
-                'bmi-gradient': 'linear-gradient(to right, #fbd3e9, #bb377d)',
-            },
-<<<<<<< HEAD
-  darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
-  prefix: "",
-  theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
-      backgroundImage: {
-        "login-pattern1": "url('/login-pattern1.png')",
-        "login-pattern2": "url('/login-pattern2.png')",
-        "login-pattern3": "url('/login-pattern3.png')",
-      },
-=======
->>>>>>> aebdbf052e1c896f679bdb1bd3e626bdddd62d59
-
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

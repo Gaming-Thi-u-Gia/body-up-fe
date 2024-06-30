@@ -1,4 +1,4 @@
-import { AddNewRecipeType } from "./type";
+import { AddNewRecipeType, AddNewVideoType } from "./type";
 
 export const fetchGetTotalElements = async (sessionToken: string) => {
   try {
@@ -70,23 +70,56 @@ export const fetchGetTableFilterRecipe = async () => {
     throw new Error(`Error while get table filter`);
   }
 };
-  export const fetchPostRecipe = async (recipe:AddNewRecipeType) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/recipe/add`, {
-        method: 'POST',
+export const fetchPostRecipe = async (
+  recipe: AddNewRecipeType,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/create-recipe`,
+      {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(recipe),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
       }
+    );
 
-      const data = await response.text();
-      return data;
-    } catch (error) {
-      throw new Error(`Error while fetching post recipe`);
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
     }
-  };
+
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while fetching post recipe`);
+  }
+};
+export const fetchPostVideo = async (
+  video: AddNewVideoType,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/create-video`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+        body: JSON.stringify(video),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while fetching post recipe`);
+  }
+};

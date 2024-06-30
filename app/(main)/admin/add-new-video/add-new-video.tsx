@@ -1,146 +1,191 @@
-"use client"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { Plus, X } from "lucide-react"  
-import { AddNewVideoType, TopicType, VideoCategoryType, TableFilterType } from "@/utils/admin/type"
-import { fetchGetVideoTopics, fetchGetTableFilterVideo } from "@/utils/admin/fetch"
-import { useState, useEffect } from "react"
-import { toast } from "sonner"
+"use client";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import { AddNewVideoType, TableFilterVideoType, TopicType } from "@/utils/admin/type";
+import { useState, useEffect } from "react";
+import { fetchAllFilterCategory } from "@/utils/video/category";
+import { fetchVideoCategoryData } from "@/utils/video/workoutVideoCollection";
+import { toast } from "sonner";
+import { fetchPostVideo } from "@/utils/admin/fetch";
+import { useAuthStore } from "@/components/providers/auth-provider";
 
 export function AddNewVideo() {
+  const { sessionToken } = useAuthStore((store) => store);
   const [video, setVideo] = useState<AddNewVideoType>({
-    name: "" as string,
-    url: "" as string,
-    isFeatured: false as boolean,
-    topics: [] as TopicType[],
-    categories: [] as VideoCategoryType[],
-  })
-
-  const [topics, setTopics] = useState<TopicType[]>([]);
-  const [tableFilter, setTableFilter] = useState<TableFilterType[]>([]);
-  const [errors, setErrors] = useState({
-    general: ""
+    name: "",
+    url: "",
+    isFeatured: false,
+    videoTopics: [],
+    videoCategories: [],
   });
 
-  useEffect(() => {
-    const getTableFilter = async () => {
-      try {
-        const response = await fetchGetTableFilterVideo();
-        const sortedResponse = response
-          .sort((a: TableFilterType, b: TableFilterType) =>
-            a.type.localeCompare(b.type)
-          )
-          .map((table: TableFilterType) => ({
-            ...table,
-            recipeCategories: table.recipeCategories.sort((a, b) =>
-              a.name.localeCompare(b.name)
-            ),
-          }));
-        setTableFilter(sortedResponse);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getTableFilter();
-  }, []);
+  const [topics, setTopics] = useState<TopicType[]>([]);
+  const [videoCategories, setVideoCategories] = useState<TableFilterVideoType[]>([]);
+  const [errors, setErrors] = useState({
+    name: "",
+    url: "",
+    isFeatured: "",
+    videoTopics: "",
+    videoCategories: "",
+  });
 
   useEffect(() => {
     const getTopics = async () => {
       try {
-        const data = await fetchGetVideoTopics();
+        const data = await fetchVideoCategoryData();
         setTopics(data);
       } catch (error) {
         console.error(error);
       }
-    }
+    };
     getTopics();
-  }, [])
+  }, []);
 
-  const handleInputChange = (field: string, value: string) => {
-    setVideo(prevVideo => ({
+  useEffect(() => {
+    const getVideoCategories = async () => {
+      try {
+        const response = await fetchAllFilterCategory();
+        const sortedResponse = response
+          .sort((a: TableFilterVideoType, b: TableFilterVideoType) =>
+            a.type.localeCompare(b.type)
+          )
+          .map((category: TableFilterVideoType) => ({
+            ...category,
+            videoCategories: category.videoCategories.sort((a, b) =>
+              a.name.localeCompare(b.name)
+            ),
+          }));
+        setVideoCategories(sortedResponse);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getVideoCategories();
+  }, []);
+
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setVideo((prevVideo) => ({
       ...prevVideo,
-      [field]: value
+      [field]: value,
     }));
-  }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [field]: "",
+    }));
+  };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVideo(prevVideo => ({
-      ...prevVideo,
-      isFeatured: e.target.checked
-    }));
-  }
+    handleInputChange("isFeatured", e.target.checked);
+  };
 
   const handleTopicChange = (value: string) => {
-    const selectedTopic = topics.find(topic => topic.name === value);
-    if (selectedTopic && !video.topics.some(topic => topic.id === selectedTopic.id)) {
-      setVideo(prevVideo => ({
+    const selectedTopic = topics.find((topic) => topic.name === value);
+    if (selectedTopic && !video.videoTopics.some((topic) => topic.id === selectedTopic.id)) {
+      setVideo((prevVideo) => ({
         ...prevVideo,
-        topics: [...prevVideo.topics, selectedTopic]
+        videoTopics: [...prevVideo.videoTopics, selectedTopic],
+      }));
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        videoTopics: "",
       }));
     }
-  }
+  };
 
   const handleRemoveTopic = (index: number) => {
-    const updatedTopics = [...video.topics];
+    const updatedTopics = [...video.videoTopics];
     updatedTopics.splice(index, 1);
-    setVideo(prevVideo => ({
+    setVideo((prevVideo) => ({
       ...prevVideo,
-      topics: updatedTopics
+      videoTopics: updatedTopics,
     }));
-  }
+  };
 
   const handleCategoryChange = (type: string, value: string) => {
-    const selectedCategory = tableFilter
-      .find(table => table.type === type)
-      ?.recipeCategories.find(category => category.name === value);
+    const selectedCategory = videoCategories
+      .find((category) => category.type === type)
+      ?.videoCategories.find((category) => category.name === value);
     if (selectedCategory) {
-      const updatedCategories = video.categories.filter(category => category.type !== type);
-      setVideo(prevVideo => ({
+      const updatedVideoCategories = video.videoCategories.filter((category) => category.type !== type);
+      setVideo((prevVideo) => ({
         ...prevVideo,
-        categories: [...updatedCategories, selectedCategory]
+        videoCategories: [...updatedVideoCategories, selectedCategory],
+      }));
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        videoCategories: "",
       }));
     }
-  }
+  };
 
   const handleRemoveCategory = (type: string) => {
-    const updatedCategories = video.categories.filter(category => category.type !== type);
-    setVideo(prevVideo => ({
+    const updatedVideoCategories = video.videoCategories.filter((category) => category.type !== type);
+    setVideo((prevVideo) => ({
       ...prevVideo,
-      categories: updatedCategories
+      videoCategories: updatedVideoCategories,
     }));
-  }
+  };
 
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  //   const checkEmptyFields = () => {
-  //     let hasError = false;
-  //     if (!video.name || !video.url) {
-  //       setErrors(prevErrors => ({ ...prevErrors, general: "Please fill in all the required fields." }));
-  //       hasError = true;
-  //     }
-  //     return hasError;
-  //   }
+    const checkEmptyFields = () => {
+      let hasError = false;
 
-  //   if (checkEmptyFields()) {
-  //     return;
-  //   }
+      if (!video.name) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          name: "Please fill in the video name.",
+        }));
+        hasError = true;
+      }
 
-  //   try {
-  //     const response = await fetchPostVideo(video);
-  //     toast.success("Video submitted successfully!");
-  //     console.log(response);
-  //   } catch (error) {
-  //     toast.error("Failed to submit video");
-  //     console.error(error);
-  //   }
-  // }
+      if (!video.url) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          url: "Please fill in the video URL.",
+        }));
+        hasError = true;
+      }
+
+      if (video.videoTopics.length === 0) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          videoTopics: "Please select at least one topic.",
+        }));
+        hasError = true;
+      }
+
+      if (video.videoCategories.length === 0) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          videoCategories: "Please select at least one category.",
+        }));
+        hasError = true;
+      }
+
+      return hasError;
+    };
+
+    if (checkEmptyFields()) {
+      return;
+    }
+
+    try {
+      const response = await fetchPostVideo(video, sessionToken!);
+      toast.success("Video submitted successfully!");
+      console.log(response);
+    } catch (error) {
+      toast.error("Failed to submit video");
+      console.error(error);
+    }
+  };
 
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-3xl font-bold mb-8">Add New Video</h1>
-      {/* <form className="space-y-6" onSubmit={handleSubmit}> */}
-      <form className="space-y-6" >
+      <form className="space-y-6" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name" className="block font-medium mb-2">
             Video Name
@@ -153,8 +198,8 @@ export function AddNewVideo() {
             value={video.name}
             onChange={(e) => handleInputChange("name", e.target.value)}
           />
+          {errors.name && <p className="text-red-500">{errors.name}</p>}
         </div>
-        {errors.general && <p className="text-red-500">{errors.general}</p>}
         <div>
           <label htmlFor="url" className="block font-medium mb-2">
             Video URL
@@ -167,15 +212,16 @@ export function AddNewVideo() {
             value={video.url}
             onChange={(e) => handleInputChange("url", e.target.value)}
           />
+          {errors.url && <p className="text-red-500">{errors.url}</p>}
         </div>
         <div>
           <label htmlFor="is-featured" className="block font-medium mb-2">
             Featured
           </label>
-          <input 
-            type="checkbox" 
-            id="is-featured" 
-            className="mr-2" 
+          <input
+            type="checkbox"
+            id="is-featured"
+            className="mr-2"
             checked={video.isFeatured}
             onChange={handleCheckboxChange}
           />
@@ -191,7 +237,7 @@ export function AddNewVideo() {
                 <SelectValue placeholder="Select Video Topics" />
               </SelectTrigger>
               <SelectContent>
-                {topics.map(topic => (
+                {topics.map((topic) => (
                   <SelectItem key={topic.id} value={topic.name}>
                     {topic.name}
                   </SelectItem>
@@ -200,8 +246,8 @@ export function AddNewVideo() {
             </Select>
           </div>
           <div className="grid grid-cols-3 gap-4 mt-4">
-            {video.topics.map((topic, index) => (
-              <div key={index} className="bg-gray-100 rounded-md p-4">
+            {video.videoTopics.map((topic, index) => (
+              <div key={index} className="bg-gray-100 rounded-md p-4 flex items-center">
                 <span className="font-medium">{topic.name}</span>
                 <Button variant="default" size="icon" className="ml-auto" onClick={() => handleRemoveTopic(index)}>
                   <X className="w-4 h-4" />
@@ -209,32 +255,33 @@ export function AddNewVideo() {
               </div>
             ))}
           </div>
+          {errors.videoTopics && <p className="text-red-500">{errors.videoTopics}</p>}
         </div>
         <div>
           <label htmlFor="video-categories" className="block font-medium mb-2">
             Video Categories
           </label>
           <div className="grid grid-cols-2 gap-4">
-            {tableFilter.map((table) => (
-              <div key={table.type} className="flex flex-col items-start space-y-2">
-                <label className="block text-lg font-medium">{table.type}</label>
-                <Select onValueChange={(value) => handleCategoryChange(table.type, value)}>
+            {videoCategories.map((category) => (
+              <div key={category.type} className="flex flex-col items-start space-y-2">
+                <label className="block text-lg font-medium">{category.type}</label>
+                <Select onValueChange={(value) => handleCategoryChange(category.type, value)}>
                   <SelectTrigger className="w-64 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg">
-                    <SelectValue placeholder={`Select ${table.type} Category`} />
+                    <SelectValue placeholder={`Select ${category.type} Category`} />
                   </SelectTrigger>
                   <SelectContent>
-                    {table.recipeCategories.map(category => (
-                      <SelectItem key={category.id} value={category.name}>
-                        {category.name}
+                    {category.videoCategories.map((subCategory) => (
+                      <SelectItem key={subCategory.id} value={subCategory.name}>
+                        {subCategory.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 <div className="flex flex-wrap gap-4 mt-4">
-                  {video.categories.filter(cat => cat.type === table.type).map((category, index) => (
+                  {video.videoCategories.filter((cat) => cat.type === category.type).map((filteredCategory, index) => (
                     <div key={index} className="bg-gray-100 rounded-md p-4 flex items-center space-x-2">
-                      <span className="font-medium">{category.name}</span>
-                      <Button variant="default" size="icon" onClick={() => handleRemoveCategory(category.type)}>
+                      <span className="font-medium">{filteredCategory.name}</span>
+                      <Button variant="default" size="icon" onClick={() => handleRemoveCategory(filteredCategory.type)}>
                         <X className="w-4 h-4" />
                       </Button>
                     </div>
@@ -243,16 +290,14 @@ export function AddNewVideo() {
               </div>
             ))}
           </div>
+          {errors.videoCategories && <p className="text-red-500">{errors.videoCategories}</p>}
         </div>
         <div className="flex justify-end">
-          <Button
-            type="submit"
-            variant="primary"
-            className="text-lg">
+          <Button type="submit" variant="primary" className="text-lg">
             Add Video
           </Button>
         </div>
       </form>
     </div>
-  )
+  );
 }

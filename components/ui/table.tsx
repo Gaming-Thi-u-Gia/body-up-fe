@@ -114,12 +114,5 @@ export {
   TableRow,
   TableCell,
   TableCaption,
-<<<<<<< HEAD
 }
-=======
-<<<<<<< HEAD
-}
-=======
-}
->>>>>>> 2-recipes-page
->>>>>>> aebdbf052e1c896f679bdb1bd3e626bdddd62d59
+
