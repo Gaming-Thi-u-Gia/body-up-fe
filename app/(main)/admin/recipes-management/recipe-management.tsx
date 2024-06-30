@@ -5,72 +5,48 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Eye, Pen, Plus, Trash, X, Upload } from "lucide-react";
-import { AddNewRecipeType, RecipeDetailType, TableFilterRecipeType, TopicType } from "@/utils/admin/type";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { fetchGetRecipeTopic, fetchGetTableFilterRecipe } from "@/utils/admin/fetch";
+import {
+  RecipeDetailType,
+  TableFilterRecipeType,
+  TopicType,
+} from "@/utils/admin/type";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  fetchDeleteRecipe,
+  fetchGetRecipeDetailById,
+  fetchGetRecipes,
+  fetchGetRecipeTopic,
+  fetchGetTableFilterRecipe,
+  fetchPutRecipe,
+} from "@/utils/admin/fetch";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import InfiniteScroll from "react-infinite-scroll-component";
 
-type EditableRecipeType = Omit<RecipeDetailType, 'id' | 'avgStar' | 'createAt' | 'totalRating'>;
+export type EditableRecipeType = Omit<
+  RecipeDetailType,
+  "avgStar" | "createAt" | "totalRating"
+>;
 
 const RecipeManagement = () => {
-  const [recipes, setRecipes] = useState<RecipeDetailType[]>([
-    {
-      id: 1,
-      name: "Grilled Chicken Salad",
-      detail: "A fresh and healthy salad with grilled chicken, mixed greens, and a zesty vinaigrette.",
-      prepTime: 15,
-      cookTime: 20,
-      avgStar: 4.5,
-      totalRating: 10,
-      img: "/placeholder.svg",
-      cookingInstruction: "Marinate the chicken, grill until cooked through, slice and add to a bed of mixed greens. Drizzle with vinaigrette.",
-      otherImageRecipes: [{ img: "/placeholder.svg" }, { img: "/placeholder.svg" }, { img: "/placeholder.svg" }],
-      ingredientRecipes: [
-        { name: "Chicken Breasts", amount: "4" },
-        { name: "Mixed Greens", amount: "6 cups" },
-        { name: "Tomatoes", amount: "2" },
-        { name: "Cucumber", amount: "1" },
-        { name: "Balsamic Vinaigrette", amount: "1/2 cup" },
-      ],
-      recipeNotes: [
-        { detail: "Use organic ingredients if possible." },
-        { detail: "Marinate the chicken for at least 30 minutes for best flavor." },
-      ],
-      recipeCategories: [{ id: 1, name: "Salad", type: "Healthy", img: "Image URL", totalRecipe: 0 }],
-      recipeTopics: [{ id: 1, name: "Gluten-Free" }, { id: 2, name: "Low-Carb" }],
-      createAt: new Date(),
-    },
-    {
-      id: 2,
-      name: "Beef Stroganoff",
-      detail: "A classic comfort food dish with tender beef, mushrooms, and a creamy sauce served over egg noodles.",
-      prepTime: 20,
-      cookTime: 45,
-      avgStar: 4.7,
-      totalRating: 15,
-      img: "/placeholder.svg",
-      cookingInstruction: "Brown the beef, sauté the mushrooms, make the sauce, and serve over cooked egg noodles.",
-      otherImageRecipes: [{ img: "/placeholder.svg" }],
-      ingredientRecipes: [
-        { name: "Beef Tenderloin", amount: "1 lb" },
-        { name: "Mushrooms", amount: "8 oz" },
-        { name: "Onion", amount: "1" },
-        { name: "Sour Cream", amount: "1 cup" },
-        { name: "Egg Noodles", amount: "8 oz" },
-      ],
-      recipeNotes: [
-        { detail: "Use high-quality beef for best results." },
-        { detail: "Serve with a side of steamed broccoli." },
-      ],
-      recipeCategories: [{ id: 1, name: "Main Dish", type: "Type Value", img: "Image URL", totalRecipe: 0 }],
-      recipeTopics: [{ id: 2, name: "Comfort Food" }],
-      createAt: new Date(),
-    },
-  ]);
-
-  const [selectedRecipe, setSelectedRecipe] = useState<RecipeDetailType | null>(null);
-  const [editingRecipe, setEditingRecipe] = useState<EditableRecipeType | null>(null);
+  const { sessionToken } = useAuthStore((store) => store);
+  const [recipes, setRecipes] = useState<RecipeDetailType[]>([]);
+  const [selectedRecipe, setSelectedRecipe] = useState<RecipeDetailType | null>(
+    null
+  );
+  const [editingRecipe, setEditingRecipe] = useState<EditableRecipeType | null>(
+    null
+  );
   const [topics, setTopics] = useState<TopicType[]>([]);
   const [tableFilter, setTableFilter] = useState<TableFilterRecipeType[]>([]);
+  const [pageNo, setPageNo] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasMoreRecipe, setHasMoreRecipe] = useState(false);
 
   useEffect(() => {
     const getTableFilter = async () => {
@@ -106,35 +82,80 @@ const RecipeManagement = () => {
     getTopics();
   }, []);
 
-  const handleAddRecipe = (newRecipe: AddNewRecipeType) => {
-    setRecipes([...recipes, newRecipe as RecipeDetailType]);
+  useEffect(() => {
+    getRecipes();
+  }, []);
+
+  const getRecipes = async () => {
+    try {
+      setIsLoading(true);
+      const pageSize = 8;
+      const data = await fetchGetRecipes(pageNo, pageSize, sessionToken!);
+      console.log(data.content);
+      if (data.totalElements === 0) {
+        setHasMoreRecipe(false);
+        setIsLoading(false);
+      }
+      setRecipes((prev) => [...prev, ...data.content]);
+      setPageNo((previous) => previous + 1);
+      setHasMoreRecipe(!data.last);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleUpdateRecipe = (updatedRecipe: EditableRecipeType) => {
-    const updatedRecipes = recipes.map((recipe) =>
-      recipe.id === selectedRecipe?.id ? { ...recipe, ...updatedRecipe } : recipe
+  const handleUpdateRecipe = async (updatedRecipe: EditableRecipeType) => {
+    try {
+      const response = await fetchPutRecipe(sessionToken!, updatedRecipe);
+      const updatedRecipes = recipes.map((recipe) =>
+        recipe.id === updatedRecipe.id
+          ? { ...recipe, ...updatedRecipe }
+          : recipe
+      );
+      setRecipes(updatedRecipes);
+      setEditingRecipe(null);
+      setSelectedRecipe(null);
+      console.log(response);
+    } catch (error) {
+      console.error("Error while updating the recipe:");
+    }
+  };
+
+  const handleDeleteRecipe = async (id: number) => {
+    const isConfirmed = window.confirm(
+      `Are you sure you want to delete the recipe with ID ${id}?`
     );
-    setRecipes(updatedRecipes);
-    setEditingRecipe(null);
-    setSelectedRecipe(null);
+    if (!isConfirmed) return;
+
+    try {
+      const response = await fetchDeleteRecipe(id, sessionToken!);
+      const updatedRecipes = recipes.filter((recipe) => recipe.id !== id);
+      console.log(response);
+      setRecipes(updatedRecipes);
+    } catch (error) {
+      console.log("error", error);
+    }
   };
 
-  const handleDeleteRecipe = (id: number) => {
-    const updatedRecipes = recipes.filter((recipe) => recipe.id !== id);
-    setRecipes(updatedRecipes);
+  const handleViewRecipe = async (recipeId: number) => {
+    try {
+      const data = await fetchGetRecipeDetailById(recipeId, sessionToken!);
+      setSelectedRecipe(data);
+    } catch (error) {
+      console.log("error", error);
+    }
   };
 
-  const handleViewRecipe = (id: number) => {
-    const recipe = recipes.find((r) => r.id === id);
-    setSelectedRecipe(recipe || null);
-  };
-
-  const handleEditRecipe = (id: number) => {
-    const recipe = recipes.find((r) => r.id === id);
-    if (recipe) {
-      const { id, avgStar, createAt, totalRating, ...editableFields } = recipe;
-      setEditingRecipe(editableFields);
-      setSelectedRecipe(recipe);
+  const handleEditRecipe = async (recipeId: number) => {
+    try {
+      const data = await fetchGetRecipeDetailById(recipeId, sessionToken!);
+      const { id, avgStar, createAt, totalRating, ...editableFields } = data;
+      setEditingRecipe({ id, ...editableFields });
+      setSelectedRecipe(data);
+    } catch (error) {
+      console.log("error", error);
     }
   };
 
@@ -173,7 +194,11 @@ const RecipeManagement = () => {
 
   const handleTopicChange = (value: string) => {
     const selectedTopic = topics.find((topic) => topic.name === value);
-    if (selectedTopic && editingRecipe && !editingRecipe.recipeTopics.some((topic) => topic.id === selectedTopic.id)) {
+    if (
+      selectedTopic &&
+      editingRecipe &&
+      !editingRecipe.recipeTopics.some((topic) => topic.id === selectedTopic.id)
+    ) {
       setEditingRecipe({
         ...editingRecipe,
         recipeTopics: [...editingRecipe.recipeTopics, selectedTopic],
@@ -195,45 +220,85 @@ const RecipeManagement = () => {
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-3xl font-bold mb-8">Manage Recipes</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {recipes.map((recipe) => (
-          <div key={recipe.id} className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">{recipe.name}</h2>
-              <div className="flex gap-2">
-                <Button variant="default" size="icon" onClick={() => handleViewRecipe(recipe.id)}>
-                  <Eye className="w-4 h-4" />
-                </Button>
-                <Button variant="default" size="icon" onClick={() => handleEditRecipe(recipe.id)}>
-                  <Pen className="w-4 h-4" />
-                </Button>
-                <Button variant="default" size="icon" onClick={() => handleDeleteRecipe(recipe.id)}>
-                  <Trash className="w-4 h-4" />
-                </Button>
-              </div>
+
+      {isLoading && recipes.length === 0 ? (
+        <div>
+          <ListRecipeCategorySkeleton />
+          <ListRecipeCategorySkeleton />
+        </div>
+      ) : (
+        <div>
+          <InfiniteScroll
+            dataLength={recipes.length}
+            next={getRecipes}
+            hasMore={hasMoreRecipe}
+            loader={<ListRecipeCategorySkeleton />}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {recipes.map((recipe) => (
+                <div
+                  key={recipe.id}
+                  className="bg-white rounded-lg shadow-md p-6"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold">{recipe.name}</h2>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="default"
+                        size="icon"
+                        onClick={() => handleViewRecipe(recipe.id)}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="icon"
+                        onClick={() => handleEditRecipe(recipe.id)}
+                      >
+                        <Pen className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="icon"
+                        onClick={() => handleDeleteRecipe(recipe.id)}
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 mb-4 line-clamp-[7] overflow-hidden">
+                    {recipe.detail}
+                  </p>
+                  <div className="flex items-center gap-4 mb-4">
+                    <div>
+                      <span className="font-medium">Avg Star:</span>{" "}
+                      {recipe.avgStar}
+                    </div>
+                  </div>
+                  <img
+                    src={recipe.img}
+                    alt={recipe.name}
+                    width={400}
+                    height={300}
+                    className="rounded-lg object-cover w-full"
+                  />
+                </div>
+              ))}
             </div>
-            <p className="text-gray-600 mb-4">{recipe.detail}</p>
-            <div className="flex items-center gap-4 mb-4">
-              <div>
-                <span className="font-medium">Avg Star:</span> {recipe.avgStar}
-              </div>
-            </div>
-            <img
-              src={recipe.img}
-              alt={recipe.name}
-              width={400}
-              height={300}
-              className="rounded-lg object-cover w-full"
-            />
-          </div>
-        ))}
-      </div>
+          </InfiniteScroll>
+        </div>
+      )}
+
       {selectedRecipe && !editingRecipe && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-3xl overflow-y-auto max-h-[90vh]">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">{selectedRecipe.name}</h2>
-              <Button variant="default" size="icon" onClick={() => setSelectedRecipe(null)}>
+              <Button
+                variant="default"
+                size="icon"
+                onClick={() => setSelectedRecipe(null)}
+              >
                 <X className="w-6 h-6" />
               </Button>
             </div>
@@ -245,24 +310,33 @@ const RecipeManagement = () => {
                     <span className="font-medium">ID:</span> {selectedRecipe.id}
                   </div>
                   <div>
-                    <span className="font-medium">Created At:</span> {selectedRecipe.createAt.toLocaleDateString()}
+                    <span className="font-medium">Created At:</span>{" "}
+                    {new Date(selectedRecipe.createAt).toLocaleDateString()}
                   </div>
                   <div>
-                    <span className="font-medium">Average Rating:</span> {selectedRecipe.avgStar}
+                    <span className="font-medium">Average Rating:</span>{" "}
+                    {selectedRecipe.avgStar}
                   </div>
                   <div>
-                    <span className="font-medium">Total Ratings:</span> {selectedRecipe.totalRating}
-                    <Button variant="default" className="ml-2" onClick={() => alert('Display list of raters here.')}>
+                    <span className="font-medium">Total Ratings:</span>{" "}
+                    {selectedRecipe.totalRating}
+                    <Button
+                      variant="default"
+                      className="ml-2"
+                      onClick={() => alert("Display list of raters here.")}
+                    >
                       View Raters
                     </Button>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 mb-4">
                   <div>
-                    <span className="font-medium">Prep Time:</span> {selectedRecipe.prepTime} min
+                    <span className="font-medium">Prep Time:</span>{" "}
+                    {selectedRecipe.prepTime} min
                   </div>
                   <div>
-                    <span className="font-medium">Cook Time:</span> {selectedRecipe.cookTime} min
+                    <span className="font-medium">Cook Time:</span>{" "}
+                    {selectedRecipe.cookTime} min
                   </div>
                 </div>
                 <h3 className="text-lg font-bold mb-2">Ingredients</h3>
@@ -275,7 +349,7 @@ const RecipeManagement = () => {
                 </ul>
                 <h3 className="text-lg font-bold mb-2 mt-4">Notes</h3>
                 <ul className="list-disc pl-6 space-y-2">
-                  {selectedRecipe.recipeNotes.map((note, index) => (
+                  {selectedRecipe.noteRecipes.map((note, index) => (
                     <li key={index}>{note.detail}</li>
                   ))}
                 </ul>
@@ -300,12 +374,17 @@ const RecipeManagement = () => {
                     />
                   ))}
                 </div>
-                <h3 className="text-lg font-bold mb-2 mt-4">Cooking Instructions</h3>
+                <h3 className="text-lg font-bold mb-2 mt-4">
+                  Cooking Instructions
+                </h3>
                 <p>{selectedRecipe.cookingInstruction}</p>
                 <h3 className="text-lg font-bold mb-2 mt-4">Categories</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedRecipe.recipeCategories.map((category, index) => (
-                    <div key={index} className="bg-gray-100 rounded-md px-3 py-1 text-sm font-medium">
+                    <div
+                      key={index}
+                      className="bg-gray-100 rounded-md px-3 py-1 text-sm font-medium"
+                    >
                       {category.name}
                     </div>
                   ))}
@@ -313,7 +392,10 @@ const RecipeManagement = () => {
                 <h3 className="text-lg font-bold mb-2 mt-4">Topics</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedRecipe.recipeTopics.map((topic, index) => (
-                    <div key={index} className="bg-gray-100 rounded-md px-3 py-1 text-sm font-medium">
+                    <div
+                      key={index}
+                      className="bg-gray-100 rounded-md px-3 py-1 text-sm font-medium"
+                    >
                       {topic.name}
                     </div>
                   ))}
@@ -328,14 +410,23 @@ const RecipeManagement = () => {
           <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-3xl overflow-y-auto max-h-[90vh]">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">Edit Recipe</h2>
-              <Button variant="default" size="icon" onClick={() => setEditingRecipe(null)}>
+              <Button
+                variant="default"
+                size="icon"
+                onClick={() => {
+                  setEditingRecipe(null);
+                  setSelectedRecipe(null);
+                }}
+              >
                 <X className="w-6 h-6" />
               </Button>
             </div>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleUpdateRecipe(editingRecipe);
+                if (editingRecipe) {
+                  handleUpdateRecipe(editingRecipe);
+                }
               }}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -354,7 +445,9 @@ const RecipeManagement = () => {
                   <Textarea
                     id="detail"
                     value={editingRecipe.detail}
-                    onChange={(e) => handleFieldChange("detail", e.target.value)}
+                    onChange={(e) =>
+                      handleFieldChange("detail", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -364,7 +457,9 @@ const RecipeManagement = () => {
                     type="number"
                     id="prepTime"
                     value={editingRecipe.prepTime}
-                    onChange={(e) => handleFieldChange("prepTime", parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handleFieldChange("prepTime", parseInt(e.target.value))
+                    }
                     required
                   />
                 </div>
@@ -374,7 +469,9 @@ const RecipeManagement = () => {
                     type="number"
                     id="cookTime"
                     value={editingRecipe.cookTime}
-                    onChange={(e) => handleFieldChange("cookTime", parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handleFieldChange("cookTime", parseInt(e.target.value))
+                    }
                     required
                   />
                 </div>
@@ -394,11 +491,15 @@ const RecipeManagement = () => {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="cookingInstruction">Cooking Instruction</Label>
+                  <Label htmlFor="cookingInstruction">
+                    Cooking Instruction
+                  </Label>
                   <Textarea
                     id="cookingInstruction"
                     value={editingRecipe.cookingInstruction}
-                    onChange={(e) => handleFieldChange("cookingInstruction", e.target.value)}
+                    onChange={(e) =>
+                      handleFieldChange("cookingInstruction", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -406,15 +507,23 @@ const RecipeManagement = () => {
               <h3 className="text-lg font-bold mb-2 mt-4">Ingredients</h3>
               <div className="space-y-4">
                 {editingRecipe.ingredientRecipes.map((ingredient, index) => (
-                  <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-4">
+                  <div
+                    key={index}
+                    className="grid grid-cols-[1fr_1fr_auto] gap-4"
+                  >
                     <Input
                       type="text"
                       placeholder="Ingredient Name"
                       value={ingredient.name}
                       onChange={(e) => {
-                        const updatedIngredients = [...editingRecipe.ingredientRecipes];
+                        const updatedIngredients = [
+                          ...editingRecipe.ingredientRecipes,
+                        ];
                         updatedIngredients[index].name = e.target.value;
-                        handleFieldChange("ingredientRecipes", updatedIngredients);
+                        handleFieldChange(
+                          "ingredientRecipes",
+                          updatedIngredients
+                        );
                       }}
                       required
                     />
@@ -423,9 +532,14 @@ const RecipeManagement = () => {
                       placeholder="Amount"
                       value={ingredient.amount}
                       onChange={(e) => {
-                        const updatedIngredients = [...editingRecipe.ingredientRecipes];
+                        const updatedIngredients = [
+                          ...editingRecipe.ingredientRecipes,
+                        ];
                         updatedIngredients[index].amount = e.target.value;
-                        handleFieldChange("ingredientRecipes", updatedIngredients);
+                        handleFieldChange(
+                          "ingredientRecipes",
+                          updatedIngredients
+                        );
                       }}
                       required
                     />
@@ -433,9 +547,14 @@ const RecipeManagement = () => {
                       variant="default"
                       size="icon"
                       onClick={() => {
-                        const updatedIngredients = [...editingRecipe.ingredientRecipes];
+                        const updatedIngredients = [
+                          ...editingRecipe.ingredientRecipes,
+                        ];
                         updatedIngredients.splice(index, 1);
-                        handleFieldChange("ingredientRecipes", updatedIngredients);
+                        handleFieldChange(
+                          "ingredientRecipes",
+                          updatedIngredients
+                        );
                       }}
                     >
                       <Trash className="w-4 h-4" />
@@ -457,15 +576,15 @@ const RecipeManagement = () => {
               </div>
               <h3 className="text-lg font-bold mb-2 mt-4">Notes</h3>
               <div className="space-y-4">
-                {editingRecipe.recipeNotes.map((note, index) => (
+                {editingRecipe.noteRecipes.map((note, index) => (
                   <div key={index} className="grid grid-cols-[1fr_auto] gap-4">
                     <Textarea
                       placeholder="Note"
                       value={note.detail}
                       onChange={(e) => {
-                        const updatedNotes = [...editingRecipe.recipeNotes];
+                        const updatedNotes = [...editingRecipe.noteRecipes];
                         updatedNotes[index].detail = e.target.value;
-                        handleFieldChange("recipeNotes", updatedNotes);
+                        handleFieldChange("noteRecipes", updatedNotes);
                       }}
                       required
                     />
@@ -473,9 +592,9 @@ const RecipeManagement = () => {
                       variant="default"
                       size="icon"
                       onClick={() => {
-                        const updatedNotes = [...editingRecipe.recipeNotes];
+                        const updatedNotes = [...editingRecipe.noteRecipes];
                         updatedNotes.splice(index, 1);
-                        handleFieldChange("recipeNotes", updatedNotes);
+                        handleFieldChange("noteRecipes", updatedNotes);
                       }}
                     >
                       <Trash className="w-4 h-4" />
@@ -485,7 +604,10 @@ const RecipeManagement = () => {
                 <Button
                   variant="default"
                   onClick={() => {
-                    handleFieldChange("recipeNotes", [...editingRecipe.recipeNotes, { detail: "" }]);
+                    handleFieldChange("noteRecipes", [
+                      ...editingRecipe.noteRecipes,
+                      { detail: "" },
+                    ]);
                   }}
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -495,13 +617,18 @@ const RecipeManagement = () => {
               <h3 className="text-lg font-bold mb-2 mt-4">Additional Images</h3>
               <div className="space-y-4">
                 {editingRecipe.otherImageRecipes.map((image, index) => (
-                  <div key={index} className="grid grid-cols-[1fr_auto_auto] gap-4">
+                  <div
+                    key={index}
+                    className="grid grid-cols-[1fr_auto_auto] gap-4"
+                  >
                     <Input
                       type="text"
                       placeholder="Image URL"
                       value={image.img}
                       onChange={(e) => {
-                        const updatedImages = [...editingRecipe.otherImageRecipes];
+                        const updatedImages = [
+                          ...editingRecipe.otherImageRecipes,
+                        ];
                         updatedImages[index].img = e.target.value;
                         handleFieldChange("otherImageRecipes", updatedImages);
                       }}
@@ -514,7 +641,9 @@ const RecipeManagement = () => {
                       variant="default"
                       size="icon"
                       onClick={() => {
-                        const updatedImages = [...editingRecipe.otherImageRecipes];
+                        const updatedImages = [
+                          ...editingRecipe.otherImageRecipes,
+                        ];
                         updatedImages.splice(index, 1);
                         handleFieldChange("otherImageRecipes", updatedImages);
                       }}
@@ -541,11 +670,22 @@ const RecipeManagement = () => {
               <h3 className="text-lg font-bold mb-2 mt-4">Categories</h3>
               <div className="grid grid-cols-2 gap-4">
                 {tableFilter.map((table) => (
-                  <div key={table.type} className="flex flex-col items-start space-y-2">
-                    <Label className="block text-lg font-medium">{table.type}</Label>
-                    <Select onValueChange={(value) => handleCategoryChange(table.type, value)}>
+                  <div
+                    key={table.type}
+                    className="flex flex-col items-start space-y-2"
+                  >
+                    <Label className="block text-lg font-medium">
+                      {table.type}
+                    </Label>
+                    <Select
+                      onValueChange={(value) =>
+                        handleCategoryChange(table.type, value)
+                      }
+                    >
                       <SelectTrigger className="w-64 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg">
-                        <SelectValue placeholder={`Select ${table.type} Category`} />
+                        <SelectValue
+                          placeholder={`Select ${table.type} Category`}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {table.recipeCategories.map((category) => (
@@ -556,14 +696,25 @@ const RecipeManagement = () => {
                       </SelectContent>
                     </Select>
                     <div className="grid grid-cols-2 gap-4 mt-4">
-                      {editingRecipe.recipeCategories.filter((cat) => cat.type === table.type).map((category, index) => (
-                        <div key={index} className="bg-gray-100 rounded-md p-4 flex items-center space-x-2">
-                          <span className="font-medium">{category.name}</span>
-                          <Button variant="default" size="icon" onClick={() => handleRemoveCategory(category.type)}>
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
+                      {editingRecipe.recipeCategories
+                        .filter((cat) => cat.type === table.type)
+                        .map((category, index) => (
+                          <div
+                            key={index}
+                            className="bg-gray-100 rounded-md p-4 flex items-center space-x-2"
+                          >
+                            <span className="font-medium">{category.name}</span>
+                            <Button
+                              variant="default"
+                              size="icon"
+                              onClick={() =>
+                                handleRemoveCategory(category.type)
+                              }
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
                     </div>
                   </div>
                 ))}
@@ -583,9 +734,17 @@ const RecipeManagement = () => {
               </Select>
               <div className="grid grid-cols-3 gap-4 mt-4">
                 {editingRecipe.recipeTopics.map((topic, index) => (
-                  <div key={index} className="bg-gray-100 rounded-md p-4 flex items-center">
+                  <div
+                    key={index}
+                    className="bg-gray-100 rounded-md p-4 flex items-center"
+                  >
                     <span className="font-medium">{topic.name}</span>
-                    <Button variant="default" size="icon" className="ml-auto" onClick={() => handleRemoveTopic(index)}>
+                    <Button
+                      variant="default"
+                      size="icon"
+                      className="ml-auto"
+                      onClick={() => handleRemoveTopic(index)}
+                    >
                       <X className="w-4 h-4" />
                     </Button>
                   </div>
@@ -603,3 +762,44 @@ const RecipeManagement = () => {
 };
 
 export default RecipeManagement;
+
+const ListRecipeCategorySkeleton = () => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 my-5">
+      <RecipeCardSkeleton />
+      <RecipeCardSkeleton />
+      <RecipeCardSkeleton />
+      <RecipeCardSkeleton />
+    </div>
+  );
+};
+const RecipeCardSkeleton = () => {
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col space-y-2 w-full">
+          <div className="h-8 bg-gray-300 rounded w-2/3"></div>
+          <div className="h-8 bg-gray-300 rounded w-1/2"></div>
+        </div>
+        <div className="flex gap-2">
+          <div className="h-6 w-6 bg-gray-300 rounded-full"></div>
+          <div className="h-6 w-6 bg-gray-300 rounded-full"></div>
+          <div className="h-6 w-6 bg-gray-300 rounded-full"></div>
+        </div>
+      </div>
+      <div className="space-y-2 mb-4">
+        <div className="h-4 bg-gray-300 rounded w-full"></div>
+        <div className="h-4 bg-gray-300 rounded w-full"></div>
+        <div className="h-4 bg-gray-300 rounded w-full"></div>
+        <div className="h-4 bg-gray-300 rounded w-full"></div>
+        <div className="h-4 bg-gray-300 rounded w-full"></div>
+        <div className="h-4 bg-gray-300 rounded w-full"></div>
+        <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+      </div>
+      <div className="space-y-3 mb-4">
+        <div className="h-6 bg-gray-300 rounded w-2/3"></div>
+      </div>
+      <div className="h-[350px] bg-gray-300 rounded-lg w-full mb-4"></div>
+    </div>
+  );
+};

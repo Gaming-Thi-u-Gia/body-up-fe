@@ -7,11 +7,11 @@ export type AddNewRecipeType = {
   cookingInstruction: string;
   ingredientRecipes: IngredientRecipeType[];
   otherImageRecipes: OtherImageRecipeType[];
-  noteRecipes: recipeNoteType[];
+  noteRecipes: NoteRecipeType[];
   recipeTopics: TopicType[];
   recipeCategories: RecipeCategoryType[];
 };
-export type recipeNoteType = {
+export type NoteRecipeType = {
   detail: string;
 };
 export type TableFilterRecipeType = {
@@ -71,7 +71,7 @@ export type RecipeDetailType = {
   createAt: Date;
   ingredientRecipes: IngredientRecipeType[];
   otherImageRecipes: OtherImageRecipeType[];
-  recipeNotes: recipeNoteType[];
+  noteRecipes: NoteRecipeType[];
   recipeTopics: TopicType[];
   recipeCategories: RecipeCategoryType[];
 };
