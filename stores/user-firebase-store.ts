@@ -8,7 +8,7 @@ export type User = {
    username?: string;
    email?: string;
    avatar?: string;
-   blockedUsers?: string[];
+   blocked?: string[];
 };
 
 type UserFirebaseStore = {

@@ -22,7 +22,7 @@ import {
 import { MoveVerticalIcon, SendIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { ChatListProps } from "./chat-list";
-import { useAuthStore } from "@/components/providers/auth-provider";
+import { useBlockUserModal } from "@/stores/block-user-model";
 interface Message {
    senderId: string;
    text: string;
@@ -37,12 +37,15 @@ export type UserChats = {
 };
 const Chat = () => {
    const [chat, setChat] = useState<Chat>();
-   const { chatId, user } = useChatFireBaseStore((store) => store);
+   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } =
+      useChatFireBaseStore((store) => store);
    const [text, setText] = useState("");
+   console.log("isCurrentUserBlocked", isCurrentUserBlocked);
+   console.log("isReceiverBlocked", isReceiverBlocked);
+
    const { currentUser } = useUserFirebaseStore((store) => store);
    console.log("current", currentUser);
-   const { user: UserCookies } = useAuthStore((store) => store);
-
+   const { open } = useBlockUserModal();
    useEffect(() => {
       if (!chatId) return;
       const unsub = onSnapshot(doc(db, "chats", chatId), async (res) => {
@@ -114,6 +117,18 @@ const Chat = () => {
                      <AvatarFallback>AC</AvatarFallback>
                   </Avatar>
                   <div className="text-sm font-medium">{user?.username}</div>
+                  <Button
+                     className="bg-red-500"
+                     variant="secondary"
+                     onClick={open}
+                     disabled={isCurrentUserBlocked}
+                  >
+                     {isCurrentUserBlocked
+                        ? "You are blocked"
+                        : isReceiverBlocked
+                        ? "User Blocked"
+                        : "Block"}
+                  </Button>
                </div>
                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -127,21 +142,10 @@ const Chat = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                      <DropdownMenuItem>View profile</DropdownMenuItem>
-                     <DropdownMenuItem>Mute conversation</DropdownMenuItem>
-                     <DropdownMenuItem>Delete conversation</DropdownMenuItem>
                   </DropdownMenuContent>
                </DropdownMenu>
             </div>
             <div className="flex-1 overflow-auto p-4">
-               {/* <div className=" w-full flex justify-center items-center">
-                  <div className="flex items-center justify-center w-full gap-2 mt-4">
-                     <hr className="w-[45%] h-1" />
-                     <span className="text-gray-400 text-sm font-medium">
-                        11th Jun 2024
-                     </span>
-                     <hr className="w-[45%] h-1" />
-                  </div>
-               </div> */}
                <div className="grid gap-4">
                   {chat?.messages?.map((message) => (
                      <div key={message?.createdAt}>
@@ -150,14 +154,15 @@ const Chat = () => {
                               key={message?.createdAt}
                               className="flex items-start gap-3 justify-end"
                            >
-                              <div className="flex-1 rounded-md bg-primary p-3 text-sm text-primary-foreground">
-                                 <p>{message.text}</p>
+                              <div className="flex flex-col w-[60%]  rounded-md bg-primary p-3 text-sm text-primary-foreground">
+                                 <p className="">{message.text}</p>
                                  <div className="mt-2 text-xs text-primary-foreground/80">
                                     {/* {message?.createAt} */}
+                                    ALOOO
                                  </div>
                               </div>
                               <Avatar className="h-8 w-8 border">
-                                 <AvatarImage src={UserCookies?.avatar} />
+                                 <AvatarImage src={currentUser?.avatar} />
                                  <AvatarFallback>AC</AvatarFallback>
                               </Avatar>
                            </div>
@@ -170,7 +175,7 @@ const Chat = () => {
                                  <AvatarImage src={user?.avatar} />
                                  <AvatarFallback>AC</AvatarFallback>
                               </Avatar>
-                              <div className="flex-1 rounded-md bg-muted p-3 text-sm">
+                              <div className="flex flex-col w-[60%] rounded-md bg-gray-300 p-3 text-sm">
                                  <p>{message.text}</p>
                                  <div className="mt-2 text-xs text-muted-foreground">
                                     {/* {message?.createAt} */}
@@ -185,17 +190,23 @@ const Chat = () => {
             <div className="sticky bottom-0 border-t bg-background px-4 py-3">
                <div className="relative">
                   <Textarea
-                     placeholder="Type your message..."
+                     placeholder={
+                        isCurrentUserBlocked || isReceiverBlocked
+                           ? "You cannot send a message"
+                           : "Type your message..."
+                     }
                      className="min-h-[48px] w-full rounded-2xl border border-neutral-400 bg-muted px-4 py-2 pr-16 text-sm shadow-sm"
                      onChange={(e) => setText(e.target.value)}
                      value={text}
                      onKeyDown={handlePress}
+                     disabled={isCurrentUserBlocked || isReceiverBlocked}
                   />
                   <Button
                      type="button"
                      size="icon"
                      className="absolute right-3 top-3 h-8 w-8"
                      onClick={handleSend}
+                     disabled={isCurrentUserBlocked || isReceiverBlocked}
                   >
                      <SendIcon className="h-4 w-4" />
                      <span className="sr-only">Send</span>

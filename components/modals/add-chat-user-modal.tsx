@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useEffect, useState } from "react";
 
-import { useAddChatModel } from "@/stores/add-chat-user";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import defaultProfile from "/public/default-iProfile.png";
@@ -26,12 +25,7 @@ import {
    where,
 } from "firebase/firestore";
 import { db } from "@/firebase";
-// export type ChatUser = {
-//    id: string;
-//    username: string;
-//    avatar?: string;
-//    // add any other fields that exist in your user document
-// };
+import { useAddChatModel } from "@/stores/add-chat-user";
 export function AddChatUser() {
    const { isOpen, close } = useAddChatModel();
    const [isClient, setIsClient] = useState(false);
@@ -128,9 +122,6 @@ export function AddChatUser() {
                            </span>
                         </div>
                         <div className="flex items-center gap-3">
-                           <Button variant="secondary" onClick={close}>
-                              Cancel
-                           </Button>
                            <Button
                               type="button"
                               variant="secondary"
@@ -143,6 +134,9 @@ export function AddChatUser() {
                      </div>
                   )}
                </div>
+               <Button variant="secondary" onClick={close}>
+                  Cancel
+               </Button>
             </AlertDialogHeader>
          </AlertDialogContent>
       </AlertDialog>
