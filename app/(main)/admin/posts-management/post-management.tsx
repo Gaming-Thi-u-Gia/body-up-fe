@@ -1,225 +1,261 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  fetchDeletePost,
+  fetchGetPostDetailById,
+  fetchGetPosts,
+} from "@/utils/admin/fetch";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import InfiniteScroll from "react-infinite-scroll-component";
+
+interface UserType {
+  id: number;
+  firstName: string;
+  lastName: string;
+  avatar: string | null;
+}
+
+interface BadgeType {
+  id: number;
+  name: string;
+}
+
+interface PostCard {
+  id: number;
+  title: string;
+  description: string;
+  badge: BadgeType;
+}
+
+interface Post extends PostCard {
+  user: UserType;
+  imgBefore: string | null;
+  imgAfter: string | null;
+  dayBefore: string | null;
+  dayAfter: string | null;
+  createdAt: string;
+}
 
 export function PostManagement() {
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      title: "Introduction to React",
-      description: "Learn the basics of React, a popular JavaScript library for building user interfaces.",
-      imgBefore: "https://example.com/react-intro-before.jpg",
-      imgAfter: "https://example.com/react-intro-after.jpg",
-      dayBefore: new Date("2023-05-01"),
-      dayAfter: new Date("2023-05-08"),
-      categoryCommunity: { id: 1, name: "Web Development" },
-      badge: { id: 1, name: "Beginner" },
-      userChallenges: [
-        { id: 1, name: "John Doe" },
-        { id: 2, name: "Jane Smith" },
-      ],
-      createdAt: new Date("2023-04-15"),
-      url: "https://example.com/react-intro",
-      postTopics: [
-        { id: 1, name: "React" },
-        { id: 2, name: "JavaScript" },
-      ],
-      postCategories: [
-        { id: 1, name: "Web Development" },
-        { id: 2, name: "Frontend" },
-      ],
-    },
-    {
-      id: 2,
-      title: "Mastering CSS Grid",
-      description: "Dive deep into CSS Grid, a powerful layout system for creating complex web designs.",
-      imgBefore: "https://example.com/css-grid-before.jpg",
-      imgAfter: "https://example.com/css-grid-after.jpg",
-      dayBefore: new Date("2023-06-01"),
-      dayAfter: new Date("2023-06-15"),
-      categoryCommunity: { id: 1, name: "Web Development" },
-      badge: { id: 2, name: "Intermediate" },
-      userChallenges: [
-        { id: 3, name: "Michael Johnson" },
-        { id: 4, name: "Emily Davis" },
-      ],
-      createdAt: new Date("2023-05-20"),
-      url: "https://example.com/css-grid-tutorial",
-      postTopics: [
-        { id: 2, name: "CSS" },
-        { id: 3, name: "Layout" },
-      ],
-      postCategories: [
-        { id: 1, name: "Web Development" },
-        { id: 3, name: "Design" },
-      ],
-    },
-  ])
-  const [selectedPost, setSelectedPost] = useState(null)
-  const handleAddPost = (newPost) => {
-    setPosts([...posts, newPost])
-  }
-  const handleDeletePost = (id) => {
-    const updatedPosts = posts.filter((post) => post.id !== id)
-    setPosts(updatedPosts)
-  }
-  const handleViewPost = (id) => {
-    const post = posts.find((p) => p.id === id)
-    setSelectedPost(post)
-  }
+  const { sessionToken } = useAuthStore((store) => store);
+  const [posts, setPosts] = useState<PostCard[]>([]);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [hasMorePost, setHasMorePost] = useState<boolean>(false);
+  const [pageNo, setPageNo] = useState<number>(0);
+
+  useEffect(() => {
+    getPosts();
+  }, []);
+
+  const getPosts = async () => {
+    try {
+      setIsLoading(true);
+      const pageSize = 12;
+      const data = await fetchGetPosts(pageNo, pageSize, sessionToken!);
+      if (data.totalElements === 0) {
+        setHasMorePost(false);
+        setIsLoading(false);
+      }
+      setPosts((prev) => [...prev, ...data.content]);
+      setPageNo((previous) => previous + 1);
+      setHasMorePost(!data.last);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleViewDetails = async (postId: number) => {
+    setIsLoading(true);
+    const postDetails = await fetchGetPostDetailById(postId, sessionToken!);
+    console.log(postDetails);
+    setSelectedPost(postDetails);
+    setIsLoading(false);
+  };
+
+  const handleDeletePost = async (postId: number) => {
+    const isConfirmed = window.confirm(
+      `Are you sure you want to delete the post with ID ${postId}?`
+    );
+    if (!isConfirmed) return;
+    try {
+      const response = await fetchDeletePost(postId, sessionToken!);
+      setPosts(posts.filter((post) => post.id !== postId));
+    } catch (error) {
+      console.log("Error when delete post Id" + postId);
+    }
+  };
+
   return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold mb-8">Manage Posts</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {posts.map((post) => (
-          <div key={post.id} className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">{post.title}</h2>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="icon" onClick={() => handleViewPost(post.id)}>
-                  <EyeIcon className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDeletePost(post.id)}>
-                  <TrashIcon className="w-4 h-4" />
-                </Button>
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Post Management</h1>
+      {isLoading && posts.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array(9)
+            .fill(0)
+            .map((_, index) => (
+              <PostCardSkeleton key={index} />
+            ))}
+        </div>
+      ) : (
+        <InfiniteScroll
+          dataLength={posts.length}
+          next={getPosts}
+          hasMore={hasMorePost}
+          loader={
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+            </div>
+          }
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {posts.map((post) => (
+              <div key={post.id} className="bg-white rounded-lg shadow-md p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold line-clamp-2 overflow-hidden">
+                    {post.title}
+                  </h2>
+                  <Badge variant="secondary">{post.badge.name}</Badge>
+                </div>
+                <p className="text-gray-600 mb-4 line-clamp-4 overflow-hidden">
+                  {post.description}
+                </p>
+                <div className="flex justify-end">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => handleViewDetails(post.id)}
+                  >
+                    View Details
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="ml-2"
+                    onClick={() => handleDeletePost(post.id)}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </div>
-            </div>
-            <p className="text-gray-600 mb-4">{post.description}</p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {post.postTopics.map((topic) => (
-                <div key={topic.id} className="bg-gray-100 rounded-md px-3 py-1 text-sm font-medium">
-                  {topic.name}
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {post.postCategories.map((category) => (
-                <div key={category.id} className="bg-gray-100 rounded-md px-3 py-1 text-sm font-medium">
-                  {category.name}
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
-      {selectedPost && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-3xl">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">{selectedPost.title}</h2>
-              <Button variant="ghost" size="icon" onClick={() => setSelectedPost(null)}>
-                <XIcon className="w-6 h-6" />
+        </InfiniteScroll>
+      )}
+
+      {isLoading && <p>Loading...</p>}
+      {selectedPost && !isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl w-full">
+            <div className="flex items-center mb-4">
+              <img
+                src={selectedPost.user.avatar || "/placeholder.svg"}
+                alt={`${selectedPost.user.firstName + " " + selectedPost.user.lastName}'s avatar`}
+                className="rounded-full w-16 h-16 mr-4"
+              />
+              <h2 className="text-xl font-bold">
+                {selectedPost.user.firstName + " " + selectedPost.user.lastName}
+              </h2>
+            </div>
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-gray-600">ID: {selectedPost.id}</p>
+              <Badge variant="secondary">{selectedPost.badge.name}</Badge>
+            </div>
+            <div className="mt-6">
+              <h2 className="text-2xl font-bold mb-2">{selectedPost.title}</h2>
+              <p className="text-gray-600 mb-2">
+                Description: {selectedPost.description}
+              </p>
+              <p className="text-gray-600 mb-2">
+                Created At:{" "}
+                {new Date(selectedPost.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-6 mt-4">
+              {selectedPost.imgBefore && (
+                <div>
+                  <img
+                    src={selectedPost.imgBefore}
+                    alt="Before"
+                    width={400}
+                    height={300}
+                    className="rounded-lg"
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-gray-600">Before</p>
+                    <p className="text-gray-600">
+                      {new Date(selectedPost.dayBefore!).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              )}
+              {selectedPost.imgAfter && (
+                <div>
+                  <img
+                    src={selectedPost.imgAfter}
+                    alt="After"
+                    width={400}
+                    height={300}
+                    className="rounded-lg"
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-gray-600">After</p>
+                    <p className="text-gray-600">
+                      {new Date(selectedPost.dayAfter!).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end mt-6">
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setSelectedPost(null)}
+              >
+                Close
               </Button>
             </div>
-            <p className="text-gray-600 mb-4">{selectedPost.description}</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h3 className="text-lg font-bold mb-2">Before</h3>
-                <img src="/placeholder.svg" alt="Before" width={400} height={300} className="object-cover rounded-lg" />
-                <div className="mt-4">
-                  <h3 className="text-lg font-bold mb-2">Day Before</h3>
-                  <p>{selectedPost.dayBefore.toLocaleDateString()}</p>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-bold mb-2">After</h3>
-                <img src="/placeholder.svg" alt="After" width={400} height={300} className="object-cover rounded-lg" />
-                <div className="mt-4">
-                  <h3 className="text-lg font-bold mb-2">Day After</h3>
-                  <p>{selectedPost.dayAfter.toLocaleDateString()}</p>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-bold mb-2">Category</h3>
-              <p>{selectedPost.categoryCommunity.name}</p>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-bold mb-2">Badge</h3>
-              <p>{selectedPost.badge.name}</p>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-bold mb-2">User Challenges</h3>
-              <div className="flex flex-wrap gap-2">
-                {selectedPost.userChallenges.map((user) => (
-                  <div key={user.id} className="bg-gray-100 rounded-md px-3 py-1 text-sm font-medium">
-                    {user.name}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-bold mb-2">Created At</h3>
-              <p>{selectedPost.createdAt.toLocaleDateString()}</p>
-            </div>
           </div>
-          )}
         </div>
       )}
     </div>
-  )
+  );
 }
 
-function EyeIcon(props) {
+const PostCardSkeleton = () => {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  )
-}
-
-
-function TrashIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 6h18" />
-      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-    </svg>
-  )
-}
-
-
-function XIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  )
-}
+    <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+      <div className="flex justify-between items-center mb-4">
+        <div className="h-8 bg-gray-300 rounded w-2/3"></div>
+        <div className="h-6 bg-gray-300 rounded w-16"></div>
+      </div>
+      <div className="space-y-2 mb-4">
+        <div className="h-4 bg-gray-300 rounded w-full"></div>
+        <div className="h-4 bg-gray-300 rounded w-full"></div>
+        <div className="h-4 bg-gray-300 rounded w-full"></div>
+        <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+      </div>
+      <div className="flex justify-end space-x-2">
+        <div className="h-10 bg-gray-300 rounded w-24"></div>
+        <div className="h-10 bg-gray-300 rounded w-24"></div>
+      </div>
+    </div>
+  );
+};

@@ -1,5 +1,6 @@
 import { EditableRecipeType } from "@/app/(main)/admin/recipes-management/recipe-management";
 import { AddNewRecipeType, AddNewVideoType } from "./type";
+import { VideoType } from "@/app/(main)/admin/workout-video-management/video-management";
 
 export const fetchGetTotalElements = async (sessionToken: string) => {
   try {
@@ -200,7 +201,7 @@ export const fetchDeleteRecipe = async (
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/delete?recipeId=${recipeId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/delete-recipe?recipeId=${recipeId}`,
       {
         method: "DELETE",
         headers: {
@@ -234,6 +235,156 @@ export const fetchGetUser = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    throw new Error(`Error while get table filter`);
+    throw new Error(`Error while get User`);
+  }
+};
+export const fetchGetVideos = async (
+  pageNo: number,
+  pageSize: number,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-video?pageNo=${pageNo}&pageSize=${pageSize}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get Videos`);
+  }
+};
+export const fetchDeleteVideo = async (
+  videoId: number,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/delete-video?videoId=${videoId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    throw new Error(`Error when deleting video`);
+  }
+};
+export const fetchPutVideo = async (
+  sessionToken: string,
+  updatedVideo: VideoType
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/update-video`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+        body: JSON.stringify(updatedVideo),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to update the video");
+    }
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while updating the video`);
+  }
+};
+export const fetchGetPosts = async (
+  pageNo: number,
+  pageSize: number,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-post?pageNo=${pageNo}&pageSize=${pageSize}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get Posts`);
+  }
+};
+export const fetchGetPostDetailById = async (
+  postId: number,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/post-detail?postId=${postId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get post details`);
+  }
+};
+export const fetchDeletePost = async (postId: number, sessionToken: string) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/delete-post?postId=${postId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    throw new Error(`Error when deleting post`);
+  }
+};
+export const fetchGetVideoDetailById = async (
+  videoId: number,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/video-detail?videoId=${videoId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get video details`);
   }
 };
