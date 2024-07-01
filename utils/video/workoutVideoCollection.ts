@@ -254,6 +254,21 @@ export const fetchDailyExerciseData = async (workoutProgramId: number, selectDay
     }  
 }
 
+export const fetchLastTestVideo = async () => {
+    try {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/workout-video/getVideoLatest`
+        );
+        console.log(process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1);
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching video category data:", error);
+        return [];
+    }  
+}
+
 export const fetchDailyRecipeExerciseData = async (workoutProgramId: number, selectDay: number) => {
     try {
         const response = await fetch(
