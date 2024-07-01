@@ -7,9 +7,11 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { AlignJustify, Calendar, CalendarCheck, Clock4, Ellipsis } from "lucide-react";
 import { fetchWorkoutProgramDataById } from "@/utils/video/workoutVideoCollection";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import DailyCourses from "./daily-courses";
 import SkeletonLoader from "./skeleton-daily";
+import { fetchJoinChallenge } from "@/utils/user";
+import { useAuthStore } from "@/components/providers/auth-provider";
 
 interface Category {
     id: number;
@@ -36,9 +38,11 @@ const Page = () => {
     const [showDiv, setShowDiv] = useState(false);
     const [loading, setLoading] = useState(true);
     const [workoutProgramById, setWorkoutProgramById] = useState<WorkoutProgram | null>(null);
+    const sessionToken = useAuthStore((store) => store.sessionToken);
 
     const pathName = usePathname();
     const workoutProgramId = pathName.split('/')[2];
+    const router = useRouter();
 
     const toggleDetails = () => {
         setShowDetails(!showDetails);
@@ -52,6 +56,11 @@ const Page = () => {
         };
         getWorkoutProgramById();
     }, [workoutProgramId]);
+
+    const joinChallenge = async () => {
+        const res = await fetchJoinChallenge(sessionToken!, Number(workoutProgramId));
+        router.push("/my-fitness-journey");
+    }
 
     const getTypes = (categories: Category[] | undefined): string => {
         if (!categories) return '';
@@ -173,6 +182,7 @@ const Page = () => {
                                 className="mt-2 py-2 ml-0"
                                 variant="active"
                                 size="default"
+                                onClick={joinChallenge}
                             >
                                 Start Challenge
                             </Button>

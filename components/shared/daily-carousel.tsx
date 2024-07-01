@@ -47,7 +47,7 @@ export const DailyCarousel = ({
             <Carousel
                 opts={{
                     align: "start",
-                    startIndex: +currDay.dailyExercise.day - 1,
+                    startIndex: currDay ? +currDay.dailyExercise.day - 1 : 0 ,
                 }}
                 className='w-[88%] mx-auto mb-5'
             >

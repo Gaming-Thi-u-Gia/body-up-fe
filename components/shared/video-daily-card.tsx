@@ -1,4 +1,3 @@
-"use client";
 import { CircleAlert, Crosshair, Heart } from "lucide-react";
 import { Badge } from "../ui/badge";
 import {
@@ -26,7 +25,6 @@ type Props = {
     currDay: string;
     day: string;
 };
-
 export const VideoDailyCard = ({
     id,
     title,
@@ -102,19 +100,22 @@ export const VideoDailyCard = ({
                         </div>
                     </div>
                 </div>
-            </div>
-            {status === "complete" && (
-                <Accordion type="single" collapsible className="flex flex-col p-[20px] bg-[#e0eefb] mt-4 rounded-lg">
-                    <AccordionItem value="item-1" className="border-none">
-                        <AccordionTrigger className="flex justify-between items-center py-0">
-                            <div className="flex justify-between w-full">
-                                <h4 className="text-base text-[#303033] font-semibold">
+            ) : (
+                <Accordion
+                    type='single'
+                    collapsible
+                    className='flex flex-col p-[20px] bg-[#e0eefb] mt-4 rounded-lg'
+                >
+                    <AccordionItem value='item-1' className='border-none'>
+                        <AccordionTrigger className='flex justify-between items-center py-0'>
+                            <div className='flex justify-between w-full'>
+                                <h4 className='text-base text-[#303033] font-semibold'>
                                     {title}
                                 </h4>
                                 {validatedStatus === "complete" && (
                                     <Badge
-                                        variant="secondary"
-                                        className="bg-[#7065cd] text-white hover:text-black hover:bg-[#c3c3c3] font-bold mr-4"
+                                        variant='secondary'
+                                        className='bg-[#7065cd] text-white hover:text-black hover:bg-[#c3c3c3] font-bold mr-4'
                                     >
                                         WORKOUT COMPLETE
                                     </Badge>
@@ -126,29 +127,37 @@ export const VideoDailyCard = ({
                                 style={{ backgroundImage: `url(${img})` }}
                                 className='pb-[12%] min-w-[180px] bg-cover bg-center rounded-md relative bg-no-repeat cursor-pointer group overflow-hidden'
                             >
-                                <div className="bg-black opacity-0 absolute left-0 bottom-0 right-0 top-0 z-1 group-hover:opacity-20 transition-all duration-300" />
-                                <Badge className="absolute right-8 bottom-3">
+                                <div className='bg-black opacity-0 absolute left-0 bottom-0 right-0 top-0 z-1 group-hover:opacity-20 transition-all duration-300' />
+                                <Badge className='absolute right-2 bottom-3'>
                                     {duration}
                                 </Badge>
                             </div>
 
-                            <div className="flex flex-col justify-between w-full ml-4">
-                                <div className="flex justify-between ">
-                                    <h4 className="text-lg text-[#303033] font-semibold">
+                            <div className='flex flex-col justify-between w-full ml-4'>
+                                <div className='flex justify-between '>
+                                    <h4 className='text-lg text-[#303033] font-semibold'>
                                         {title}
                                     </h4>
                                 </div>
-                                <div className="flex items-center gap-1">
+                                <div className='flex items-center gap-1'>
                                     <Crosshair width={12} height={12} />
-                                    <p className="text-sm">{target}</p>
+                                    <p className='text-sm'>Warm Up</p>
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <p className="text-xs text-[#868A93]">
+                                <div className='flex items-center justify-between'>
+                                    <p className='text-xs text-[#868A93]'>
                                         {view} • {releaseDate}
                                     </p>
-                                    <div className="flex items-center text-[#868A93] gap-2">
-                                        <CircleAlert width={17} height={18} cursor="pointer" />
-                                        <Heart width={18} height={18} cursor="pointer" />
+                                    <div className='flex items-center text-[#868A93] gap-2'>
+                                        <CircleAlert
+                                            width={17}
+                                            height={18}
+                                            cursor='pointer'
+                                        />
+                                        <Heart
+                                            width={18}
+                                            height={18}
+                                            cursor='pointer'
+                                        />
                                     </div>
                                 </div>
                             </div>

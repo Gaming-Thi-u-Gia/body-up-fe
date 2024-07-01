@@ -460,3 +460,19 @@ export const markFinishChallenge = async (
         }
     );
 };
+
+export const fetchJoinChallenge = async (
+    sessionToken: string,
+    workoutProgramId: number
+) => {
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/addChallenge?workoutProgramId=${workoutProgramId}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+        }
+    );
+};
