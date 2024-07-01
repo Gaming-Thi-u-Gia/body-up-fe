@@ -5,7 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { db } from "@/firebase";
 import useUserFirebaseStore, { User } from "@/stores/user-firebase-store";
-import { doc, getDoc, getDocs, onSnapshot } from "firebase/firestore";
+import {
+   doc,
+   getDoc,
+   getDocs,
+   onSnapshot,
+   updateDoc,
+} from "firebase/firestore";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { collection, query, where } from "firebase/firestore";
@@ -15,11 +21,13 @@ import { Button } from "@/components/ui/button";
 import { useAddChatModel } from "@/stores/add-chat-user";
 // import { ChatUser } from "@/components/modals/add-chat-user-modal";
 import useChatFireBaseStore from "@/stores/chat-firebase-store";
+import { UserChats } from "./chat";
 
-type ChatListProps = {
+export type ChatListProps = {
    chatId: string;
    lastMessage: string;
-   updatedAt: string;
+   isSeen: boolean;
+   updatedAt: number;
    receiverId: string;
    user: User;
 };
@@ -44,9 +52,7 @@ const ChatList = () => {
                   const promises = items.map(async (item: ChatListProps) => {
                      const userDocRef = doc(db, "users", item.receiverId);
                      const userDocSnap = await getDoc(userDocRef);
-
                      const user = userDocSnap.data();
-
                      return { ...item, user };
                   });
                   const chatData = await Promise.all(promises);
@@ -61,7 +67,24 @@ const ChatList = () => {
    }, [currentUser?.id]);
    console.log(username);
    const handleSelect = async (chat: ChatListProps) => {
-      console.log("Selected Chat", chat);
+      const userChats = chats.map((item) => {
+         const { user, ...rest } = item;
+         return rest;
+      });
+      const chatIndex = userChats.findIndex(
+         (item) => item.chatId === chat.chatId
+      );
+      userChats[chatIndex].isSeen = true;
+      if (currentUser?.id) {
+         const userChatsRef = doc(db, "userchats", currentUser?.id);
+         try {
+            await updateDoc(userChatsRef, {
+               chats: userChats,
+            });
+         } catch (error) {
+            console.log(error);
+         }
+      }
       if (chat) {
          changeChat(chat.chatId, chat.user);
       }
@@ -92,7 +115,9 @@ const ChatList = () => {
             {chats.map((chat) => (
                <Link
                   href="#"
-                  className="flex items-center gap-3 rounded-md bg-muted/50 px-3 py-2 transition-colors hover:bg-muted"
+                  className={`flex ${
+                     chat?.isSeen ? "bg-transparent" : "bg-[#5183fe]"
+                  } items-center gap-3 rounded-md bg-muted/50 px-3 py-2 transition-colors hover:bg-muted`}
                   prefetch={false}
                   key={chat.chatId}
                   onClick={() => handleSelect(chat)}
