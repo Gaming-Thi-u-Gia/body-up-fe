@@ -18,7 +18,7 @@ export function ChattingPage() {
       <div className="grid min-h-screen w-full grid-cols-[260px_1fr] bg-background">
          <div className="flex flex-col border-r bg-muted/40">
             <div className="sticky top-0 flex h-[60px] items-center justify-between border-b bg-background px-4">
-               <div className="flex items-center gap-2">
+               <div className="flex items-center gap-2 ">
                   <Avatar className="h-8 w-8 border">
                      <AvatarImage src="/placeholder-user.jpg" />
                      <AvatarFallback>AC</AvatarFallback>

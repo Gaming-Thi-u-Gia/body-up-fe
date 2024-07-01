@@ -23,10 +23,16 @@ import { MoveVerticalIcon, SendIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { ChatListProps } from "./chat-list";
 import { useBlockUserModal } from "@/stores/block-user-model";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import moment from "moment";
+interface FirebaseTimestamp {
+   seconds: number;
+   nanoseconds: number;
+}
 interface Message {
    senderId: string;
    text: string;
-   createdAt: string;
+   createdAt: FirebaseTimestamp;
 }
 interface Chat {
    messages: Message[];
@@ -40,9 +46,7 @@ const Chat = () => {
    const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } =
       useChatFireBaseStore((store) => store);
    const [text, setText] = useState("");
-   console.log("isCurrentUserBlocked", isCurrentUserBlocked);
-   console.log("isReceiverBlocked", isReceiverBlocked);
-
+   const { user: userReal } = useAuthStore((store) => store);
    const { currentUser } = useUserFirebaseStore((store) => store);
    console.log("current", currentUser);
    const { open } = useBlockUserModal();
@@ -107,6 +111,12 @@ const Chat = () => {
          console.log(error);
       }
    };
+   const formatTimestamp = (timestamp: FirebaseTimestamp) => {
+      const date = new Date(
+         timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000
+      );
+      return moment(date).fromNow();
+   };
    return (
       <>
          <div className="flex flex-col">
@@ -148,29 +158,23 @@ const Chat = () => {
             <div className="flex-1 overflow-auto p-4">
                <div className="grid gap-4">
                   {chat?.messages?.map((message) => (
-                     <div key={message?.createdAt}>
+                     <div key={message?.createdAt.seconds}>
                         {message.senderId === currentUser?.id ? (
-                           <div
-                              key={message?.createdAt}
-                              className="flex items-start gap-3 justify-end"
-                           >
+                           <div className="flex items-start gap-3 justify-end">
                               <div className="flex flex-col w-[60%]  rounded-md bg-primary p-3 text-sm text-primary-foreground">
                                  <p className="">{message.text}</p>
                                  <div className="mt-2 text-xs text-primary-foreground/80">
-                                    {/* {message?.createAt} */}
-                                    ALOOO
+                                    {/* Date Here */}
+                                    {formatTimestamp(message.createdAt)}
                                  </div>
                               </div>
                               <Avatar className="h-8 w-8 border">
-                                 <AvatarImage src={currentUser?.avatar} />
+                                 <AvatarImage src={userReal?.avatar} />
                                  <AvatarFallback>AC</AvatarFallback>
                               </Avatar>
                            </div>
                         ) : (
-                           <div
-                              key={message?.createdAt}
-                              className="flex items-start gap-3"
-                           >
+                           <div className="flex items-start gap-3">
                               <Avatar className="h-8 w-8 border">
                                  <AvatarImage src={user?.avatar} />
                                  <AvatarFallback>AC</AvatarFallback>
@@ -178,7 +182,7 @@ const Chat = () => {
                               <div className="flex flex-col w-[60%] rounded-md bg-gray-300 p-3 text-sm">
                                  <p>{message.text}</p>
                                  <div className="mt-2 text-xs text-muted-foreground">
-                                    {/* {message?.createAt} */}
+                                    {formatTimestamp(message.createdAt)}
                                  </div>
                               </div>
                            </div>
