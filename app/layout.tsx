@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { VerifyCodeModel } from "@/components/modals/verify-code-modal";
 import { VerifyResetCodeModel } from "@/components/modals/verify-reset-code-modal";
 import { UploadPhotoModal } from "@/components/modals/upload-photo-modal";
+import { DeletePhotoModal } from "@/components/modals/delete-photo-modal";
 import BmiCaculate from "@/components/shared/bmi-calculate";
 import { BmiModal } from "@/components/modals/bmi-modal";
 const font = Manrope({ subsets: ["latin"] });
@@ -49,6 +50,7 @@ export default async function RootLayout({
                         <AvatarModal />
                         <DeleteAvatarModal />
                         <UploadPhotoModal />
+                        <DeletePhotoModal />
                         <BmiModal/>
                         {children}
                         <BmiCaculate />

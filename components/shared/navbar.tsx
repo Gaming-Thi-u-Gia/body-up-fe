@@ -109,7 +109,7 @@ export const Navbar = () => {
                                     <DropdownMenuGroup>
                                         <DropdownMenuItem>
                                             <Link
-                                                href='/profile'
+                                                href={`/${user?.userName2}`}
                                                 className='w-full flex items-center'
                                             >
                                                 <User className='mr-2 h-4 w-4' />

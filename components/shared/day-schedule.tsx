@@ -8,7 +8,6 @@ import {
     Menu,
     Users,
 } from "lucide-react";
-import Image from "next/image";
 import {
     Accordion,
     AccordionContent,
@@ -17,9 +16,31 @@ import {
 } from "../ui/accordion";
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
-import { DailyCarousel } from "./daily-carousel";
-import { useState } from "react";
+import { DailyCarousel, DailyExercise } from "./daily-carousel";
+import { useEffect, useState } from "react";
 import { VideoDailyCard } from "./video-daily-card";
+import { Button } from "../ui/button";
+import { useAuthStore } from "../providers/auth-provider";
+import {
+    getFirstUncompleted,
+    getVideoChallenge,
+    markFinishChallenge,
+} from "@/utils/user";
+import fetchVideos, { VideoItem } from "@/utils/dailyVideo";
+import { getAllDay, markDailyChallenge } from "@/utils/dailyExercise";
+import { toast } from "sonner";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "../ui/alert-dialog";
+import { redirect, useRouter } from "next/navigation";
 type Props = {
     title: string;
     releaseDate: string;
@@ -27,20 +48,12 @@ type Props = {
     time: string;
     type: string;
     equipment: string;
+    banner: string;
+    challenge: string;
+    currDay: DailyExercise;
+    setChallenge: any;
 };
 //TODO: fetch API
-const dailyVideoData = {
-    title: "Full Body Warm Up",
-    target: "Warm Up",
-    view: "1.2M",
-    releaseDate: "2021-06-01",
-    duration: "05:00",
-    bannerUrl:
-        "https://s3-alpha-sig.figma.com/img/2b8e/37ca/aa986d36e5fc3e804ad5e502069efb47?Expires=1717977600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=n8pFiICMRBK9zzFtA4ig6y6R0GBdJSHGddCiKEZrUmTDJTghDuuYREdmMv-qQFI85VJiLylMntbgKWmQoegbK9fVqd0eSUZ4H7WyGC9EGcdoRFVnCZshloQpiA~GRmk8D-YBI~fyThe83yH~75F2Eht7EA4g3CG-i1oxGTym3O7zuWw7-Hrn-~FB5DrVfAHFUAqcXi5yK8PvyeujumahKnoi0HRjJsPd1EmhSkXz5V3JBOApCkGrdQ3G5UFAd7JFJwZTKfHKyPt6xIFuZUiprGuxagMKqkgceja7ErYVuhak7xuJCMOh3FVSsNMHt6LM9XrUp9VtsGqK22JTye4CXw__",
-    isOptional: true,
-    status: "incomplete",
-    url: "https://www.youtube.com/watch?v=j5SHMJ6mUoA",
-};
 
 export const DaySchedule = ({
     title,
@@ -49,18 +62,90 @@ export const DaySchedule = ({
     time,
     type,
     equipment,
+    banner,
+    challenge,
+    currDay,
+    setChallenge,
 }: Props) => {
-    const [data, setData] = useState("");
-    const validatedStatus =
-        dailyVideoData.status === "complete" ||
-        dailyVideoData.status === "incomplete"
-            ? dailyVideoData.status
-            : "incomplete";
+    const router = useRouter();
+    const [isLoadingUI, setIsLoadingUI] = useState(false);
+    const { sessionToken } = useAuthStore((store) => store);
+    const [dailyVideoData, setDailyVideoData] = useState<VideoItem[] | []>([]);
+    const [videoData, setVideoData] = useState();
+    const [allDay, setAllDay] = useState<DailyExercise[]>([]);
+    const [day, setDay] = useState(currDay.dailyExercise.day || "1");
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingDay, setIsLoadingDay] = useState(false);
+    const [newCurrDay, setNewCurrDay] = useState<DailyExercise>(currDay);
     //TODO: SET DATA WHEN CLICK ON SCHEDULE
     const onClick = (index: number) => {
-        const day = "Day" + index;
-        setData(day);
+        if (isLoading) return;
+        setDay("" + index);
     };
+    const markFinish = async () => {
+        setIsLoadingUI(true);
+        const res = await markDailyChallenge(
+            sessionToken!,
+            newCurrDay.dailyExercise.id
+        );
+        await markFinishChallenge(sessionToken!, +challenge);
+        if (res?.status === 200) {
+            toast.success("Challenge finished");
+            setChallenge(null);
+        }
+        setIsLoadingUI(false);
+    };
+    const markComplete = async () => {
+        const res = await markDailyChallenge(
+            sessionToken!,
+            newCurrDay.dailyExercise.id
+        );
+        if (res?.status === 200) {
+            toast.success("Day marked as complete");
+            const nextDay = await getFirstUncompleted(sessionToken!);
+            // set status day to complete in all day
+            const newAllDay = allDay.map((item) => {
+                if (item.dailyExercise.day === newCurrDay.dailyExercise.day) {
+                    return {
+                        ...item,
+                        status: "complete",
+                    };
+                }
+                return item;
+            });
+            setAllDay(newAllDay);
+            setDay(nextDay?.dailyExercise.day);
+            setNewCurrDay(nextDay!);
+        }
+    };
+    useEffect(() => {
+        const getDay = async () => {
+            setIsLoadingDay(true);
+            const res = await getAllDay(sessionToken!, challenge);
+            const sortDay = res?.payload.sort(
+                (a: any, b: any) => a.dailyExercise.day - b.dailyExercise.day
+            );
+            setAllDay(sortDay);
+            setIsLoadingDay(false);
+        };
+        getDay();
+    }, [sessionToken, challenge]);
+    useEffect(() => {
+        const getVideoData = async () => {
+            setIsLoading(true);
+            const res = await getVideoChallenge(sessionToken!, day, +challenge);
+            const video = await fetchVideos(
+                res?.payload.map((item: any) => item.video)
+            );
+            setVideoData(res?.payload);
+            setDailyVideoData(video);
+            setIsLoading(false);
+        };
+        getVideoData();
+    }, [day, sessionToken, challenge]);
+    if (isLoadingUI) {
+        return <LoadingSpinner />;
+    }
     return (
         <div>
             <div className='flex justify-between items-center'>
@@ -82,15 +167,28 @@ export const DaySchedule = ({
                     <AccordionItem value='item-1'>
                         <AccordionTrigger>
                             <h3 className='text-[22px] font-semibold w-[60%] text-left'>
-                                2021 Flat Stomach Challenge
+                                {title}
                             </h3>
                             <div className='mr-2'>
                                 <div className='flex text-[10px] text-[#6C6F78] justify-between mt-1'>
-                                    <span>DAY 3/28</span>
-                                    <span>25%</span>
+                                    <span>
+                                        DAY {day}/{allDay.length}
+                                    </span>
+                                    <span>
+                                        {Math.floor(
+                                            (+newCurrDay.dailyExercise.day /
+                                                allDay.length) *
+                                                100
+                                        )}
+                                        %
+                                    </span>
                                 </div>
                                 <Progress
-                                    value={25}
+                                    value={
+                                        (+newCurrDay.dailyExercise.day /
+                                            allDay.length) *
+                                        100
+                                    }
                                     className='w-[350px] h-[6px]'
                                 />
                             </div>
@@ -121,14 +219,17 @@ export const DaySchedule = ({
                                     </Badge>
                                 </div>
                             </div>
-                            <div className='bg-[url("https://static.chloeting.com/programs/61bd418558da74df97000d5c/be3502c0-86d3-11ed-be97-e54de3bdbeba.jpeg")] pb-[18%] bg-cover w-[40%] -translate-x-6 rounded-2xl relative'>
+                            <div
+                                className='pb-[18%] bg-cover w-[40%] -translate-x-6 rounded-2xl relative'
+                                style={{ backgroundImage: `url(${banner})` }}
+                            >
                                 <div className='absolute flex bottom-2 left-2 right-2 gap-2'>
                                     <Badge
                                         variant='secondary'
                                         className='text-[#303033] text-xs space-x-1 py-1 px-2'
                                     >
                                         <Calendar width={16} height={16} />
-                                        <p>{days} days</p>
+                                        <p>{days}</p>
                                     </Badge>
                                     <Badge
                                         variant='secondary'
@@ -142,7 +243,14 @@ export const DaySchedule = ({
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
-                <DailyCarousel day='Mon 23' title='Test' onClick={onClick} />
+                <DailyCarousel
+                    day={day}
+                    title='Test'
+                    onClick={onClick}
+                    allDay={allDay!}
+                    currDay={newCurrDay!}
+                    isLoading={isLoadingDay}
+                />
             </div>
             <div className='w-full py-[30px] px-[18px] bg-white border-[#c4c4c4] border-[1px] rounded-lg items-start my-4'>
                 <Accordion type='single' collapsible>
@@ -156,24 +264,79 @@ export const DaySchedule = ({
                             </p>
                         </AccordionTrigger>
                         <AccordionContent>
-                            {Array.from({ length: 5 }).map((_, index) => (
-                                <VideoDailyCard
-                                    key={index}
-                                    title={dailyVideoData.title + " " + data}
-                                    bannerUrl={dailyVideoData.bannerUrl}
-                                    duration={dailyVideoData.duration}
-                                    releaseDate={dailyVideoData.releaseDate}
-                                    target={dailyVideoData.target}
-                                    view={dailyVideoData.view}
-                                    isOptional={dailyVideoData.isOptional}
-                                    url={dailyVideoData.url}
-                                    initialStatus={validatedStatus}
-                                />
-                            ))}
+                            {dailyVideoData.map(
+                                (dailyVideo: any, index: number) => (
+                                    <VideoDailyCard
+                                        // @ts-ignore
+                                        id={videoData![index].id}
+                                        key={dailyVideo.id}
+                                        title={dailyVideo.title}
+                                        // @ts-ignore
+                                        initialStatus={videoData![index].status}
+                                        url={dailyVideo.id}
+                                        img={dailyVideo.img}
+                                        view={dailyVideo.views}
+                                        releaseDate={dailyVideo.date}
+                                        duration={dailyVideo.duration}
+                                        isLoading={isLoading}
+                                        currDay={newCurrDay.dailyExercise.day}
+                                        day={day}
+                                    />
+                                )
+                            )}
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant='primary'
+                                        className='my-4 ml-2'
+                                        disabled={
+                                            newCurrDay.dailyExercise.day !== day
+                                        }
+                                    >
+                                        {+newCurrDay.dailyExercise.day ===
+                                        allDay.length
+                                            ? "Finish Challenge"
+                                            : `Mark day ${day} as Complete`}
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                            Are you absolutely sure?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action cannot be undone.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                            Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={
+                                                +newCurrDay.dailyExercise
+                                                    .day === allDay.length
+                                                    ? markFinish
+                                                    : markComplete
+                                            }
+                                        >
+                                            Continue
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
             </div>
+        </div>
+    );
+};
+
+const LoadingSpinner = () => {
+    return (
+        <div className='flex items-center justify-center min-h-screen'>
+            <div className='loader'></div>
         </div>
     );
 };

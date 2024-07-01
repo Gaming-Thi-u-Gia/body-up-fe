@@ -78,9 +78,9 @@ const imageFile = z.instanceof(File).refine(
     }
 );
 export const UploadPhotoSchema = z.object({
-    direction: z.string(),
-    isVisibility: z.boolean(),
-    datePhotoTaken: z.date(),
+    photoAngle: z.string(),
+    visibility: z.boolean(),
+    date: z.date(),
     caption: z.string().max(10, { message: "Not" }),
-    img: imageFile.nullable(),
+    imgUrl: imageFile.nullable(),
 });

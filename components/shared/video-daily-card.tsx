@@ -7,121 +7,98 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "../ui/accordion";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import Modal from "@/app/(main)/workout-videos/video";
+import { Skeleton } from "../ui/skeleton";
+import { useAuthStore } from "../providers/auth-provider";
+import { markVideoDailyChallenge } from "@/utils/dailyExercise";
 
 type Props = {
+    id: number;
     title: string;
-    target: string;
+    url: string;
     view: string;
     releaseDate: string;
     duration: string;
-    bannerUrl: string;
-    isOptional: boolean;
-    url: string;
-    initialStatus: string;
+    img: string;
+    initialStatus: "incomplete" | "complete";
+    isLoading: boolean;
+    currDay: string;
+    day: string;
 };
 
 export const VideoDailyCard = ({
+    id,
     title,
-    target,
-    view,
-    releaseDate,
-    duration,
-    bannerUrl,
-    isOptional,
     url,
     initialStatus,
+    view,
+    releaseDate,
+    img,
+    duration,
+    isLoading,
+    day,
+    currDay,
 }: Props) => {
-    const [status, setStatus] = useState(initialStatus);
-    const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
-    const [watchTime, setWatchTime] = useState(0);
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
-    const requiredWatchTime = 10 * 1000;
+    const { sessionToken } = useAuthStore((store) => store);
+    const validatedStatus =
+        initialStatus === "complete" || initialStatus === "incomplete"
+            ? initialStatus
+            : "incomplete";
+    const [status, setStatus] = useState(validatedStatus);
 
-    const handleThumbnailClick = (videoId: string) => {
-        setSelectedVideoId(videoId);
-        startTimer();
+    const onClick = async () => {
+        if (status === "complete" || day !== currDay) return;
+        const res = await markVideoDailyChallenge(sessionToken!, id);
+        if (res?.status === 200) {
+            setStatus("complete");
+        }
     };
-
-    const startTimer = () => {
-        timerRef.current = setInterval(() => {
-            setWatchTime((prevTime) => {
-                const newTime = prevTime + 1000;
-                if (newTime >= requiredWatchTime) {
-                    clearInterval(timerRef.current!);
-                    setStatus("complete");
-                }
-                return newTime;
-            });
-        }, 1000);
-    };
-
-    const stopTimer = () => {
-        clearInterval(timerRef.current!);
-        setWatchTime(0);
+    if (isLoading) {
+        return <VideoDailyCardSkeleton />;
     }
-
-    const closeVideo = () => {
-        setSelectedVideoId(null);
-        stopTimer();
-    };
-
-    useEffect(() => {
-        return () => {
-            clearInterval(timerRef.current!);
-        };
-    }, []);
     return (
         <>
-            <div className="flex p-[20px] bg-[#F7F7F7] rounded-lg mt-4">
-                <div
-                    onClick={() => handleThumbnailClick(url)}
-                    className="pb-[12%] min-w-[180px] bg-contain bg-center rounded-md relative bg-no-repeat cursor-pointer group overflow-hidden"
-                    style={{ backgroundImage: `url(${bannerUrl})`}}
-                >
-                    <div>
-                        <div className="bg-black opacity-0 absolute left-0 bottom-0 right-0 top-0 z-1 group-hover:opacity-20 transition-all duration-300" />
-                        <Badge className="absolute right-8 bottom-3">
-                            {duration}
-                        </Badge>
-                    </div>
-                </div>
-
-                {selectedVideoId && (
-                    <Modal
-                        isOpen={Boolean(selectedVideoId)}
-                        onClose={closeVideo}
-                        videoId={selectedVideoId}
-                    />
-                )}
-
-                <div className="flex flex-col justify-between w-full ml-4">
-                    <div className="flex justify-between">
-                        <h4 className="text-lg text-[#303033] font-semibold">
-                            {title}
-                        </h4>
-                        {isOptional && (
-                            <Badge
-                                variant="secondary"
-                                className="bg-[#B9B9B9] text-white hover:text-black hover:bg-[#c3c3c3]"
-                            >
-                                OPTIONAL
+            {status === "incomplete" ? (
+                <div className='flex p-[20px] bg-[#F7F7F7] rounded-lg mt-4'>
+                    <div
+                        className='pb-[12%] min-w-[180px] bg-cover bg-center rounded-md relative bg-no-repeat cursor-pointer group overflow-hidden'
+                        style={{ backgroundImage: `url(${img})` }}
+                    >
+                        <div onClick={onClick}>
+                            <div className='bg-black opacity-0 absolute left-0 bottom-0 right-0 top-0 z-1 group-hover:opacity-20 transition-all duration-300' />
+                            <Badge className='absolute right-2 bottom-3'>
+                                {duration}
                             </Badge>
-                        )}
+                        </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <Crosshair width={12} height={12} />
-                        <p className="text-sm">{target}</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <p className="text-xs text-[#868A93]">
-                            {view} • {releaseDate}
-                        </p>
-                        <div className="flex items-center text-[#868A93] gap-2">
-                            <CircleAlert width={17} height={18} cursor="pointer" />
-                            <Heart width={18} height={18} cursor="pointer" />
+
+                    <div className='flex flex-col justify-between w-full ml-4'>
+                        <div className='flex justify-between '>
+                            <h4 className='text-lg text-[#303033] font-semibold'>
+                                {title}
+                            </h4>
+                        </div>
+                        <div className='flex items-center gap-1'>
+                            <Crosshair width={12} height={12} />
+                            <p className='text-sm'>Good Practice</p>
+                        </div>
+                        <div className='flex items-center justify-between'>
+                            <p className='text-xs text-[#868A93]'>
+                                {view} • {releaseDate}
+                            </p>
+                            <div className='flex items-center text-[#868A93] gap-2'>
+                                <CircleAlert
+                                    width={17}
+                                    height={18}
+                                    cursor='pointer'
+                                />
+                                <Heart
+                                    width={18}
+                                    height={18}
+                                    cursor='pointer'
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -134,7 +111,7 @@ export const VideoDailyCard = ({
                                 <h4 className="text-base text-[#303033] font-semibold">
                                     {title}
                                 </h4>
-                                {isOptional && (
+                                {validatedStatus === "complete" && (
                                     <Badge
                                         variant="secondary"
                                         className="bg-[#7065cd] text-white hover:text-black hover:bg-[#c3c3c3] font-bold mr-4"
@@ -144,18 +121,16 @@ export const VideoDailyCard = ({
                                 )}
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent className="flex pb-0">
-                            <Link
-                                href={url}
-                                target="_blank"
-                                style={{ backgroundImage: `url(${bannerUrl})` }}
-                                className="pb-[12%] min-w-[180px] bg-contain bg-center rounded-md relative bg-no-repeat cursor-pointer group overflow-hidden"
+                        <AccordionContent className='flex pb-0'>
+                            <div
+                                style={{ backgroundImage: `url(${img})` }}
+                                className='pb-[12%] min-w-[180px] bg-cover bg-center rounded-md relative bg-no-repeat cursor-pointer group overflow-hidden'
                             >
                                 <div className="bg-black opacity-0 absolute left-0 bottom-0 right-0 top-0 z-1 group-hover:opacity-20 transition-all duration-300" />
                                 <Badge className="absolute right-8 bottom-3">
                                     {duration}
                                 </Badge>
-                            </Link>
+                            </div>
 
                             <div className="flex flex-col justify-between w-full ml-4">
                                 <div className="flex justify-between ">
@@ -182,5 +157,29 @@ export const VideoDailyCard = ({
                 </Accordion>
             )}
         </>
+    );
+};
+
+const VideoDailyCardSkeleton = () => {
+    return (
+        <div className='flex p-[20px] bg-[#F7F7F7] rounded-lg mt-4'>
+            <Skeleton className='pb-[12%] min-w-[180px] bg-cover bg-center rounded-md relative bg-no-repeat bg-slate-300 overflow-hidden skeleton-loader' />
+
+            <div className='flex flex-col justify-between w-full ml-4'>
+                <div className='flex justify-between'>
+                    <Skeleton className='w-3/4 h-6 bg-gray-200 rounded skeleton-loader'></Skeleton>
+                </div>
+                <div className='flex items-center gap-1 mt-2'>
+                    <Skeleton className='w-1/4 h-4 bg-gray-200 rounded skeleton-loader'></Skeleton>
+                </div>
+                <div className='flex items-center justify-between mt-2'>
+                    <Skeleton className='w-1/2 h-4 bg-gray-200 rounded skeleton-loader'></Skeleton>
+                    <div className='flex items-center text-[#868A93] gap-2'>
+                        <Skeleton className='w-6 h-6 bg-gray-200 rounded-full skeleton-loader'></Skeleton>
+                        <Skeleton className='w-6 h-6 bg-gray-200 rounded-full skeleton-loader'></Skeleton>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };

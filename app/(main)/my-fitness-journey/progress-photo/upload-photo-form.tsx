@@ -1,10 +1,10 @@
 "use client";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import { format } from "date-fns";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
-import { CalendarIcon, Eye, EyeOff, Upload } from "lucide-react";
+import { CalendarIcon, Eye, EyeOff, Router, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -27,19 +27,45 @@ import { UploadPhotoSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-
+import {
+    addProgressPhoto,
+    getProgressPhotoById,
+    updateProgreePhoto,
+} from "@/utils/user";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import { useUploadPhotoModal } from "@/stores/use-upload-photo";
+import { useRouter } from "next/navigation";
+type Props = {
+    progressPhotoId?: number;
+};
 export const UploadPhotoForm = () => {
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+    const { close, progressPhotoId, update } = useUploadPhotoModal(
+        (store) => store
+    );
+    const { sessionToken } = useAuthStore((store) => store);
     const form = useForm({
         resolver: zodResolver(UploadPhotoSchema),
         defaultValues: {
-            direction: "front",
-            isVisibility: false,
-            datePhotoTaken: new Date(),
+            photoAngle: "front",
+            visibility: false,
+            date: new Date(),
             caption: "",
-            img: null,
+            imgUrl: null,
         },
     });
     const [preview, setPreview] = useState<string | null>(null);
+    useEffect(() => {
+        if (!progressPhotoId || progressPhotoId < 0) return;
+        getProgressPhotoById(sessionToken!, progressPhotoId!).then((res) => {
+            form.setValue("photoAngle", res.payload.photoAngle);
+            form.setValue("visibility", res.payload.visibility);
+            form.setValue("date", new Date(res.payload.date));
+            form.setValue("caption", res.payload.caption);
+            setPreview(res.payload.imgUrl);
+        });
+    }, [progressPhotoId, sessionToken, form]);
     const onDrop = useCallback(
         (acceptedFiles: FileList, fileRejections: FileList) => {
             // Do something with the files
@@ -73,11 +99,54 @@ export const UploadPhotoForm = () => {
     });
     const handleDelete = () => {
         setPreview(null);
-        form.setValue("img", null);
+        form.setValue("imgUrl", null);
     };
     const onSubmit = (data: z.infer<typeof UploadPhotoSchema>) => {
-        data.img = acceptedFiles[0];
-        console.log(data);
+        data.imgUrl = acceptedFiles[0];
+        startTransition(async () => {
+            try {
+                if (progressPhotoId > 0) {
+                    const res = await updateProgreePhoto(
+                        sessionToken!,
+                        data,
+                        preview!,
+                        progressPhotoId
+                    );
+                    toast.success("Update Success!", {
+                        description: `${new Date().toLocaleString()}`,
+                        action: {
+                            label: "Close",
+                            onClick: () => console.log("Close"),
+                        },
+                    });
+                } else {
+                    const res = await addProgressPhoto(
+                        sessionToken!,
+                        data,
+                        preview!
+                    );
+                    toast.success("Save Photo Success!", {
+                        description: `${new Date().toLocaleString()}`,
+                        action: {
+                            label: "Close",
+                            onClick: () => console.log("Close"),
+                        },
+                    });
+                    update(res.payload);
+                }
+                close();
+                //TODO: refresh page
+            } catch (error) {
+                toast.error("Save Photo Failed!", {
+                    description: `${new Date().toLocaleString()}`,
+                    action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                    },
+                });
+                console.log(error);
+            }
+        });
     };
     return (
         <>
@@ -91,7 +160,7 @@ export const UploadPhotoForm = () => {
                             <div className='w-[298px] h-[366px] rounded-xl overflow-hidden'>
                                 <FormField
                                     control={form.control}
-                                    name='img'
+                                    name='imgUrl'
                                     render={({ field }) => (
                                         <FormItem className='w-full h-full'>
                                             <FormControl>
@@ -151,13 +220,13 @@ export const UploadPhotoForm = () => {
                                 <div className='flex gap-2 mt-2'>
                                     <FormField
                                         control={form.control}
-                                        name='direction'
+                                        name='photoAngle'
                                         render={({ field }) => (
                                             <FormItem>
                                                 <Button
                                                     variant={
                                                         form.watch(
-                                                            "direction"
+                                                            "photoAngle"
                                                         ) === "front"
                                                             ? "active"
                                                             : "default"
@@ -183,13 +252,13 @@ export const UploadPhotoForm = () => {
                                     ></FormField>
                                     <FormField
                                         control={form.control}
-                                        name='direction'
+                                        name='photoAngle'
                                         render={({ field }) => (
                                             <FormItem>
                                                 <Button
                                                     variant={
                                                         form.watch(
-                                                            "direction"
+                                                            "photoAngle"
                                                         ) === "side"
                                                             ? "active"
                                                             : "default"
@@ -215,13 +284,13 @@ export const UploadPhotoForm = () => {
                                     ></FormField>
                                     <FormField
                                         control={form.control}
-                                        name='direction'
+                                        name='photoAngle'
                                         render={({ field }) => (
                                             <FormItem>
                                                 <Button
                                                     variant={
                                                         form.watch(
-                                                            "direction"
+                                                            "photoAngle"
                                                         ) === "back"
                                                             ? "active"
                                                             : "default"
@@ -250,9 +319,10 @@ export const UploadPhotoForm = () => {
                             <div className='flex gap-4 max-w-[335px] bg-[#ebf4ff] py-[15px] px-[20px] rounded-lg'>
                                 <Image
                                     src={
-                                        form.watch("direction") === "front"
+                                        form.watch("photoAngle") === "front"
                                             ? "/front-angle.svg"
-                                            : form.watch("direction") === "side"
+                                            : form.watch("photoAngle") ===
+                                              "side"
                                             ? "/side-angle.svg"
                                             : "/back-angle.svg"
                                     }
@@ -263,7 +333,7 @@ export const UploadPhotoForm = () => {
                                 />
                                 <div>
                                     <h4 className='text-xs text-black leading-6 font-semibold'>
-                                        This is a {form.watch("direction")}{" "}
+                                        This is a {form.watch("photoAngle")}{" "}
                                         angle photo
                                     </h4>
                                     <p className='text-[#868a93] text-xs leading-5'>
@@ -280,7 +350,7 @@ export const UploadPhotoForm = () => {
                                     </h4>
                                     <FormField
                                         control={form.control}
-                                        name='isVisibility'
+                                        name='visibility'
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>
@@ -288,14 +358,14 @@ export const UploadPhotoForm = () => {
                                                         className={cn(
                                                             "flex py-[10px] px-[10px] border-[#303033] border rounded-md",
                                                             form.watch(
-                                                                "isVisibility"
+                                                                "visibility"
                                                             )
                                                                 ? "bg-white"
                                                                 : "bg-[#303033]"
                                                         )}
                                                     >
                                                         {!form.watch(
-                                                            "isVisibility"
+                                                            "visibility"
                                                         ) ? (
                                                             <div className='flex items-center justify-between w-full text-white'>
                                                                 <span className='text-[10px] font-bold'>
@@ -338,7 +408,7 @@ export const UploadPhotoForm = () => {
                                     </h4>
                                     <FormField
                                         control={form.control}
-                                        name='datePhotoTaken'
+                                        name='date'
                                         render={({ field }) => (
                                             <FormItem className='flex flex-col'>
                                                 <Popover>
@@ -432,6 +502,7 @@ export const UploadPhotoForm = () => {
                             type='submit'
                             variant='primary'
                             className='ml-auto'
+                            disabled={isPending}
                         >
                             Save
                         </Button>

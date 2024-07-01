@@ -34,7 +34,7 @@ export const Sidebar = () => {
             </div>
             <div className='flex flex-col p-5'>
                 <SidebarItem
-                    href='/profile'
+                    href={`/${user?.userName2}`}
                     icon='/user-icon.svg'
                     title='My Profile'
                 />

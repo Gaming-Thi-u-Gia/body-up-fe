@@ -1,7 +1,12 @@
-import React from "react";
+import { UserProfile } from "./user-profile";
 
 const ProfilePage = () => {
-  return <div>ProfilePage</div>;
+    //TODO: Fetch user data
+    return (
+        <div className='flex flex-col'>
+            <UserProfile />
+        </div>
+    );
 };
 
 export default ProfilePage;
