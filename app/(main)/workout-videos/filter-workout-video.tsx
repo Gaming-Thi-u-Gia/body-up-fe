@@ -5,6 +5,7 @@ import { fetchAllFilterCategory } from "@/utils/video/category";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
+
 type VideoCategoryType = {
     id: number;
     type: string;
@@ -24,8 +25,8 @@ interface HeaderNavWorkoutVideosProps {
     onClose: () => void;
 }
 
-const TableVideoCategory: React.FC<HeaderNavWorkoutVideosProps> = ({onClose}) => {
-    const [selectedIdPerGroup, setSelectedIdPerGroup] = useState<{ [groupName: string]: number }>({});
+const TableVideoCategory: React.FC<HeaderNavWorkoutVideosProps> = ({ onClose }) => {
+    const [selectedIdPerGroup, setSelectedIdPerGroup] = useState<{ [groupName: string]: number | undefined }>({});
     const [groupedCategories, setGroupedCategories] = useState<GroupedCategories>({});
     const router = useRouter();
 
@@ -46,7 +47,7 @@ const TableVideoCategory: React.FC<HeaderNavWorkoutVideosProps> = ({onClose}) =>
     const groupCategoriesByName = (categories: CategoryType[]): GroupedCategories => {
         let grouped = categories.reduce<GroupedCategories>((acc, category) => {
             category.videoCategories.forEach((videoCategory) => {
-                const groupName = videoCategory.name;
+                const groupName = category.type; 
                 if (!acc[groupName]) {
                     acc[groupName] = [];
                 }
@@ -58,7 +59,7 @@ const TableVideoCategory: React.FC<HeaderNavWorkoutVideosProps> = ({onClose}) =>
         const sortedGroupNames = Object.keys(grouped).sort();
         const sortedGroups: GroupedCategories = {};
         sortedGroupNames.forEach(name => {
-            sortedGroups[name] = grouped[name];
+            sortedGroups[name] = grouped[name].sort((a, b) => a.name.localeCompare(b.name)); 
         });
 
         return sortedGroups;
@@ -79,7 +80,7 @@ const TableVideoCategory: React.FC<HeaderNavWorkoutVideosProps> = ({onClose}) =>
             [groupName]: prev[groupName] === id ? undefined : id
         }));
     };
-
+            
     const clearFilters = () => {
         setSelectedIdPerGroup({});
     };
@@ -103,7 +104,7 @@ const TableVideoCategory: React.FC<HeaderNavWorkoutVideosProps> = ({onClose}) =>
                                         onChange={() => handleCheckboxChange(name, category.id)}
                                     />
                                     <label htmlFor={`checkbox-${category.id}`} className="flex items-center cursor-pointer w-full justify-between">
-                                        <span>{category.type}</span>
+                                        <span>{category.name}</span>
                                         {selectedIdPerGroup[name] === category.id && <Check color="#7065cd" width={18} height={18} />}
                                     </label>
                                 </div>
@@ -117,7 +118,7 @@ const TableVideoCategory: React.FC<HeaderNavWorkoutVideosProps> = ({onClose}) =>
                     </span>
                     <div>
                         <span className="pr-2 cursor-pointer" onClick={onClose}>Cancel</span>
-                        <Button variant="active" onClick={(handleFilter)}>
+                        <Button variant="active" onClick={handleFilter}>
                             Apply
                         </Button>
                     </div>

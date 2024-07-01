@@ -9,8 +9,8 @@ import HeaderNavWorkoutVideos from "../../header-nav-workout-videos";
 import SkeletonVideoCard from "../../skeleton-video";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import TableVideoCategory from "../../filter-workout-video";
 
 type VideoItem = {
     videoId: number;
@@ -27,6 +27,7 @@ type VideoItem = {
 const FavoriteVideo = () => {
     const [videos, setVideos] = useState<VideoItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showFilterModal, setShowFilterModal] = useState(false);
     const { sessionToken } = useAuthStore((store) => store);
 
     useEffect(() => {
@@ -60,9 +61,12 @@ const FavoriteVideo = () => {
         console.log("Category Name:", categoryName);
     };
 
+    const toggleFilterModal = () => setShowFilterModal(!showFilterModal);
+
     return (
         <div className="max-w-7xl h-full mx-auto">
-            <HeaderNavWorkoutVideos onCategoryChange={handleCategoryChange} />
+            <HeaderNavWorkoutVideos onCategoryChange={handleCategoryChange} onFilterClick={toggleFilterModal} />
+            {showFilterModal && <TableVideoCategory onClose={() => setShowFilterModal(false)} />}
             <div className="gap-2 py-3">
                 <Link className="flex space-x-2" href="http://localhost:3000/workout-videos">
                     <ArrowLeft />

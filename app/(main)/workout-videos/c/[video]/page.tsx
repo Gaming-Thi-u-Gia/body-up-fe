@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import Modal from "../../video";
 import HeaderNavWorkoutVideos from "../../header-nav-workout-videos";
 import SkeletonVideoCard from "../../skeleton-video";
+import TableVideoCategory from "../../filter-workout-video";
 
 type VideoItem = {
     videoId: number;
@@ -31,7 +32,7 @@ const VideoCategory = () => {
     const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
     const [query, setQuery] = useState<string>("");
     const [categoryName, setCategoryName] = useState<string>("Workout Videos");
-
+    const [showFilterModal, setShowFilterModal] = useState(false);
     const pathname = usePathname();
 
     useEffect(() => {
@@ -86,10 +87,11 @@ const VideoCategory = () => {
             </div>
         );
     }
-
+    const toggleFilterModal = () => setShowFilterModal(!showFilterModal);
     return (
         <div className="max-w-7xl h-full mx-auto">
-            <HeaderNavWorkoutVideos onCategoryChange={handleCategoryChange} />
+            <HeaderNavWorkoutVideos onCategoryChange={handleCategoryChange} onFilterClick={toggleFilterModal}/>
+            {showFilterModal && <TableVideoCategory onClose={() => setShowFilterModal(false)} />}
             <div>
                 <div className="flex justify-between py-2">
                     <div>
