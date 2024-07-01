@@ -42,6 +42,7 @@ export function ChattingPage() {
                </DropdownMenu>
             </div>
             <ChatList />
+            <div className="w[30%] bg-blue-500"></div>
          </div>
          <Chat />
       </div>

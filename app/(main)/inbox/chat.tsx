@@ -11,7 +11,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { db } from "@/firebase";
 import useChatFireBaseStore from "@/stores/chat-firebase-store";
-import useUserFirebaseStore, { User } from "@/stores/user-firebase-store";
+import useUserFirebaseStore from "@/stores/user-firebase-store";
 import {
    arrayUnion,
    doc,
@@ -25,6 +25,7 @@ import { ChatListProps } from "./chat-list";
 import { useBlockUserModal } from "@/stores/block-user-model";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import moment from "moment";
+import Link from "next/link";
 interface FirebaseTimestamp {
    seconds: number;
    nanoseconds: number;
@@ -151,7 +152,9 @@ const Chat = () => {
                      </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                     <DropdownMenuItem>View profile</DropdownMenuItem>
+                     <DropdownMenuItem>
+                        <Link href={`/${user?.username}`}>View profile</Link>
+                     </DropdownMenuItem>
                   </DropdownMenuContent>
                </DropdownMenu>
             </div>
