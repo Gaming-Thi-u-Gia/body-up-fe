@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { fetchDailyExerciseData, fetchDailyRecipeExerciseData } from "@/utils/video/workoutVideoCollection";
-import { DailyCarousel } from "@/components/shared/daily-carousel";
+
 import { VideoDaily } from "./daily-video";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@radix-ui/react-accordion";
 import DailyExerciseSkeleton from "./skeleton-video";
@@ -10,6 +10,7 @@ import fetchVideos from "@/utils/video/fetchDailyVideo";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
+import { DailyCarousel } from "./daily-carusel-video";
 
 interface VideoItem {
     id: string;
