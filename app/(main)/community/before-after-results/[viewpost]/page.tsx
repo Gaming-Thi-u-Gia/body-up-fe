@@ -242,11 +242,11 @@ const BeforeAfterPost = () => {
                               className="text-[16px] font-semibold mt-2"
                               htmlFor=""
                            >
-                              {posts?.user.username}
+                              {posts?.user.userName2}
                            </label>
                            <div className="flex flex-col gap-2 mt-1">
                               <span className="text-sm">
-                                 {posts?.user.username}
+                                 {posts?.user.userName2}
                               </span>
 
                               <div className="flex gap-1">
@@ -286,7 +286,7 @@ const BeforeAfterPost = () => {
                   </Sheet>
                   <div className="flex flex-col text-sm items-start">
                      <label className="font-bold text-black">
-                        {posts?.user.username}
+                        {posts?.user.userName2}
                      </label>
                      <span className="font-light text-black ">
                         {posts?.createdAt

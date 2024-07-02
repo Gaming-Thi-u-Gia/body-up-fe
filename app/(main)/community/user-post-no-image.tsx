@@ -48,6 +48,7 @@ export type Posts = {
       firstName: string;
       lastName: string;
       username: string;
+      userName2: string;
       email: string;
       avatar: string;
       profile_picture: string;
@@ -261,7 +262,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                  <SheetContent className="w-[350px]">
                                     <SheetHeader>
                                        <SheetTitle className="text-sm font-medium border-b border-gray-200 pb-4">
-                                          {post.user.username}
+                                          {post.user.userName2}
                                        </SheetTitle>
                                     </SheetHeader>
                                     <div className="flex flex-col">
@@ -278,7 +279,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                           className="text-[16px] font-semibold mt-2"
                                           htmlFor=""
                                        >
-                                          {post.user.username}
+                                          {post.user.userName2}
                                        </label>
                                        <div className="flex flex-col gap-2 mt-1">
                                           <span className="text-sm">
@@ -332,7 +333,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                  className="text-[#303033] text-sm font-bold cursor-pointer"
                                  htmlFor=""
                               >
-                                 {post.user.username}
+                                 {post.user.userName2}
                               </label>
                               <span className="text-sm">
                                  {post.createdAt

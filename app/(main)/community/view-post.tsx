@@ -293,7 +293,7 @@ const Post = () => {
                      className="text-[#303033] text-sm font-bold cursor-pointer"
                      htmlFor=""
                   >
-                     {posts?.user.username}
+                     {posts?.user.userName2}
                   </label>
                   <span className="text-sm">
                      {posts?.createdAt

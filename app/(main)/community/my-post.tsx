@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react";
 import { BookmarkStatus, Posts } from "./user-post-no-image";
 import {
    fetchBookmarkPost,
+   fetchFilterMyPost,
    fetchMyPosts,
    fetchPostsBookmark,
+   fetchSearchMyPost,
 } from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { toast } from "sonner";
@@ -34,6 +36,8 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { DeletePostModal } from "@/components/modals/delete-post-modal";
 import { useDeletePost } from "@/stores/use-delete-post-model";
 import { useSharePostModal } from "@/stores/use-share-model";
+import useSearchStore from "@/stores/use-search-post";
+import { useFilterStore } from "@/stores/use-filter-community";
 const MyPost = () => {
    const [posts, setPosts] = useState<Posts[]>([]);
    const [isBookmarked, setIsBookmarked] = useState<{
@@ -44,6 +48,9 @@ const MyPost = () => {
    const [isLoading, setIsLoading] = useState(true);
    const [page, setPage] = useState(0);
    const [hasMorePosts, setHasMorePosts] = useState(false);
+   const { searchText } = useSearchStore();
+   const { selectedFilter, setSelectedFilter } = useFilterStore();
+
    const {
       open,
       setPosts: updatedPost,
@@ -53,20 +60,45 @@ const MyPost = () => {
       (store) => store
    );
    useEffect(() => {
-      fetchPosts();
+      setPosts([]);
+      setPage(0);
+   }, [selectedFilter, searchText]);
+
+   useEffect(() => {
+      if (page === 0) {
+         fetchPosts();
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [sessionToken]);
+   }, [page, selectedFilter, searchText]);
    const fetchPosts = async () => {
       try {
          setIsLoading(true);
-         const limit = 3;
-         const res = await fetchMyPosts(sessionToken!, page, limit);
+         const limit = 4;
+         let res: Posts[] = [];
+         if (searchText === "") {
+            if (selectedFilter === "All") {
+               res = await fetchMyPosts(sessionToken!, page, limit);
+            } else {
+               res = await fetchFilterMyPost(
+                  sessionToken!,
+                  selectedFilter,
+                  page,
+                  limit
+               );
+            }
+         } else {
+            res = await fetchSearchMyPost(
+               sessionToken!,
+               searchText,
+               page,
+               limit
+            );
+            setSelectedFilter("All");
+         }
          if (res.length === 0) {
             setHasMorePosts(false);
             setIsLoading(false);
          }
-         console.log(res);
-
          //* Sort By Day
          const sortPosts = res.sort((a: any, b: any) => {
             return (
@@ -221,7 +253,7 @@ const MyPost = () => {
                               <SheetContent className="w-[350px]">
                                  <SheetHeader>
                                     <SheetTitle className="text-sm font-medium border-b border-gray-200 pb-4">
-                                       {post.user.username}
+                                       {post.user.userName2}
                                     </SheetTitle>
                                  </SheetHeader>
                                  <div className="flex flex-col">
@@ -236,7 +268,7 @@ const MyPost = () => {
                                        className="text-[16px] font-semibold mt-2"
                                        htmlFor=""
                                     >
-                                       {post.user.username}
+                                       {post.user.userName2}
                                     </label>
                                     <div className="flex flex-col gap-2 mt-1">
                                        <span className="text-sm">
@@ -284,7 +316,7 @@ const MyPost = () => {
                               className="text-[#303033] text-sm font-bold cursor-pointer"
                               htmlFor=""
                            >
-                              {post.user.username}
+                              {post.user.userName2}
                            </label>
                            <span className="text-sm">
                               {post.createdAt

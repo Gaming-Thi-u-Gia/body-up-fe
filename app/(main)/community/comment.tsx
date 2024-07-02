@@ -48,6 +48,7 @@ export type Comments = {
       lastName: string;
       id: number;
       username: string;
+      userName2: string;
    };
    createAt: string;
    parentId: number;
@@ -132,6 +133,7 @@ const Comment = ({
             setChildrenComments((prev) =>
                prev.filter((child) => child.id !== commentId)
             );
+            window.location.reload();
             toast.success("Delete Success!", {
                description: `${new Date().toLocaleString()}`,
                action: {
@@ -191,7 +193,6 @@ const Comment = ({
             console.log("CommentID: ", commentId);
 
             setIsOpennedEdit(false);
-            console.log("Data add:", res.payload);
             setChildrenComments((prevComments) => {
                console.log("Previous Comments:", prevComments);
                console.log("Payload:", res.payload);
@@ -205,6 +206,8 @@ const Comment = ({
                console.log("Updated Comments:", updatedComments);
                return [...updatedComments];
             });
+            window.location.reload();
+
             form.reset();
             toast.success("Update Comment Successfully!", {
                description: `${new Date().toLocaleString()}`,
@@ -259,7 +262,7 @@ const Comment = ({
                               className="text-[16px] font-semibold mt-2"
                               htmlFor=""
                            >
-                              {comment.user.username || "Anonymous"}
+                              {comment.user.userName2 || "Anonymous"}
                            </label>
                            <div className="flex flex-col gap-2 mt-1">
                               <span className="text-sm">
@@ -305,7 +308,7 @@ const Comment = ({
                      className="text-[#303033] text-sm font-bold cursor-pointer"
                      htmlFor=""
                   >
-                     {comment.user.username || "Anonymous"}
+                     {comment.user.userName2 || "Anonymous"}
                   </label>
                   <span className="text-sm">
                      {" "}
@@ -369,7 +372,7 @@ const Comment = ({
                <div className="w-full flex flex-col break-all  bg-[#ebf4ff] p-2 border-l-2 border-[#1890ff]">
                   <div className="flex gap-2">
                      <span className="text-[#999898] font-sm text-[12px]">
-                        {parentComment?.user?.username || "Anonymous"}
+                        {parentComment?.user?.userName2 || "Anonymous"}
                      </span>
                      <span className="text-[#999898] font-sm text-[12px]">
                         {parentComment?.createAt
