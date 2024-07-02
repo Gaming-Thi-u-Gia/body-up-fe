@@ -101,7 +101,7 @@ const PostUser = ({ categoryId }: CategoryId) => {
    const getPostsByCategory = async () => {
       try {
          setIsLoading(true);
-         const size = 3;
+         const size = 4;
          let data: Posts[] = [];
          if (searchText === "") {
             if (selectedFilter === "All") {
