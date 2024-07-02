@@ -77,7 +77,6 @@ const Post = () => {
       },
    });
    const [isBookmarked, setIsBookmarked] = useState(false);
-
    useEffect(() => {
       const fetchComments = async () => {
          try {
