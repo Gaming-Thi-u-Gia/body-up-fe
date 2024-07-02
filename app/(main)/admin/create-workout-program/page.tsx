@@ -1,11 +1,11 @@
-import { CreateWorkoutProgram } from "./create-workout-program"
+import AddWorkoutProgram from "./add-workout-program";
 
 const page = () => {
   return (
     <div>
-      <CreateWorkoutProgram />
+      <AddWorkoutProgram />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

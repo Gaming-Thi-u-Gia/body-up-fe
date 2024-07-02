@@ -24,6 +24,11 @@ export type TableFilterVideoType = {
   type: string;
   videoCategories: VideoCategoryType[];
 };
+export type TableFilterProgramType = {
+  length: number;
+  type: string;
+  workoutCategories: ProgramCategoryType[];
+};
 
 export type IngredientRecipeType = {
   amount: string;
@@ -50,6 +55,11 @@ export type VideoCategoryType = {
 export type TopicType = {
   id: number;
   name: string;
+};
+export type ProgramCategoryType = {
+  id: number;
+  name: string;
+  type: string;
 };
 export type AddNewVideoType = {
   name: string;

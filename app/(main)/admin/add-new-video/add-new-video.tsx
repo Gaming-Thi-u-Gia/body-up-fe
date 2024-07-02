@@ -1,8 +1,18 @@
 "use client";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { AddNewVideoType, TableFilterVideoType, TopicType } from "@/utils/admin/type";
+import {
+  AddNewVideoType,
+  TableFilterVideoType,
+  TopicType,
+} from "@/utils/admin/type";
 import { useState, useEffect } from "react";
 import { fetchAllFilterCategory } from "@/utils/video/category";
 import { fetchVideoCategoryData } from "@/utils/video/workoutVideoCollection";
@@ -21,7 +31,9 @@ export function AddNewVideo() {
   });
 
   const [topics, setTopics] = useState<TopicType[]>([]);
-  const [videoCategories, setVideoCategories] = useState<TableFilterVideoType[]>([]);
+  const [videoCategories, setVideoCategories] = useState<
+    TableFilterVideoType[]
+  >([]);
   const [errors, setErrors] = useState({
     name: "",
     url: "",
@@ -81,7 +93,10 @@ export function AddNewVideo() {
 
   const handleTopicChange = (value: string) => {
     const selectedTopic = topics.find((topic) => topic.name === value);
-    if (selectedTopic && !video.videoTopics.some((topic) => topic.id === selectedTopic.id)) {
+    if (
+      selectedTopic &&
+      !video.videoTopics.some((topic) => topic.id === selectedTopic.id)
+    ) {
       setVideo((prevVideo) => ({
         ...prevVideo,
         videoTopics: [...prevVideo.videoTopics, selectedTopic],
@@ -107,7 +122,9 @@ export function AddNewVideo() {
       .find((category) => category.type === type)
       ?.videoCategories.find((category) => category.name === value);
     if (selectedCategory) {
-      const updatedVideoCategories = video.videoCategories.filter((category) => category.type !== type);
+      const updatedVideoCategories = video.videoCategories.filter(
+        (category) => category.type !== type
+      );
       setVideo((prevVideo) => ({
         ...prevVideo,
         videoCategories: [...updatedVideoCategories, selectedCategory],
@@ -120,7 +137,9 @@ export function AddNewVideo() {
   };
 
   const handleRemoveCategory = (type: string) => {
-    const updatedVideoCategories = video.videoCategories.filter((category) => category.type !== type);
+    const updatedVideoCategories = video.videoCategories.filter(
+      (category) => category.type !== type
+    );
     setVideo((prevVideo) => ({
       ...prevVideo,
       videoCategories: updatedVideoCategories,
@@ -247,15 +266,28 @@ export function AddNewVideo() {
           </div>
           <div className="grid grid-cols-3 gap-4 mt-4">
             {video.videoTopics.map((topic, index) => (
-              <div key={index} className="bg-gray-100 rounded-md p-4 flex items-center">
+              <div
+                key={index}
+                className="bg-gray-100 rounded-md p-4 flex items-center"
+              >
                 <span className="font-medium">{topic.name}</span>
-                <Button variant="default" size="icon" className="ml-auto" onClick={() => handleRemoveTopic(index)}>
+                <Button
+                  variant="default"
+                  size="icon"
+                  className="ml-auto"
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent form submit when removing
+                    handleRemoveTopic(index);
+                  }}
+                >
                   <X className="w-4 h-4" />
                 </Button>
               </div>
             ))}
           </div>
-          {errors.videoTopics && <p className="text-red-500">{errors.videoTopics}</p>}
+          {errors.videoTopics && (
+            <p className="text-red-500">{errors.videoTopics}</p>
+          )}
         </div>
         <div>
           <label htmlFor="video-categories" className="block font-medium mb-2">
@@ -263,11 +295,22 @@ export function AddNewVideo() {
           </label>
           <div className="grid grid-cols-2 gap-4">
             {videoCategories.map((category) => (
-              <div key={category.type} className="flex flex-col items-start space-y-2">
-                <label className="block text-lg font-medium">{category.type}</label>
-                <Select onValueChange={(value) => handleCategoryChange(category.type, value)}>
+              <div
+                key={category.type}
+                className="flex flex-col items-start space-y-2"
+              >
+                <label className="block text-lg font-medium">
+                  {category.type}
+                </label>
+                <Select
+                  onValueChange={(value) =>
+                    handleCategoryChange(category.type, value)
+                  }
+                >
                   <SelectTrigger className="w-64 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg">
-                    <SelectValue placeholder={`Select ${category.type} Category`} />
+                    <SelectValue
+                      placeholder={`Select ${category.type} Category`}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {category.videoCategories.map((subCategory) => (
@@ -278,19 +321,35 @@ export function AddNewVideo() {
                   </SelectContent>
                 </Select>
                 <div className="flex flex-wrap gap-4 mt-4">
-                  {video.videoCategories.filter((cat) => cat.type === category.type).map((filteredCategory, index) => (
-                    <div key={index} className="bg-gray-100 rounded-md p-4 flex items-center space-x-2">
-                      <span className="font-medium">{filteredCategory.name}</span>
-                      <Button variant="default" size="icon" onClick={() => handleRemoveCategory(filteredCategory.type)}>
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
+                  {video.videoCategories
+                    .filter((cat) => cat.type === category.type)
+                    .map((filteredCategory, index) => (
+                      <div
+                        key={index}
+                        className="bg-gray-100 rounded-md p-4 flex items-center space-x-2"
+                      >
+                        <span className="font-medium">
+                          {filteredCategory.name}
+                        </span>
+                        <Button
+                          variant="default"
+                          size="icon"
+                          onClick={(e) => {
+                            e.preventDefault(); // Prevent form submit when removing
+                            handleRemoveCategory(filteredCategory.type);
+                          }}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
                 </div>
               </div>
             ))}
           </div>
-          {errors.videoCategories && <p className="text-red-500">{errors.videoCategories}</p>}
+          {errors.videoCategories && (
+            <p className="text-red-500">{errors.videoCategories}</p>
+          )}
         </div>
         <div className="flex justify-end">
           <Button type="submit" variant="primary" className="text-lg">

@@ -388,3 +388,39 @@ export const fetchGetVideoDetailById = async (
     throw new Error(`Error while get video details`);
   }
 };
+export const fetchGetAllVideoSelectForAdmin = async (sessionToken: string) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-video-select`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get video select`);
+  }
+};
+export const fetchGetAllRecipeSelectForAdmin = async (sessionToken: string) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-recipe-select`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get recipe select`);
+  }
+};
