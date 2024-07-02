@@ -1,6 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
    DropdownMenu,
@@ -9,7 +8,6 @@ import {
    DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import ChatList from "./chat-list";
 import Chat from "./chat";
 
@@ -42,7 +40,6 @@ export function ChattingPage() {
                </DropdownMenu>
             </div>
             <ChatList />
-            <div className="w[30%] bg-blue-500"></div>
          </div>
          <Chat />
       </div>
