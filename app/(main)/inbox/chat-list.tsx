@@ -1,7 +1,6 @@
 "use client";
 /* eslint-disable react/no-unescaped-entities */
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { db } from "@/firebase";
 import useUserFirebaseStore, { User } from "@/stores/user-firebase-store";
@@ -12,7 +11,6 @@ import Image from "next/image";
 import defaultProfile from "/public/default-iProfile.png";
 import { Button } from "@/components/ui/button";
 import useChatFireBaseStore from "@/stores/chat-firebase-store";
-import { UserChats } from "./chat";
 import { useAddChatModel } from "@/stores/add-chat-user";
 
 export type ChatListProps = {
@@ -80,7 +78,6 @@ const ChatList = () => {
       if (chat) {
          changeChat(chat.chatId, chat.user);
       }
-      //   console.log("Selected ChatId:", chatId);
    };
    const filteredChats = chats.filter((chat) =>
       chat.user.username?.toLowerCase().includes(username.toLowerCase())

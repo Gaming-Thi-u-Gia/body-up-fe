@@ -167,7 +167,6 @@ const Chat = () => {
                               <div className="flex flex-col w-[60%]  rounded-md bg-primary p-3 text-sm text-primary-foreground">
                                  <p className="">{message.text}</p>
                                  <div className="mt-2 text-xs text-primary-foreground/80">
-                                    {/* Date Here */}
                                     {formatTimestamp(message.createdAt)}
                                  </div>
                               </div>
