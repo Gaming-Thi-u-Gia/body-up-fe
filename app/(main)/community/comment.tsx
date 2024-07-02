@@ -124,6 +124,7 @@ const Comment = ({
          }
       };
       getChildComments();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
 
    const deleteComment = async (commentId: number) => {
