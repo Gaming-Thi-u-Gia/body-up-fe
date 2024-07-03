@@ -24,7 +24,7 @@ import {
    fetchDeleteComment,
    fetchEditComment,
 } from "@/utils/community";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { z } from "zod";
 import UserInfo from "./user-info";
