@@ -8,17 +8,20 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { X, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, MouseEvent, FormEvent, ChangeEvent } from "react";
 import { TableFilterProgramType, TopicType } from "@/utils/admin/type";
 import { fetchAllFilterCategoryWorkoutProgram } from "@/utils/video/category";
 import {
   fetchGetAllVideoSelectForAdmin,
-  fetchWorkoutProgramWithTopicData,
+  fetchWorkoutCategoryData,
 } from "@/utils/video/workoutVideoCollection";
 import { useAuthStore } from "@/components/providers/auth-provider";
-import { fetchGetAllRecipeSelectForAdmin } from "@/utils/admin/fetch";
+import {
+  fetchGetAllRecipeSelectForAdmin,
+  fetchPostWorkoutProgram,
+} from "@/utils/admin/fetch";
 
-type AddNewProgramType = {
+export type AddNewProgramType = {
   name: string;
   type: string;
   equipment: string;
@@ -47,11 +50,7 @@ type ProgramTopicType = {
 type AddNewDailyExerciseType = {
   day: number;
   dailyVideos: AddNewDailyVideoType[];
-  dailyRecipes: {
-    morning: AddNewDailyRecipeType[];
-    afternoon: AddNewDailyRecipeType[];
-    evening: AddNewDailyRecipeType[];
-  };
+  dailyRecipes: AddNewDailyRecipeType[];
 };
 
 type AddNewDailyVideoType = {
@@ -60,6 +59,7 @@ type AddNewDailyVideoType = {
 
 type AddNewDailyRecipeType = {
   recipe: RecipeType;
+  part: string;
 };
 
 type RecipeType = {
@@ -70,6 +70,13 @@ type RecipeType = {
 type VideoType = {
   id: number;
   name: string;
+};
+
+type ExerciseError = {
+  videoError?: string;
+  morningRecipeError?: string;
+  afternoonRecipeError?: string;
+  eveningRecipeError?: string;
 };
 
 const AddWorkoutProgram = () => {
@@ -89,14 +96,14 @@ const AddWorkoutProgram = () => {
     dailyExercises: [],
   });
 
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState<number>(1);
   const [topics, setTopics] = useState<TopicType[]>([]);
   const [workoutProgramCategories, setWorkoutProgramCategories] = useState<
     TableFilterProgramType[]
   >([]);
   const [videos, setVideos] = useState<VideoType[]>([]);
   const [recipes, setRecipes] = useState<RecipeType[]>([]);
-  const [errors, setErrors] = useState({
+  const [errors, setErrors] = useState<Record<string, string | ExerciseError>>({
     name: "",
     type: "",
     equipment: "",
@@ -111,6 +118,22 @@ const AddWorkoutProgram = () => {
     dailyExercises: "",
   });
 
+  const [dayStates, setDayStates] = useState<
+    {
+      dailyVideos: AddNewDailyVideoType[];
+      morningRecipes: AddNewDailyRecipeType[];
+      afternoonRecipes: AddNewDailyRecipeType[];
+      eveningRecipes: AddNewDailyRecipeType[];
+    }[]
+  >(
+    Array.from({ length: program.day }, () => ({
+      dailyVideos: [],
+      morningRecipes: [],
+      afternoonRecipes: [],
+      eveningRecipes: [],
+    }))
+  );
+
   const handleInputChange = (field: string, value: string | number) => {
     setProgram((prevProgram) => ({
       ...prevProgram,
@@ -122,10 +145,33 @@ const AddWorkoutProgram = () => {
     }));
   };
 
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setProgram((prevProgram) => ({
+        ...prevProgram,
+        img: imageUrl,
+      }));
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        img: "",
+      }));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setProgram((prevProgram) => ({
+      ...prevProgram,
+      img: "",
+    }));
+  };
+
   useEffect(() => {
     const getTopics = async () => {
       try {
-        const data = await fetchWorkoutProgramWithTopicData();
+        const data = await fetchWorkoutCategoryData();
+        console.log(data);
         setTopics(data);
       } catch (error) {
         console.error(error);
@@ -145,7 +191,7 @@ const AddWorkoutProgram = () => {
       }
     };
     getVideos();
-  }, []);
+  }, [sessionToken]);
 
   useEffect(() => {
     const getRecipes = async () => {
@@ -158,7 +204,7 @@ const AddWorkoutProgram = () => {
       }
     };
     getRecipes();
-  }, []);
+  }, [sessionToken]);
 
   useEffect(() => {
     const getProgramCategories = async () => {
@@ -170,8 +216,8 @@ const AddWorkoutProgram = () => {
           )
           .map((category: TableFilterProgramType) => ({
             ...category,
-            workoutProgramCategories: category.workoutCategories.sort((a, b) =>
-              a.name.localeCompare(b.name)
+            workoutProgramCategories: category.workoutCategories.sort(
+              (a: any, b: any) => a.name.localeCompare(b.name)
             ),
           }));
         setWorkoutProgramCategories(sortedResponse);
@@ -179,7 +225,6 @@ const AddWorkoutProgram = () => {
         console.error(error);
       }
     };
-
     getProgramCategories();
   }, []);
 
@@ -200,7 +245,7 @@ const AddWorkoutProgram = () => {
     }
   };
 
-  const handleRemoveTopic = (index: number, e: React.MouseEvent) => {
+  const handleRemoveTopic = (index: number, e: MouseEvent) => {
     e.preventDefault();
     const updatedTopics = [...program.programTopics];
     updatedTopics.splice(index, 1);
@@ -213,7 +258,7 @@ const AddWorkoutProgram = () => {
   const handleCategoryChange = (type: string, value: string) => {
     const selectedCategory = workoutProgramCategories
       .find((category) => category.type === type)
-      ?.workoutCategories.find((category) => category.name === value);
+      ?.workoutProgramCategories.find((category) => category.name === value);
     if (selectedCategory) {
       const updatedWorkoutProgramCategories =
         program.workoutProgramCategories.filter(
@@ -233,7 +278,7 @@ const AddWorkoutProgram = () => {
     }
   };
 
-  const handleRemoveCategory = (type: string, e: React.MouseEvent) => {
+  const handleRemoveCategory = (type: string, e: MouseEvent) => {
     e.preventDefault();
     const updatedWorkoutProgramCategories =
       program.workoutProgramCategories.filter(
@@ -245,47 +290,41 @@ const AddWorkoutProgram = () => {
     }));
   };
 
-  const handleNextStep = (e: React.FormEvent) => {
+  const handleNextStep = (e: FormEvent) => {
     e.preventDefault();
     if (currentStep === 1) {
       if (checkEmptyFields() || checkCategoryAndTopic()) {
         return;
       }
-      const exercises: AddNewDailyExerciseType[] = Array.from(
-        { length: program.day },
-        (_, dayIndex) => ({
-          day: dayIndex + 1,
+      setDayStates(
+        Array.from({ length: program.day }, () => ({
           dailyVideos: [],
-          dailyRecipes: {
-            morning: [],
-            afternoon: [],
-            evening: [],
-          },
-        })
+          morningRecipes: [],
+          afternoonRecipes: [],
+          eveningRecipes: [],
+        }))
       );
-      setProgram((prevProgram) => ({
-        ...prevProgram,
-        dailyExercises: exercises,
-      }));
       setCurrentStep(2);
     }
   };
 
-  const handleAddVideo = (e: React.MouseEvent, dayIndex: number) => {
+  const handleAddVideo = (e: MouseEvent, dayIndex: number) => {
     e.preventDefault();
-    setProgram((prevProgram) => {
-      const newExercises = [...prevProgram.dailyExercises];
-      const currentDay = newExercises[dayIndex];
-
-      if (currentDay.dailyVideos.length < 4) {
+    setDayStates((prevDayStates) => {
+      const newDayStates = [...prevDayStates];
+      const dayState = newDayStates[dayIndex];
+      if (dayState.dailyVideos.length < 4) {
         if (
-          currentDay.dailyVideos.length === 0 ||
-          currentDay.dailyVideos[currentDay.dailyVideos.length - 1].video.id !==
-            0
+          dayState.dailyVideos.length === 0 ||
+          dayState.dailyVideos[dayState.dailyVideos.length - 1].video.id !== 0
         ) {
-          currentDay.dailyVideos.push({
+          dayState.dailyVideos.push({
             video: { id: 0, name: "" },
           });
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            dailyExercises: "",
+          }));
         } else {
           setErrors((prevErrors) => ({
             ...prevErrors,
@@ -299,8 +338,7 @@ const AddWorkoutProgram = () => {
           dailyExercises: "You can only add up to 4 videos per day.",
         }));
       }
-
-      return { ...prevProgram, dailyExercises: newExercises };
+      return newDayStates;
     });
   };
 
@@ -309,69 +347,77 @@ const AddWorkoutProgram = () => {
     videoIndex: number,
     videoId: number
   ) => {
-    setProgram((prevProgram) => {
-      const newExercises = [...prevProgram.dailyExercises];
-      const selectedVideo = videos.find((video) => video.id === videoId);
-
-      if (
-        selectedVideo &&
-        !newExercises.some((exercise) =>
-          exercise.dailyVideos.some((v) => v.video.id === videoId)
-        )
-      ) {
-        newExercises[dayIndex].dailyVideos[videoIndex] = {
-          video: selectedVideo,
-        };
-      } else {
+    const selectedVideo = videos.find((video) => video.id === videoId);
+    if (selectedVideo) {
+      setDayStates((prevDayStates) => {
+        const newDayStates = [...prevDayStates];
+        const dayState = newDayStates[dayIndex];
+        dayState.dailyVideos[videoIndex] = { video: selectedVideo };
         setErrors((prevErrors) => ({
           ...prevErrors,
-          dailyExercises: "This video is already selected.",
+          dailyExercises: "",
         }));
-      }
-      return { ...prevProgram, dailyExercises: newExercises };
-    });
+        return newDayStates;
+      });
+    }
   };
 
   const handleRemoveVideo = (
     dayIndex: number,
     videoIndex: number,
-    e: React.MouseEvent
+    e: MouseEvent
   ) => {
     e.preventDefault();
-    setProgram((prevProgram) => {
-      const newExercises = [...prevProgram.dailyExercises];
-      newExercises[dayIndex].dailyVideos.splice(videoIndex, 1);
-      return { ...prevProgram, dailyExercises: newExercises };
+    setDayStates((prevDayStates) => {
+      const newDayStates = [...prevDayStates];
+      newDayStates[dayIndex].dailyVideos.splice(videoIndex, 1);
+      return newDayStates;
     });
   };
 
   const handleAddRecipe = (
-    e: React.MouseEvent,
+    e: MouseEvent,
     dayIndex: number,
     part: "morning" | "afternoon" | "evening"
   ) => {
     e.preventDefault();
-    setProgram((prevProgram) => {
-      const newExercises = [...prevProgram.dailyExercises];
-      const currentDay = newExercises[dayIndex];
-
-      if (
-        currentDay.dailyRecipes[part].length === 0 ||
-        currentDay.dailyRecipes[part][currentDay.dailyRecipes[part].length - 1]
-          .recipe.id !== 0
-      ) {
-        currentDay.dailyRecipes[part].push({
-          recipe: { id: 0, name: "" },
-        });
+    setDayStates((prevDayStates) => {
+      const newDayStates = [...prevDayStates];
+      const dayState = newDayStates[dayIndex];
+      const recipeState =
+        part === "morning"
+          ? dayState.morningRecipes
+          : part === "afternoon"
+            ? dayState.afternoonRecipes
+            : dayState.eveningRecipes;
+      if (recipeState.length < 2) {
+        if (
+          recipeState.length === 0 ||
+          recipeState[recipeState.length - 1].recipe.id !== 0
+        ) {
+          recipeState.push({
+            recipe: { id: 0, name: "" },
+            part: part,
+          });
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            dailyExercises: "",
+          }));
+        } else {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            dailyExercises:
+              "Please select the current recipe before adding a new one.",
+          }));
+        }
       } else {
         setErrors((prevErrors) => ({
           ...prevErrors,
           dailyExercises:
-            "Please select the current recipe before adding a new one.",
+            "You can only add up to 2 recipes per part of the day.",
         }));
       }
-
-      return { ...prevProgram, dailyExercises: newExercises };
+      return newDayStates;
     });
   };
 
@@ -381,57 +427,94 @@ const AddWorkoutProgram = () => {
     recipeId: number,
     part: "morning" | "afternoon" | "evening"
   ) => {
-    setProgram((prevProgram) => {
-      const newExercises = [...prevProgram.dailyExercises];
-      const selectedRecipe = recipes.find((recipe) => recipe.id === recipeId);
-      if (selectedRecipe) {
-        newExercises[dayIndex].dailyRecipes[part][recipeIndex] = {
+    const selectedRecipe = recipes.find((recipe) => recipe.id === recipeId);
+    if (selectedRecipe) {
+      setDayStates((prevDayStates) => {
+        const newDayStates = [...prevDayStates];
+        const dayState = newDayStates[dayIndex];
+        const recipeState =
+          part === "morning"
+            ? dayState.morningRecipes
+            : part === "afternoon"
+              ? dayState.afternoonRecipes
+              : dayState.eveningRecipes;
+        recipeState[recipeIndex] = {
+          ...recipeState[recipeIndex],
           recipe: selectedRecipe,
         };
-      }
-      return { ...prevProgram, dailyExercises: newExercises };
-    });
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          dailyExercises: "",
+        }));
+        return newDayStates;
+      });
+    }
   };
 
   const handleRemoveRecipe = (
     dayIndex: number,
     recipeIndex: number,
     part: "morning" | "afternoon" | "evening",
-    e: React.MouseEvent
+    e: MouseEvent
   ) => {
     e.preventDefault();
-    setProgram((prevProgram) => {
-      const newExercises = [...prevProgram.dailyExercises];
-      newExercises[dayIndex].dailyRecipes[part].splice(recipeIndex, 1);
-      return { ...prevProgram, dailyExercises: newExercises };
+    setDayStates((prevDayStates) => {
+      const newDayStates = [...prevDayStates];
+      const recipeState =
+        part === "morning"
+          ? newDayStates[dayIndex].morningRecipes
+          : part === "afternoon"
+            ? newDayStates[dayIndex].afternoonRecipes
+            : newDayStates[dayIndex].eveningRecipes;
+      recipeState.splice(recipeIndex, 1);
+      return newDayStates;
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log(program);
+    const updatedDailyExercises = dayStates.map((dayState, dayIndex) => ({
+      day: dayIndex + 1,
+      dailyVideos: dayState.dailyVideos,
+      dailyRecipes: [
+        ...dayState.morningRecipes,
+        ...dayState.afternoonRecipes,
+        ...dayState.eveningRecipes,
+      ],
+    }));
+    setProgram((prevProgram) => ({
+      ...prevProgram,
+      dailyExercises: updatedDailyExercises,
+    }));
 
     let hasError = false;
-    const updatedDailyExercises = program.dailyExercises.map((exercise) => {
-      const updatedExercise = { ...exercise };
+    const validatedDailyExercises = updatedDailyExercises.map((exercise) => {
+      const updatedExercise: AddNewDailyExerciseType & ExerciseError = {
+        ...exercise,
+      };
       if (
         exercise.dailyVideos.length === 0 ||
         exercise.dailyVideos.some((video) => video.video.id === 0)
       ) {
-        updatedExercise["videoError"] =
+        updatedExercise.videoError =
           "Each day must have at least one video selected.";
         hasError = true;
       } else {
-        updatedExercise["videoError"] = "";
+        updatedExercise.videoError = "";
       }
 
-      ["morning", "afternoon", "evening"].forEach((part) => {
+      const parts: Array<"morning" | "afternoon" | "evening"> = [
+        "morning",
+        "afternoon",
+        "evening",
+      ];
+      parts.forEach((part) => {
+        const partRecipes = exercise.dailyRecipes.filter(
+          (r) => r.part === part
+        );
         if (
-          exercise.dailyRecipes[part as "morning" | "afternoon" | "evening"]
-            .length === 0 ||
-          exercise.dailyRecipes[
-            part as "morning" | "afternoon" | "evening"
-          ].some((recipe) => recipe.recipe.id === 0)
+          partRecipes.length === 0 ||
+          partRecipes.some((recipe) => recipe.recipe.id === 0)
         ) {
           updatedExercise[`${part}RecipeError`] =
             `Each part of the day must have at least one recipe selected.`;
@@ -446,7 +529,7 @@ const AddWorkoutProgram = () => {
 
     setProgram((prevProgram) => ({
       ...prevProgram,
-      dailyExercises: updatedDailyExercises,
+      dailyExercises: validatedDailyExercises,
     }));
 
     if (hasError) {
@@ -455,11 +538,15 @@ const AddWorkoutProgram = () => {
         dailyExercises: "Please fix the errors before submitting.",
       }));
       return;
+    } else {
+      postWorkoutProgram();
     }
+  };
 
+  const postWorkoutProgram = async () => {
     try {
-      console.log("Program submitted successfully!", program);
-      // Perform the submit action here
+      const response = await fetchPostWorkoutProgram(program, sessionToken!);
+      console.log(response);
     } catch (error) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -469,10 +556,10 @@ const AddWorkoutProgram = () => {
     }
   };
 
-  const checkEmptyFields = () => {
+  const checkEmptyFields = (): boolean => {
     let hasError = false;
 
-    const requiredFields = [
+    const requiredFields: (keyof AddNewProgramType)[] = [
       "name",
       "type",
       "equipment",
@@ -499,7 +586,7 @@ const AddWorkoutProgram = () => {
     return hasError;
   };
 
-  const checkCategoryAndTopic = () => {
+  const checkCategoryAndTopic = (): boolean => {
     let hasError = false;
 
     if (program.programTopics.length === 0) {
@@ -521,9 +608,9 @@ const AddWorkoutProgram = () => {
     return hasError;
   };
 
-  const getAvailableVideos = (dayIndex: number) => {
-    const selectedVideos = program.dailyExercises.flatMap((exercise) =>
-      exercise.dailyVideos.map((video) => video.video.id)
+  const getAvailableVideos = (dayIndex: number): VideoType[] => {
+    const selectedVideos = dayStates[dayIndex].dailyVideos.map(
+      (video) => video.video.id
     );
     return videos.filter((video) => !selectedVideos.includes(video.id));
   };
@@ -531,9 +618,11 @@ const AddWorkoutProgram = () => {
   const getAvailableRecipes = (
     dayIndex: number,
     part: "morning" | "afternoon" | "evening"
-  ) => {
-    const selectedRecipes = program.dailyExercises[dayIndex].dailyRecipes[
-      part
+  ): RecipeType[] => {
+    const selectedRecipes = [
+      ...dayStates[dayIndex].morningRecipes,
+      ...dayStates[dayIndex].afternoonRecipes,
+      ...dayStates[dayIndex].eveningRecipes,
     ].map((recipe) => recipe.recipe.id);
     return recipes.filter((recipe) => !selectedRecipes.includes(recipe.id));
   };
@@ -554,9 +643,13 @@ const AddWorkoutProgram = () => {
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Enter program name"
                 value={program.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleInputChange("name", e.target.value)
+                }
               />
-              {errors.name && <p className="text-red-500">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-500">{errors.name.toString()}</p>
+              )}
             </div>
             <div>
               <label htmlFor="type" className="block font-medium mb-2">
@@ -568,9 +661,13 @@ const AddWorkoutProgram = () => {
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Enter type"
                 value={program.type}
-                onChange={(e) => handleInputChange("type", e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleInputChange("type", e.target.value)
+                }
               />
-              {errors.type && <p className="text-red-500">{errors.type}</p>}
+              {errors.type && (
+                <p className="text-red-500">{errors.type.toString()}</p>
+              )}
             </div>
             <div>
               <label htmlFor="equipment" className="block font-medium mb-2">
@@ -582,10 +679,12 @@ const AddWorkoutProgram = () => {
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Enter equipment"
                 value={program.equipment}
-                onChange={(e) => handleInputChange("equipment", e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleInputChange("equipment", e.target.value)
+                }
               />
               {errors.equipment && (
-                <p className="text-red-500">{errors.equipment}</p>
+                <p className="text-red-500">{errors.equipment.toString()}</p>
               )}
             </div>
             <div>
@@ -597,9 +696,13 @@ const AddWorkoutProgram = () => {
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Enter program detail"
                 value={program.detail}
-                onChange={(e) => handleInputChange("detail", e.target.value)}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                  handleInputChange("detail", e.target.value)
+                }
               />
-              {errors.detail && <p className="text-red-500">{errors.detail}</p>}
+              {errors.detail && (
+                <p className="text-red-500">{errors.detail.toString()}</p>
+              )}
             </div>
             <div>
               <label htmlFor="day" className="block font-medium mb-2">
@@ -611,11 +714,13 @@ const AddWorkoutProgram = () => {
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Enter number of days"
                 value={program.day}
-                onChange={(e) =>
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("day", parseInt(e.target.value))
                 }
               />
-              {errors.day && <p className="text-red-500">{errors.day}</p>}
+              {errors.day && (
+                <p className="text-red-500">{errors.day.toString()}</p>
+              )}
             </div>
             <div>
               <label htmlFor="time" className="block font-medium mb-2">
@@ -627,9 +732,13 @@ const AddWorkoutProgram = () => {
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Enter time"
                 value={program.time}
-                onChange={(e) => handleInputChange("time", e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleInputChange("time", e.target.value)
+                }
               />
-              {errors.time && <p className="text-red-500">{errors.time}</p>}
+              {errors.time && (
+                <p className="text-red-500">{errors.time.toString()}</p>
+              )}
             </div>
             <div>
               <label htmlFor="year" className="block font-medium mb-2">
@@ -641,25 +750,44 @@ const AddWorkoutProgram = () => {
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Enter year"
                 value={program.year}
-                onChange={(e) =>
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("year", parseInt(e.target.value))
                 }
               />
-              {errors.year && <p className="text-red-500">{errors.year}</p>}
+              {errors.year && (
+                <p className="text-red-500">{errors.year.toString()}</p>
+              )}
             </div>
             <div>
               <label htmlFor="img" className="block font-medium mb-2">
                 Image
               </label>
               <input
-                type="text"
+                type="file"
                 id="img"
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                placeholder="Enter image URL"
-                value={program.img}
-                onChange={(e) => handleInputChange("img", e.target.value)}
+                onChange={handleImageChange}
               />
-              {errors.img && <p className="text-red-500">{errors.img}</p>}
+              {program.img && (
+                <div className="relative mt-4">
+                  <img
+                    src={program.img}
+                    alt="Program Image"
+                    className="w-64 h-64 object-cover rounded-md"
+                  />
+                  <Button
+                    variant="default"
+                    size="icon"
+                    className="absolute top-2 right-2"
+                    onClick={handleRemoveImage}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+              {errors.img && (
+                <p className="text-red-500">{errors.img.toString()}</p>
+              )}
             </div>
             <div>
               <label htmlFor="banner" className="block font-medium mb-2">
@@ -671,9 +799,13 @@ const AddWorkoutProgram = () => {
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Enter banner URL"
                 value={program.banner}
-                onChange={(e) => handleInputChange("banner", e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleInputChange("banner", e.target.value)
+                }
               />
-              {errors.banner && <p className="text-red-500">{errors.banner}</p>}
+              {errors.banner && (
+                <p className="text-red-500">{errors.banner.toString()}</p>
+              )}
             </div>
             <div>
               <label className="block font-medium mb-2">Program Topics</label>
@@ -710,7 +842,9 @@ const AddWorkoutProgram = () => {
                 ))}
               </div>
               {errors.programTopics && (
-                <p className="text-red-500">{errors.programTopics}</p>
+                <p className="text-red-500">
+                  {errors.programTopics.toString()}
+                </p>
               )}
             </div>
             <div>
@@ -775,7 +909,7 @@ const AddWorkoutProgram = () => {
                   </div>
                 ))}
               </div>
-              {errors.workoutProgramCategories && (
+              {typeof errors.workoutProgramCategories === "string" && (
                 <p className="text-red-500">
                   {errors.workoutProgramCategories}
                 </p>
@@ -794,13 +928,13 @@ const AddWorkoutProgram = () => {
         <>
           <h1 className="text-3xl font-bold mb-8">Select Videos and Recipes</h1>
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {program.dailyExercises.map((exercise, dayIndex) => (
+            {dayStates.map((dayState, dayIndex) => (
               <div key={dayIndex} className="mb-8">
-                <h3 className="text-xl font-bold mb-4">Day {exercise.day}</h3>
+                <h3 className="text-xl font-bold mb-4">Day {dayIndex + 1}</h3>
                 <div className="mb-4">
                   <h4 className="text-lg font-bold mb-2">Select Videos</h4>
                   <div className="grid grid-cols-1 gap-2">
-                    {exercise.dailyVideos.map((video, videoIndex) => (
+                    {dayState.dailyVideos.map((video, videoIndex) => (
                       <div key={videoIndex} className="flex items-center">
                         <Select
                           onValueChange={(value) =>
@@ -810,7 +944,7 @@ const AddWorkoutProgram = () => {
                               parseInt(value)
                             )
                           }
-                          value={video.video.id || ""}
+                          value={video.video.id.toString() || ""}
                         >
                           <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                             <SelectValue>
@@ -829,7 +963,7 @@ const AddWorkoutProgram = () => {
                             ))}
                           </SelectContent>
                         </Select>
-                        {exercise.dailyVideos.length > 1 && (
+                        {dayState.dailyVideos.length > 1 && (
                           <Button
                             variant="default"
                             size="icon"
@@ -843,10 +977,11 @@ const AddWorkoutProgram = () => {
                         )}
                       </div>
                     ))}
-                    {exercise["videoError"] && (
-                      <p className="text-red-500">{exercise["videoError"]}</p>
-                    )}
-                    {exercise.dailyVideos.length < 4 && (
+                    {errors.dailyExercises &&
+                      typeof errors.dailyExercises === "string" && (
+                        <p className="text-red-500">{errors.dailyExercises}</p>
+                      )}
+                    {dayState.dailyVideos.length < 4 && (
                       <Button
                         variant="secondary"
                         size="sm"
@@ -857,6 +992,7 @@ const AddWorkoutProgram = () => {
                     )}
                   </div>
                 </div>
+
                 {["morning", "afternoon", "evening"].map((timeOfDay) => (
                   <div key={timeOfDay}>
                     <h4 className="text-lg font-bold mb-2">
@@ -865,8 +1001,8 @@ const AddWorkoutProgram = () => {
                       Recipes
                     </h4>
                     <div className="grid grid-cols-1 gap-2">
-                      {exercise.dailyRecipes[timeOfDay].map(
-                        (recipe, recipeIndex) => (
+                      {timeOfDay === "morning" &&
+                        dayState.morningRecipes.map((recipe, recipeIndex) => (
                           <div key={recipeIndex} className="flex items-center">
                             <Select
                               onValueChange={(value) =>
@@ -874,13 +1010,10 @@ const AddWorkoutProgram = () => {
                                   dayIndex,
                                   recipeIndex,
                                   parseInt(value),
-                                  timeOfDay as
-                                    | "morning"
-                                    | "afternoon"
-                                    | "evening"
+                                  "morning"
                                 )
                               }
-                              value={recipe.recipe.id || ""}
+                              value={recipe.recipe.id.toString() || ""}
                             >
                               <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                                 <SelectValue>
@@ -891,23 +1024,19 @@ const AddWorkoutProgram = () => {
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {getAvailableRecipes(
-                                  dayIndex,
-                                  timeOfDay as
-                                    | "morning"
-                                    | "afternoon"
-                                    | "evening"
-                                ).map((recipe) => (
-                                  <SelectItem
-                                    key={recipe.id}
-                                    value={recipe.id.toString()}
-                                  >
-                                    {recipe.name}
-                                  </SelectItem>
-                                ))}
+                                {getAvailableRecipes(dayIndex, "morning").map(
+                                  (recipe) => (
+                                    <SelectItem
+                                      key={recipe.id}
+                                      value={recipe.id.toString()}
+                                    >
+                                      {recipe.name}
+                                    </SelectItem>
+                                  )
+                                )}
                               </SelectContent>
                             </Select>
-                            {exercise.dailyRecipes[timeOfDay].length > 1 && (
+                            {dayState.morningRecipes.length > 1 && (
                               <Button
                                 variant="default"
                                 size="icon"
@@ -916,10 +1045,7 @@ const AddWorkoutProgram = () => {
                                   handleRemoveRecipe(
                                     dayIndex,
                                     recipeIndex,
-                                    timeOfDay as
-                                      | "morning"
-                                      | "afternoon"
-                                      | "evening",
+                                    "morning",
                                     e
                                   )
                                 }
@@ -928,14 +1054,126 @@ const AddWorkoutProgram = () => {
                               </Button>
                             )}
                           </div>
-                        )
-                      )}
-                      {exercise[`${timeOfDay}RecipeError`] && (
+                        ))}
+                      {timeOfDay === "afternoon" &&
+                        dayState.afternoonRecipes.map((recipe, recipeIndex) => (
+                          <div key={recipeIndex} className="flex items-center">
+                            <Select
+                              onValueChange={(value) =>
+                                handleRecipeSelection(
+                                  dayIndex,
+                                  recipeIndex,
+                                  parseInt(value),
+                                  "afternoon"
+                                )
+                              }
+                              value={recipe.recipe.id.toString() || ""}
+                            >
+                              <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <SelectValue>
+                                  {recipes.find(
+                                    (r) => r.id === recipe.recipe.id
+                                  )?.name ||
+                                    `Select ${timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1)} Recipe`}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {getAvailableRecipes(dayIndex, "afternoon").map(
+                                  (recipe) => (
+                                    <SelectItem
+                                      key={recipe.id}
+                                      value={recipe.id.toString()}
+                                    >
+                                      {recipe.name}
+                                    </SelectItem>
+                                  )
+                                )}
+                              </SelectContent>
+                            </Select>
+                            {dayState.afternoonRecipes.length > 1 && (
+                              <Button
+                                variant="default"
+                                size="icon"
+                                className="ml-2"
+                                onClick={(e) =>
+                                  handleRemoveRecipe(
+                                    dayIndex,
+                                    recipeIndex,
+                                    "afternoon",
+                                    e
+                                  )
+                                }
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                      {timeOfDay === "evening" &&
+                        dayState.eveningRecipes.map((recipe, recipeIndex) => (
+                          <div key={recipeIndex} className="flex items-center">
+                            <Select
+                              onValueChange={(value) =>
+                                handleRecipeSelection(
+                                  dayIndex,
+                                  recipeIndex,
+                                  parseInt(value),
+                                  "evening"
+                                )
+                              }
+                              value={recipe.recipe.id.toString() || ""}
+                            >
+                              <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <SelectValue>
+                                  {recipes.find(
+                                    (r) => r.id === recipe.recipe.id
+                                  )?.name ||
+                                    `Select ${timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1)} Recipe`}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {getAvailableRecipes(dayIndex, "evening").map(
+                                  (recipe) => (
+                                    <SelectItem
+                                      key={recipe.id}
+                                      value={recipe.id.toString()}
+                                    >
+                                      {recipe.name}
+                                    </SelectItem>
+                                  )
+                                )}
+                              </SelectContent>
+                            </Select>
+                            {dayState.eveningRecipes.length > 1 && (
+                              <Button
+                                variant="default"
+                                size="icon"
+                                className="ml-2"
+                                onClick={(e) =>
+                                  handleRemoveRecipe(
+                                    dayIndex,
+                                    recipeIndex,
+                                    "evening",
+                                    e
+                                  )
+                                }
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                      {errors[`${timeOfDay}RecipeError`] && (
                         <p className="text-red-500">
-                          {exercise[`${timeOfDay}RecipeError`]}
+                          {errors[`${timeOfDay}RecipeError`].toString()}
                         </p>
                       )}
-                      {exercise.dailyRecipes[timeOfDay].length < 2 && (
+                      {((timeOfDay === "morning" &&
+                        dayState.morningRecipes.length < 2) ||
+                        (timeOfDay === "afternoon" &&
+                          dayState.afternoonRecipes.length < 2) ||
+                        (timeOfDay === "evening" &&
+                          dayState.eveningRecipes.length < 2)) && (
                         <Button
                           variant="secondary"
                           size="sm"
@@ -956,9 +1194,6 @@ const AddWorkoutProgram = () => {
                     </div>
                   </div>
                 ))}
-                {errors.dailyExercises && (
-                  <p className="text-red-500">{errors.dailyExercises}</p>
-                )}
               </div>
             ))}
             <div className="flex justify-between">

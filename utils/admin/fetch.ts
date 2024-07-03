@@ -1,6 +1,7 @@
 import { EditableRecipeType } from "@/app/(main)/admin/recipes-management/recipe-management";
 import { AddNewRecipeType, AddNewVideoType } from "./type";
 import { VideoType } from "@/app/(main)/admin/workout-video-management/video-management";
+import { AddNewProgramType } from "@/app/(main)/admin/create-workout-program/add-workout-program";
 
 export const fetchGetTotalElements = async (sessionToken: string) => {
   try {
@@ -422,5 +423,32 @@ export const fetchGetAllRecipeSelectForAdmin = async (sessionToken: string) => {
     return data;
   } catch (error) {
     throw new Error(`Error while get recipe select`);
+  }
+};
+export const fetchPostWorkoutProgram = async (
+  workoutProgram: AddNewProgramType,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/create-program`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+        body: JSON.stringify(workoutProgram),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while fetching post workout program`);
   }
 };

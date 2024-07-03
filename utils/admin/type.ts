@@ -27,7 +27,7 @@ export type TableFilterVideoType = {
 export type TableFilterProgramType = {
   length: number;
   type: string;
-  workoutCategories: ProgramCategoryType[];
+  workoutProgramCategories: ProgramCategoryType[];
 };
 
 export type IngredientRecipeType = {
