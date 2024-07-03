@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -91,8 +90,8 @@ export function ManagementUser() {
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen">
-      <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6">
+    <div className="flex flex-col max-w-7xl m-auto min-h-screen">
+      <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
         <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link
             href="#"
@@ -103,33 +102,16 @@ export function ManagementUser() {
             <span>User Management</span>
           </Link>
         </nav>
-        <div className="flex items-center w-full gap-4 md:ml-auto md:gap-2 lg:gap-4">
-          <form className="flex-1 ml-auto sm:flex-initial">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search users..."
-                className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              />
-            </div>
-          </form>
-          <Button variant="default" size="icon" className="rounded-full">
-            <img
-              src="/placeholder.svg"
-              width="32"
-              height="32"
-              className="rounded-full"
-              alt="Avatar"
-            />
-            <span className="sr-only">Toggle user menu</span>
-          </Button>
+        <div className="ml-auto">
+          <Link href="/admin" className="text-lg font-semibold">
+            Home
+          </Link>
         </div>
       </header>
       <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 p-4 md:gap-8 md:p-10">
         <Card>
           <CardHeader>
-            <CardTitle>Users</CardTitle>
+            <CardTitle className="text-2xl">Users</CardTitle>
             <CardDescription>Manage your users here.</CardDescription>
           </CardHeader>
           <CardContent>

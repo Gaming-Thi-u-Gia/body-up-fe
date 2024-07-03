@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -84,7 +85,7 @@ export function PostManagement() {
     );
     if (!isConfirmed) return;
     try {
-      const response = await fetchDeletePost(postId, sessionToken!);
+      await fetchDeletePost(postId, sessionToken!);
       setPosts(posts.filter((post) => post.id !== postId));
     } catch (error) {
       console.log("Error when delete post Id" + postId);
@@ -93,7 +94,14 @@ export function PostManagement() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Post Management</h1>
+      <div className="flex justify-between items-center bg-black text-white p-4 mb-6">
+        <h1 className="text-3xl font-bold">Post Management</h1>
+        <Link href="/admin">
+          <Button variant="secondary" className="text-lg">
+            Home
+          </Button>
+        </Link>
+      </div>
       {isLoading && posts.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array(9)
@@ -109,14 +117,6 @@ export function PostManagement() {
           hasMore={hasMorePost}
           loader={
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
               <PostCardSkeleton />
               <PostCardSkeleton />
               <PostCardSkeleton />
@@ -166,11 +166,11 @@ export function PostManagement() {
             <div className="flex items-center mb-4">
               <img
                 src={selectedPost.user.avatar || "/placeholder.svg"}
-                alt={`${selectedPost.user.firstName + " " + selectedPost.user.lastName}'s avatar`}
+                alt={`${selectedPost.user.firstName} ${selectedPost.user.lastName}'s avatar`}
                 className="rounded-full w-16 h-16 mr-4"
               />
               <h2 className="text-xl font-bold">
-                {selectedPost.user.firstName + " " + selectedPost.user.lastName}
+                {selectedPost.user.firstName} {selectedPost.user.lastName}
               </h2>
             </div>
             <div className="flex justify-between items-center mb-4">

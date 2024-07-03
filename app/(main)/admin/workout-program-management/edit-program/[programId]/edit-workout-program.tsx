@@ -18,11 +18,14 @@ import {
 import { useAuthStore } from "@/components/providers/auth-provider";
 import {
   fetchGetAllRecipeSelectForAdmin,
-  fetchPostWorkoutProgram,
+  fetchPutWorkoutProgram,
+  fetchGetWorkoutProgramDetailById,
 } from "@/utils/admin/fetch";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 
-export type AddNewProgramType = {
+export type EditProgramType = {
+  id: number;
   name: string;
   type: string;
   equipment: string;
@@ -80,9 +83,13 @@ type ExerciseError = {
   eveningRecipeError?: string;
 };
 
-const AddWorkoutProgram = () => {
+const EditWorkoutProgram = () => {
   const { sessionToken } = useAuthStore((store) => store);
-  const [program, setProgram] = useState<AddNewProgramType>({
+  const { programId } = useParams();
+  const workoutProgramIdNumber = Number(programId);
+
+  const [program, setProgram] = useState<EditProgramType>({
+    id: workoutProgramIdNumber,
     name: "",
     type: "",
     equipment: "",
@@ -128,6 +135,54 @@ const AddWorkoutProgram = () => {
     }[]
   >([]);
 
+  const [initialDays, setInitialDays] = useState<number>(0);
+
+  useEffect(() => {
+    const getProgram = async () => {
+      try {
+        const data = await fetchGetWorkoutProgramDetailById(
+          workoutProgramIdNumber,
+          sessionToken!
+        );
+        setProgram(data);
+        setInitialDays(data.day);
+
+        const initialDayStates = Array.from({ length: data.day }, (_, i) => ({
+          dailyVideos: data.dailyExercises[i]?.dailyVideos || [],
+          morningRecipes:
+            data.dailyExercises[i]?.dailyRecipes.filter(
+              (r: any) => r.part === "morning"
+            ).length > 0
+              ? data.dailyExercises[i]?.dailyRecipes.filter(
+                  (r: any) => r.part === "morning"
+                )
+              : [{ recipe: { id: 0, name: "" }, part: "morning" }],
+          afternoonRecipes:
+            data.dailyExercises[i]?.dailyRecipes.filter(
+              (r: any) => r.part === "afternoon"
+            ).length > 0
+              ? data.dailyExercises[i]?.dailyRecipes.filter(
+                  (r: any) => r.part === "afternoon"
+                )
+              : [{ recipe: { id: 0, name: "" }, part: "afternoon" }],
+          eveningRecipes:
+            data.dailyExercises[i]?.dailyRecipes.filter(
+              (r: any) => r.part === "evening"
+            ).length > 0
+              ? data.dailyExercises[i]?.dailyRecipes.filter(
+                  (r: any) => r.part === "evening"
+                )
+              : [{ recipe: { id: 0, name: "" }, part: "evening" }],
+        }));
+
+        setDayStates(initialDayStates);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getProgram();
+  }, [workoutProgramIdNumber, sessionToken]);
+
   const handleInputChange = (field: string, value: string | number) => {
     setProgram((prevProgram) => ({
       ...prevProgram,
@@ -165,7 +220,6 @@ const AddWorkoutProgram = () => {
     const getTopics = async () => {
       try {
         const data = await fetchWorkoutCategoryData();
-        console.log(data);
         setTopics(data);
       } catch (error) {
         console.error(error);
@@ -178,7 +232,6 @@ const AddWorkoutProgram = () => {
     const getVideos = async () => {
       try {
         const data = await fetchGetAllVideoSelectForAdmin(sessionToken!);
-        console.log(data);
         setVideos(data);
       } catch (error) {
         console.error(error);
@@ -191,7 +244,6 @@ const AddWorkoutProgram = () => {
     const getRecipes = async () => {
       try {
         const data = await fetchGetAllRecipeSelectForAdmin(sessionToken!);
-        console.log(data);
         setRecipes(data);
       } catch (error) {
         console.error(error);
@@ -291,14 +343,25 @@ const AddWorkoutProgram = () => {
         return;
       }
 
-      const newDayStates = Array.from({ length: program.day }, () => ({
-        dailyVideos: [],
-        morningRecipes: [{ recipe: { id: 0, name: "" }, part: "morning" }],
-        afternoonRecipes: [{ recipe: { id: 0, name: "" }, part: "afternoon" }],
-        eveningRecipes: [{ recipe: { id: 0, name: "" }, part: "evening" }],
-      }));
+      if (program.day !== dayStates.length) {
+        const newDayStates = Array.from({ length: program.day }, (_, i) => ({
+          dailyVideos: dayStates[i]?.dailyVideos || [],
+          morningRecipes:
+            dayStates[i]?.morningRecipes.length > 0
+              ? dayStates[i].morningRecipes
+              : [{ recipe: { id: 0, name: "" }, part: "morning" }],
+          afternoonRecipes:
+            dayStates[i]?.afternoonRecipes.length > 0
+              ? dayStates[i].afternoonRecipes
+              : [{ recipe: { id: 0, name: "" }, part: "afternoon" }],
+          eveningRecipes:
+            dayStates[i]?.eveningRecipes.length > 0
+              ? dayStates[i].eveningRecipes
+              : [{ recipe: { id: 0, name: "" }, part: "evening" }],
+        }));
+        setDayStates(newDayStates);
+      }
 
-      setDayStates(newDayStates);
       setCurrentStep(2);
     }
   };
@@ -518,7 +581,6 @@ const AddWorkoutProgram = () => {
           updatedExercise[`${part}RecipeError`] = "";
         }
       });
-      console.log(updatedExercise);
       return updatedExercise;
     });
 
@@ -534,13 +596,13 @@ const AddWorkoutProgram = () => {
       }));
       return;
     } else {
-      postWorkoutProgram();
+      updateWorkoutProgram();
     }
   };
 
-  const postWorkoutProgram = async () => {
+  const updateWorkoutProgram = async () => {
     try {
-      const response = await fetchPostWorkoutProgram(program, sessionToken!);
+      const response = await fetchPutWorkoutProgram(sessionToken!, program);
       console.log(response);
     } catch (error) {
       setErrors((prevErrors) => ({
@@ -554,7 +616,7 @@ const AddWorkoutProgram = () => {
   const checkEmptyFields = (): boolean => {
     let hasError = false;
 
-    const requiredFields: (keyof AddNewProgramType)[] = [
+    const requiredFields: (keyof EditProgramType)[] = [
       "name",
       "type",
       "equipment",
@@ -624,16 +686,24 @@ const AddWorkoutProgram = () => {
 
   return (
     <div className="container mx-auto py-12">
-      <header className="bg-black py-4 px-6 flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-white">Add Workout Program</h1>
-        <Link href="/admin">
-          <Button variant="secondary" className="text-lg">
-            Home
-          </Button>
-        </Link>
-      </header>
       {currentStep === 1 && (
         <>
+          <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
+            <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+              <Link
+                href="#"
+                className="flex items-center gap-2 text-lg font-semibold md:text-base"
+                prefetch={false}
+              >
+                <span>Edit Workout Program</span>
+              </Link>
+            </nav>
+            <div className="ml-auto">
+              <Link href="/" className="text-lg font-semibold">
+                Home
+              </Link>
+            </div>
+          </header>
           <form className="space-y-6" onSubmit={handleNextStep}>
             <div>
               <label htmlFor="name" className="block font-medium mb-2">
@@ -928,7 +998,25 @@ const AddWorkoutProgram = () => {
 
       {currentStep === 2 && (
         <>
-          <h1 className="text-3xl font-bold mb-8">Select Videos and Recipes</h1>
+          <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
+            <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+              <Link
+                href="#"
+                className="flex items-center gap-2 text-lg font-semibold md:text-base"
+                prefetch={false}
+              >
+                <span>Select Video And Recipe</span>
+              </Link>
+            </nav>
+            <div className="ml-auto">
+              <Link
+                href="/admin/workout-program-management"
+                className="text-lg font-semibold"
+              >
+                Home
+              </Link>
+            </div>
+          </header>
           <form className="space-y-6" onSubmit={handleSubmit}>
             {dayStates.map((dayState, dayIndex) => (
               <div key={dayIndex} className="mb-8">
@@ -1217,4 +1305,4 @@ const AddWorkoutProgram = () => {
   );
 };
 
-export default AddWorkoutProgram;
+export default EditWorkoutProgram;

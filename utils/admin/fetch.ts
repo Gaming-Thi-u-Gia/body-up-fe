@@ -2,6 +2,7 @@ import { EditableRecipeType } from "@/app/(main)/admin/recipes-management/recipe
 import { AddNewRecipeType, AddNewVideoType } from "./type";
 import { VideoType } from "@/app/(main)/admin/workout-video-management/video-management";
 import { AddNewProgramType } from "@/app/(main)/admin/create-workout-program/add-workout-program";
+import { EditProgramType } from "@/app/(main)/admin/workout-program-management/edit-program/[programId]/edit-workout-program";
 
 export const fetchGetTotalElements = async (sessionToken: string) => {
   try {
@@ -450,5 +451,94 @@ export const fetchPostWorkoutProgram = async (
     return data;
   } catch (error) {
     throw new Error(`Error while fetching post workout program`);
+  }
+};
+export const fetchGetWorkoutPrograms = async (
+  pageNo: number,
+  pageSize: number,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-workout-program?pageNo=${pageNo}&pageSize=${pageSize}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get Workout Program`);
+  }
+};
+export const fetchDeleteWorkoutProgram = async (
+  workoutProgramId: number,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/delete-workout-program?workoutProgramId=${workoutProgramId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    throw new Error(`Error when deleting workout program`);
+  }
+};
+export const fetchGetWorkoutProgramDetailById = async (
+  workoutProgramId: number,
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/workout-program-detail?workoutProgramId=${workoutProgramId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get workout program detail`);
+  }
+};
+export const fetchPutWorkoutProgram = async (
+  sessionToken: string,
+  updateWorkoutProgram: EditProgramType
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/update-workout-program`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+        body: JSON.stringify(updateWorkoutProgram),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to update the video");
+    }
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while updating the Workout Program`);
   }
 };

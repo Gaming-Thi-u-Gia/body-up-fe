@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { TableFilterVideoType } from "@/utils/admin/type";
 import InfiniteScroll from "react-infinite-scroll-component";
+import Link from "next/link";
 
 type Topic = {
   id: number;
@@ -211,7 +212,22 @@ export function VideoManagement() {
 
   return (
     <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold mb-8">Manage Videos</h1>
+      <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
+        <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+          <Link
+            href="#"
+            className="flex items-center gap-2 text-lg font-semibold md:text-base"
+            prefetch={false}
+          >
+            <span>Videos Management</span>
+          </Link>
+        </nav>
+        <div className="ml-auto">
+          <Link href="/admin" className="text-lg font-semibold">
+            Home
+          </Link>
+        </div>
+      </header>
       {isLoading && videos.length === 0 ? (
         <ListSkeleton />
       ) : (

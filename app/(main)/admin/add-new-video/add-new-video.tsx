@@ -19,6 +19,7 @@ import { fetchVideoCategoryData } from "@/utils/video/workoutVideoCollection";
 import { toast } from "sonner";
 import { fetchPostVideo } from "@/utils/admin/fetch";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import Link from "next/link";
 
 export function AddNewVideo() {
   const { sessionToken } = useAuthStore((store) => store);
@@ -203,8 +204,15 @@ export function AddNewVideo() {
 
   return (
     <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold mb-8">Add New Video</h1>
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      <div className="flex items-center justify-between bg-black text-white p-4 rounded-lg">
+        <h1 className="text-3xl font-bold">Add New Video</h1>
+        <Link href="/admin" passHref>
+          <Button variant="primary" className="text-lg">
+            Home
+          </Button>
+        </Link>
+      </div>
+      <form className="space-y-6 mt-8" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name" className="block font-medium mb-2">
             Video Name

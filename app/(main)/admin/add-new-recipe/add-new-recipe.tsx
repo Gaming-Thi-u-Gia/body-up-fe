@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -426,8 +427,15 @@ const AddNewRecipe = () => {
 
   return (
     <div className="container mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-8">Add New Recipe</h1>
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      <div className="flex items-center justify-between bg-black text-white p-4 rounded-lg">
+        <h1 className="text-4xl font-bold">Add New Recipe</h1>
+        <Link href="/admin" passHref>
+          <Button variant="primary" className="text-lg">
+            Home
+          </Button>
+        </Link>
+      </div>
+      <form className="space-y-6 mt-8" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name" className="block text-lg font-medium mb-2">
             Recipe Name

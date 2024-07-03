@@ -25,6 +25,7 @@ export type TableFilterVideoType = {
   videoCategories: VideoCategoryType[];
 };
 export type TableFilterProgramType = {
+  workoutCategories: any;
   length: number;
   type: string;
   workoutProgramCategories: ProgramCategoryType[];
