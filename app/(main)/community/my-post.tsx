@@ -5,7 +5,6 @@ import {
    fetchBookmarkPost,
    fetchFilterMyPost,
    fetchMyPosts,
-   fetchPostsBookmark,
    fetchSearchMyPost,
 } from "@/utils/community";
 import { useAuthStore } from "@/components/providers/auth-provider";
@@ -13,31 +12,19 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Bookmark, Pencil, Trash2 } from "lucide-react";
 import share_icon from "/public/share-icon.svg";
-
-import {
-   Sheet,
-   SheetContent,
-   SheetHeader,
-   SheetTitle,
-   SheetTrigger,
-} from "@/components/ui/sheet";
 import Image from "next/image";
-import defaultProfile from "/public/default-iProfile.png";
-import before_after from "/public/before-after-icon.svg";
-import challenges_icon from "/public/challenges-icon.svg";
 import { Button } from "@/components/ui/button";
 import moment from "moment";
 import fitness_icon from "/public/fitness-icon.svg";
 import message_icon from "/public/message-icon.svg";
 import Link from "next/link";
-import { SharePostModal } from "@/components/modals/share-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { DeletePostModal } from "@/components/modals/delete-post-modal";
 import { useDeletePost } from "@/stores/use-delete-post-model";
 import { useSharePostModal } from "@/stores/use-share-model";
 import useSearchStore from "@/stores/use-search-post";
 import { useFilterStore } from "@/stores/use-filter-community";
+import UserInfo from "./user-info";
 const MyPost = () => {
    const [posts, setPosts] = useState<Posts[]>([]);
    const [isBookmarked, setIsBookmarked] = useState<{
@@ -50,7 +37,6 @@ const MyPost = () => {
    const [hasMorePosts, setHasMorePosts] = useState(false);
    const { searchText } = useSearchStore();
    const { selectedFilter, setSelectedFilter } = useFilterStore();
-
    const {
       open,
       setPosts: updatedPost,
@@ -240,78 +226,7 @@ const MyPost = () => {
                   >
                      <div className="w-full flex justify-between items-center ">
                         <div className="flex gap-2 items-center ">
-                           <Sheet>
-                              <SheetTrigger>
-                                 <Image
-                                    src={post.user.avatar || defaultProfile}
-                                    alt="logo"
-                                    width={32}
-                                    height={32}
-                                    className="cursor-pointer rounded-full"
-                                 />
-                              </SheetTrigger>
-                              <SheetContent className="w-[350px]">
-                                 <SheetHeader>
-                                    <SheetTitle className="text-sm font-medium border-b border-gray-200 pb-4">
-                                       {post.user.userName2}
-                                    </SheetTitle>
-                                 </SheetHeader>
-                                 <div className="flex flex-col">
-                                    <Image
-                                       src={post.user.avatar || defaultProfile}
-                                       alt="logo"
-                                       width={40}
-                                       height={40}
-                                       className="cursor-pointer mt-2 rounded-full"
-                                    />
-                                    <label
-                                       className="text-[16px] font-semibold mt-2"
-                                       htmlFor=""
-                                    >
-                                       {post.user.userName2}
-                                    </label>
-                                    <div className="flex flex-col gap-2 mt-1">
-                                       <span className="text-sm">
-                                          {post.user.email}
-                                       </span>
-
-                                       <div className="flex gap-1">
-                                          <Image
-                                             src={before_after}
-                                             width={18}
-                                             height={18}
-                                             alt="logo"
-                                          />
-                                          <label htmlFor="" className="text-sm">
-                                             0 Challenges Completed
-                                          </label>
-                                       </div>
-                                       <div className="flex gap-1">
-                                          <Image
-                                             src={challenges_icon}
-                                             width={18}
-                                             height={18}
-                                             alt="logo"
-                                          />
-                                          <label htmlFor="" className="text-sm">
-                                             120 Achievement Points
-                                          </label>
-                                       </div>
-                                    </div>
-                                    <div className="flex gap-2 mt-4">
-                                       <Button variant="primary">
-                                          View Profile
-                                       </Button>
-                                       <Button
-                                          variant="default"
-                                          className="bg-[#EFF0F4]"
-                                       >
-                                          Send Message
-                                       </Button>
-                                    </div>
-                                 </div>
-                              </SheetContent>
-                           </Sheet>
+                           <UserInfo user={post.user} />
                            <label
                               className="text-[#303033] text-sm font-bold cursor-pointer"
                               htmlFor=""

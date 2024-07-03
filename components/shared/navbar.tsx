@@ -176,7 +176,7 @@ export const Navbar = () => {
                                               ${
                                                  chat?.isSeen
                                                     ? "bg-transparent"
-                                                    : "bg-[#4d7aeb]"
+                                                    : "bg-[#4b7af0]"
                                               } items-center w-full gap-3 rounded-md bg-muted/50 px-3 py-2 transition-colors hover:bg-muted`}
                                              prefetch={false}
                                              onClick={() => handleSelect(chat)}

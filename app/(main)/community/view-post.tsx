@@ -1,25 +1,14 @@
 "use client";
 import React, { useEffect, useState, useTransition } from "react";
-import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import fitness_icon from "/public/fitness-icon.svg";
 import message_icon from "/public/message-icon.svg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import before_after from "/public/before-after-icon.svg";
-import challenges_icon from "/public/challenges-icon.svg";
-import {
-   Sheet,
-   SheetContent,
-   SheetHeader,
-   SheetTitle,
-   SheetTrigger,
-} from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import back_Icon from "/public/back-icon.svg";
 import { usePathname } from "next/navigation";
 import { Bookmark, ChevronDown } from "lucide-react";
-
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -37,7 +26,7 @@ import { toast } from "sonner";
 import { CommentSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { nullable, z } from "zod";
+import { z } from "zod";
 import {
    Form,
    FormControl,
@@ -46,13 +35,13 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { useAuthStore } from "@/components/providers/auth-provider";
-import { SharePostModal } from "@/components/modals/share-modal";
 import { Posts } from "./user-post-no-image";
 import Comment, { Comments } from "./comment";
 import moment from "moment";
 import { Skeleton } from "@/components/ui/skeleton";
 import share_icon from "/public/share-icon.svg";
 import { useSharePostModal } from "@/stores/use-share-model";
+import UserInfo from "./user-info";
 const Post = () => {
    const pathname = usePathname();
    const pathParts = pathname.split("/");
@@ -64,11 +53,9 @@ const Post = () => {
    const [comments, setComments] = useState<Comments[]>([]);
    const [isLoading, setIsLoading] = useState(false);
    const [countComments, setCountComments] = useState(0);
-   const {
-      open,
-      posts: postsShare,
-      setPosts: setPostsShare,
-   } = useSharePostModal((store) => store);
+   const { open, setPosts: setPostsShare } = useSharePostModal(
+      (store) => store
+   );
    const form = useForm({
       resolver: zodResolver(CommentSchema),
       defaultValues: {
@@ -216,152 +203,95 @@ const Post = () => {
             </span>
          </Link>
 
-         <div className="w-full flex flex-col p-2 gap-2 hover:bg-[#f5f5f5] rounded-lg">
-            <div className="w-full flex justify-between items-center ">
-               <div className="flex gap-2 items-center ">
-                  <Sheet>
-                     <SheetTrigger>
+         {posts && (
+            <div className="w-full flex flex-col p-2 gap-2 hover:bg-[#f5f5f5] rounded-lg">
+               <div className="w-full flex justify-between items-center ">
+                  <div className="flex gap-2 items-center ">
+                     <UserInfo user={posts.user} />
+                     <label
+                        className="text-[#303033] text-sm font-bold cursor-pointer"
+                        htmlFor=""
+                     >
+                        {posts?.user.userName2}
+                     </label>
+                     <span className="text-sm">
+                        {posts?.createdAt
+                           ? moment(posts?.createdAt).fromNow()
+                           : "No date provided"}
+                     </span>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                     <div className="flex gap-1 rounded-full bg-[#EFF0F4] px-3 py-2 justify-center items-center">
                         <Image
-                           src={posts?.user.avatar || defaultProfile}
+                           src={fitness_icon}
                            alt="logo"
-                           width={32}
-                           height={32}
-                           className="cursor-pointer rounded-full"
+                           width={13}
+                           height={12}
                         />
-                     </SheetTrigger>
-                     <SheetContent className="w-[350px]">
-                        <SheetHeader>
-                           <SheetTitle className="text-sm font-medium border-b border-gray-200 pb-4">
-                              User Profile
-                           </SheetTitle>
-                        </SheetHeader>
-                        <div className="flex flex-col">
-                           <Image
-                              src={posts?.user.avatar || defaultProfile}
-                              alt="logo"
-                              width={50}
-                              height={50}
-                              className="cursor-pointer mt-2 rounded-full"
-                           />
-                           <label
-                              className="text-[16px] font-semibold mt-2"
-                              htmlFor=""
-                           >
-                              {posts?.user.firstName}
-                           </label>
-                           <div className="flex flex-col gap-2 mt-1">
-                              <span className="text-sm">
-                                 {posts?.user.email}
-                              </span>
-
-                              <div className="flex gap-1">
-                                 <Image
-                                    src={before_after}
-                                    width={18}
-                                    height={18}
-                                    alt="logo"
-                                 />
-                                 <label htmlFor="" className="text-sm">
-                                    0 Challenges Completed
-                                 </label>
-                              </div>
-                              <div className="flex gap-1">
-                                 <Image
-                                    src={challenges_icon}
-                                    width={18}
-                                    height={18}
-                                    alt="logo"
-                                 />
-                                 <label htmlFor="" className="text-sm">
-                                    120 Achievement Points
-                                 </label>
-                              </div>
-                           </div>
-                           <div className="flex gap-2 mt-4">
-                              <Button variant="primary">View Profile</Button>
-                              <Button
-                                 variant="default"
-                                 className="bg-[#EFF0F4]"
-                              >
-                                 Send Message
-                              </Button>
-                           </div>
-                        </div>
-                     </SheetContent>
-                  </Sheet>
-                  <label
-                     className="text-[#303033] text-sm font-bold cursor-pointer"
-                     htmlFor=""
-                  >
-                     {posts?.user.userName2}
-                  </label>
-                  <span className="text-sm">
-                     {posts?.createdAt
-                        ? moment(posts?.createdAt).fromNow()
-                        : "No date provided"}
-                  </span>
-               </div>
-               <div className="flex gap-2 items-center">
-                  <div className="flex gap-1 rounded-full bg-[#EFF0F4] px-3 py-2 justify-center items-center">
-                     <Image
-                        src={fitness_icon}
-                        alt="logo"
-                        width={13}
-                        height={12}
-                     />
-                     <span className="text-[12px]">{posts?.badge.name}</span>
+                        <span className="text-[12px]">{posts?.badge.name}</span>
+                     </div>
                   </div>
                </div>
-            </div>
-            <Link
-               href="/community/fitness"
-               className="text-black text-lg font-medium mt-3"
-            >
-               {posts?.title}
-            </Link>
-            <div className="text-[#303033] text-[16px] mt-2 break-all">
-               {posts?.description}
-            </div>
-            <div className="flex gap-2 items-center mt-6">
-               <Button
-                  variant="secondary"
-                  className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
+               <Link
+                  href="/community/fitness"
+                  className="text-black text-lg font-medium mt-3"
                >
-                  <Image src={message_icon} alt="logo" width={20} height={20} />
-                  <span className="text-[12px]">
-                     <span>{countComments}</span> Replies
-                  </span>
-               </Button>
-               <Button
-                  variant="secondary"
-                  className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
-                  onClick={() => handleBookmark()}
-               >
-                  <Bookmark
-                     size={20}
-                     fill={isBookmarked ? "#7065cd" : "transparent"}
-                     strokeWidth={1}
-                  />
-                  <span className="text-[12px]">Saved</span>
-               </Button>
-               <Button
-                  type="button"
-                  variant="secondary"
-                  size="default"
-                  className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
-                  onClick={() => {
-                     if (posts) {
-                        open(posts.id);
-                     }
-                  }}
-               >
-                  <Image src={share_icon} alt="logo" width={20} height={20} />
-                  <span className="text-[12px]">Share</span>
-               </Button>
-            </div>
+                  {posts?.title}
+               </Link>
+               <div className="text-[#303033] text-[16px] mt-2 break-all">
+                  {posts?.description}
+               </div>
+               <div className="flex gap-2 items-center mt-6">
+                  <Button
+                     variant="secondary"
+                     className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
+                  >
+                     <Image
+                        src={message_icon}
+                        alt="logo"
+                        width={20}
+                        height={20}
+                     />
+                     <span className="text-[12px]">
+                        <span>{countComments}</span> Replies
+                     </span>
+                  </Button>
+                  <Button
+                     variant="secondary"
+                     className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
+                     onClick={() => handleBookmark()}
+                  >
+                     <Bookmark
+                        size={20}
+                        fill={isBookmarked ? "#7065cd" : "transparent"}
+                        strokeWidth={1}
+                     />
+                     <span className="text-[12px]">Saved</span>
+                  </Button>
+                  <Button
+                     type="button"
+                     variant="secondary"
+                     size="default"
+                     className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
+                     onClick={() => {
+                        if (posts) {
+                           open(posts.id);
+                        }
+                     }}
+                  >
+                     <Image
+                        src={share_icon}
+                        alt="logo"
+                        width={20}
+                        height={20}
+                     />
+                     <span className="text-[12px]">Share</span>
+                  </Button>
+               </div>
 
-            <hr className="mt-3" />
-         </div>
+               <hr className="mt-3" />
+            </div>
+         )}
          <Form {...form}>
             <form
                onSubmit={form.handleSubmit(onSubmit)}

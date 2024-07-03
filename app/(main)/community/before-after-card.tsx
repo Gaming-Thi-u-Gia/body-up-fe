@@ -1,19 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-   Sheet,
-   SheetContent,
-   SheetHeader,
-   SheetTitle,
-   SheetTrigger,
-} from "@/components/ui/sheet";
 import Image from "next/image";
-import defaultProfile from "/public/default-iProfile.png";
-import before_after from "/public/before-after-icon.svg";
-import { Button } from "@/components/ui/button";
-import challenges_icon from "/public/challenges-icon.svg";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Posts } from "./user-post-no-image";
 import {
    fetchFilterPost,
@@ -23,11 +12,11 @@ import {
 import { useAuthStore } from "@/components/providers/auth-provider";
 import moment from "moment";
 import { Skeleton } from "@/components/ui/skeleton";
-import { category } from "@/constants";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useSharePostModal } from "@/stores/use-share-model";
 import { useFilterStore } from "@/stores/use-filter-community";
 import useSearchStore from "@/stores/use-search-post";
+import UserInfo from "./user-info";
 const BeforAfterPost = () => {
    const pathname = usePathname();
    const pathParts = pathname.split("/");
@@ -40,6 +29,7 @@ const BeforAfterPost = () => {
    const { open, setPosts: setPostsZustand } = useSharePostModal(
       (store) => store
    );
+   const router = useRouter();
    const { selectedFilter } = useFilterStore();
    const { searchText } = useSearchStore();
 
@@ -144,86 +134,7 @@ const BeforAfterPost = () => {
                      >
                         <div className="flex items-center justify-between ">
                            <div className="flex gap-2 items-center">
-                              <Sheet>
-                                 <SheetTrigger>
-                                    <Image
-                                       src={post.user.avatar || defaultProfile}
-                                       alt="logo"
-                                       width={32}
-                                       height={32}
-                                       className="cursor-pointer rounded-full"
-                                    />
-                                 </SheetTrigger>
-                                 <SheetContent className="w-[350px]">
-                                    <SheetHeader>
-                                       <SheetTitle className="text-sm font-medium border-b border-gray-200 pb-4">
-                                          User Profile
-                                       </SheetTitle>
-                                    </SheetHeader>
-                                    <div className="flex flex-col">
-                                       <Image
-                                          src={
-                                             post.user.avatar || defaultProfile
-                                          }
-                                          alt="logo"
-                                          width={50}
-                                          height={50}
-                                          className="cursor-pointer mt-2 rounded-full"
-                                       />
-                                       <label
-                                          className="text-[16px] font-semibold mt-2"
-                                          htmlFor=""
-                                       >
-                                          {post.user.userName2}
-                                       </label>
-                                       <div className="flex flex-col gap-2 mt-1">
-                                          <span className="text-sm">
-                                             {post.user.email}
-                                          </span>
-
-                                          <div className="flex gap-1">
-                                             <Image
-                                                src={before_after}
-                                                width={18}
-                                                height={18}
-                                                alt="logo"
-                                             />
-                                             <label
-                                                htmlFor=""
-                                                className="text-sm"
-                                             >
-                                                0 Challenges Completed
-                                             </label>
-                                          </div>
-                                          <div className="flex gap-1">
-                                             <Image
-                                                src={challenges_icon}
-                                                width={18}
-                                                height={18}
-                                                alt="logo"
-                                             />
-                                             <label
-                                                htmlFor=""
-                                                className="text-sm"
-                                             >
-                                                120 Achievement Points
-                                             </label>
-                                          </div>
-                                       </div>
-                                       <div className="flex gap-2 mt-4">
-                                          <Button variant="primary">
-                                             View Profile
-                                          </Button>
-                                          <Button
-                                             variant="default"
-                                             className="bg-[#EFF0F4]"
-                                          >
-                                             Send Message
-                                          </Button>
-                                       </div>
-                                    </div>
-                                 </SheetContent>
-                              </Sheet>
+                              <UserInfo user={post.user} />
                               <div className="flex flex-col text-sm items-start">
                                  <label className="font-bold text-black">
                                     {post.user.userName2}

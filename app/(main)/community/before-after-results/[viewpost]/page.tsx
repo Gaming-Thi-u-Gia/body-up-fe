@@ -55,6 +55,7 @@ import { SharePostModal } from "@/components/modals/share-modal";
 import moment from "moment";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSharePostModal } from "@/stores/use-share-model";
+import UserInfo from "../../user-info";
 const BeforeAfterPost = () => {
    const pathname = usePathname();
    const pathParts = pathname.split("/");
@@ -211,219 +212,151 @@ const BeforeAfterPost = () => {
                   Back to <span>#{title}</span>
                </span>
             </Link>
+            {posts && (
+               <div className="w-full flex flex-col p-2 gap-2 hover:bg-[#f5f5f5] rounded-lg">
+                  <div className="flex gap-2 items-center">
+                     <UserInfo user={posts.user} />
+                     <div className="flex flex-col text-sm items-start">
+                        <label className="font-bold text-black">
+                           {posts.user.userName2}
+                        </label>
+                        <span className="font-light text-black ">
+                           {posts.createdAt
+                              ? moment(posts.createdAt).fromNow()
+                              : "No date provided"}
+                        </span>
+                     </div>
+                  </div>
+                  <div className="text-black text-lg font-medium mt-3">
+                     {posts.title}
+                  </div>
+                  <div className="text-[#303033] text-[16px] mt-2">
+                     {posts.description}
+                  </div>
+                  <div className="w-full flex items-center gap-4">
+                     <div className="flex flex-col gap-1 w-[50%]">
+                        <span className="text-[12px] font-bold">Before</span>
+                        <Item
+                           original={posts.imgBefore}
+                           thumbnail={posts.imgBefore}
+                           width={1000}
+                           height={800}
+                        >
+                           {({ ref, open }) => (
+                              <Image
+                                 ref={ref}
+                                 onClick={open}
+                                 src={posts.imgBefore}
+                                 alt=""
+                                 width={0}
+                                 height={0}
+                                 sizes="100"
+                                 className="w-[100%] h-[100%] object-cover rounded-xl "
+                                 // priority={true}
+                              />
+                           )}
+                        </Item>
+                        <span className="text-[12px] font-semibold flex items-stretch bg-[#EFF0F4] rounded-full p-2 mt-2">
+                           Date Taken:{" "}
+                           {posts.dayBefore &&
+                              new Date(posts.dayBefore).toLocaleDateString(
+                                 "en-US",
+                                 {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                 }
+                              )}
+                        </span>
+                     </div>
+                     <div className="flex flex-col gap-1 w-[50%]">
+                        <span className="text-[12px] font-bold">After</span>
+                        <Item
+                           original={posts.imgAfter}
+                           thumbnail={posts.imgAfter}
+                           width={1000}
+                           height={800}
+                        >
+                           {({ ref, open }) => (
+                              <Image
+                                 ref={ref}
+                                 onClick={open}
+                                 src={posts.imgAfter}
+                                 width={0}
+                                 height={0}
+                                 sizes="100"
+                                 alt=""
+                                 className="w-[100%] h-[100%] object-cover rounded-xl "
+                              />
+                           )}
+                        </Item>
 
-            <div className="w-full flex flex-col p-2 gap-2 hover:bg-[#f5f5f5] rounded-lg">
-               <div className="flex gap-2 items-center">
-                  <Sheet>
-                     <SheetTrigger>
+                        <span className="text-[12px] font-semibold flex items-stretch bg-[#EFF0F4] rounded-full p-2 mt-2">
+                           Date Taken:{" "}
+                           {posts.dayAfter &&
+                              new Date(posts.dayAfter).toLocaleDateString(
+                                 "en-US",
+                                 {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                 }
+                              )}
+                        </span>
+                     </div>
+                  </div>
+                  <div className="flex gap-2 items-center mt-6">
+                     <Button
+                        variant="secondary"
+                        className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
+                     >
                         <Image
-                           src={posts?.user.avatar || defaultProfile}
+                           src={message_icon}
                            alt="logo"
-                           width={32}
-                           height={32}
-                           className="cursor-pointer rounded-full"
+                           width={20}
+                           height={20}
                         />
-                     </SheetTrigger>
-                     <SheetContent className="w-[350px]">
-                        <SheetHeader>
-                           <SheetTitle className="text-sm font-medium border-b border-gray-200 pb-4">
-                              User Profile
-                           </SheetTitle>
-                        </SheetHeader>
-                        <div className="flex flex-col">
-                           <Image
-                              src={posts?.user.avatar || defaultProfile}
-                              alt="logo"
-                              width={50}
-                              height={50}
-                              className="cursor-pointer mt-2 rounded-full"
-                           />
-                           <label
-                              className="text-[16px] font-semibold mt-2"
-                              htmlFor=""
-                           >
-                              {posts?.user.userName2}
-                           </label>
-                           <div className="flex flex-col gap-2 mt-1">
-                              <span className="text-sm">
-                                 {posts?.user.userName2}
-                              </span>
-
-                              <div className="flex gap-1">
-                                 <Image
-                                    src={before_after}
-                                    width={18}
-                                    height={18}
-                                    alt="logo"
-                                 />
-                                 <label htmlFor="" className="text-sm">
-                                    0 Challenges Completed
-                                 </label>
-                              </div>
-                              <div className="flex gap-1">
-                                 <Image
-                                    src={challenges_icon}
-                                    width={18}
-                                    height={18}
-                                    alt="logo"
-                                 />
-                                 <label htmlFor="" className="text-sm">
-                                    120 Achievement Points
-                                 </label>
-                              </div>
-                           </div>
-                           <div className="flex gap-2 mt-4">
-                              <Button variant="primary">View Profile</Button>
-                              <Button
-                                 variant="default"
-                                 className="bg-[#EFF0F4]"
-                              >
-                                 Send Message
-                              </Button>
-                           </div>
-                        </div>
-                     </SheetContent>
-                  </Sheet>
-                  <div className="flex flex-col text-sm items-start">
-                     <label className="font-bold text-black">
-                        {posts?.user.userName2}
-                     </label>
-                     <span className="font-light text-black ">
-                        {posts?.createdAt
-                           ? moment(posts?.createdAt).fromNow()
-                           : "No date provided"}
-                     </span>
-                  </div>
-               </div>
-               <div className="text-black text-lg font-medium mt-3">
-                  {posts?.title}
-               </div>
-               <div className="text-[#303033] text-[16px] mt-2">
-                  {posts?.description}
-               </div>
-               <div className="w-full flex items-center gap-4">
-                  <div className="flex flex-col gap-1 w-[50%]">
-                     <span className="text-[12px] font-bold">Before</span>
-                     <Item
-                        original={posts?.imgBefore}
-                        thumbnail={posts?.imgBefore}
-                        width={1000}
-                        height={800}
+                        <span className="text-[12px]">
+                           <span>{countComments}</span> Replies
+                        </span>
+                     </Button>
+                     <Button
+                        variant="secondary"
+                        className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
+                        onClick={() => handleBookmark()}
                      >
-                        {({ ref, open }) => (
-                           <Image
-                              ref={ref}
-                              onClick={open}
-                              src={posts?.imgBefore!}
-                              alt=""
-                              width={0}
-                              height={0}
-                              sizes="100"
-                              className="w-[100%] h-[100%] object-cover rounded-xl "
-                              // priority={true}
-                           />
-                        )}
-                     </Item>
-                     <span className="text-[12px] font-semibold flex items-stretch bg-[#EFF0F4] rounded-full p-2 mt-2">
-                        Date Taken:{" "}
-                        {posts?.dayBefore &&
-                           new Date(posts.dayBefore).toLocaleDateString(
-                              "en-US",
-                              {
-                                 year: "numeric",
-                                 month: "long",
-                                 day: "numeric",
-                              }
-                           )}
-                     </span>
-                  </div>
-                  <div className="flex flex-col gap-1 w-[50%]">
-                     <span className="text-[12px] font-bold">After</span>
-                     <Item
-                        original={posts?.imgAfter}
-                        thumbnail={posts?.imgAfter}
-                        width={1000}
-                        height={800}
+                        <Bookmark
+                           size={20}
+                           fill={isBookmarked ? "#7065cd" : "transparent"}
+                           strokeWidth={1}
+                        />
+                        <span className="text-[12px]">Saved</span>
+                     </Button>
+                     <Button
+                        type="button"
+                        variant="secondary"
+                        size="default"
+                        className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
+                        onClick={() => {
+                           if (posts) {
+                              open(posts.id);
+                           }
+                        }}
                      >
-                        {({ ref, open }) => (
-                           <Image
-                              ref={ref}
-                              onClick={open}
-                              src={posts?.imgAfter!}
-                              width={0}
-                              height={0}
-                              sizes="100"
-                              alt=""
-                              className="w-[100%] h-[100%] object-cover rounded-xl "
-                              // priority={true}
-                           />
-                        )}
-                     </Item>
-
-                     <span className="text-[12px] font-semibold flex items-stretch bg-[#EFF0F4] rounded-full p-2 mt-2">
-                        Date Taken:{" "}
-                        {posts?.dayAfter &&
-                           new Date(posts.dayAfter).toLocaleDateString(
-                              "en-US",
-                              {
-                                 year: "numeric",
-                                 month: "long",
-                                 day: "numeric",
-                              }
-                           )}
-                     </span>
+                        <Image
+                           src={share_icon}
+                           alt="logo"
+                           width={20}
+                           height={20}
+                        />
+                        <span className="text-[12px]">Share</span>
+                     </Button>
                   </div>
-               </div>
-               <div className="flex gap-2 items-center mt-6">
-                  <Button
-                     variant="secondary"
-                     className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
-                  >
-                     <Image
-                        src={message_icon}
-                        alt="logo"
-                        width={20}
-                        height={20}
-                     />
-                     <span className="text-[12px]">
-                        <span>{countComments}</span> Replies
-                     </span>
-                  </Button>
-                  <Button
-                     variant="secondary"
-                     className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 justify-center items-center"
-                     onClick={() => handleBookmark()}
-                  >
-                     <Bookmark
-                        size={20}
-                        fill={isBookmarked ? "#7065cd" : "transparent"}
-                        strokeWidth={1}
-                     />
-                     <span className="text-[12px]">Saved</span>
-                  </Button>
-                  <Button
-                     type="button"
-                     variant="secondary"
-                     size="default"
-                     className="flex gap-1 rounded-full bg-[#EFF0F4] p-4 h-7 justify-center items-center"
-                     onClick={() => {
-                        if (posts) {
-                           open(posts.id);
-                        }
-                     }}
-                  >
-                     <Image
-                        src={share_icon}
-                        alt="logo"
-                        width={20}
-                        height={20}
-                     />
-                     <span className="text-[12px]">Share</span>
-                  </Button>
-               </div>
 
-               <hr className="mt-3" />
-            </div>
+                  <hr className="mt-3" />
+               </div>
+            )}
+
             <Form {...form}>
                <form
                   onSubmit={form.handleSubmit(onSubmit)}
