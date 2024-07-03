@@ -54,8 +54,13 @@ export function BlockUserModal() {
             <AlertDialogHeader>
                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently block this
-                  user.
+                  This action cannot be undone. This will permanently{" "}
+                  {!isReceiverBlocked ? (
+                     <span>block</span>
+                  ) : (
+                     <span>unblock</span>
+                  )}{" "}
+                  this user.
                </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
