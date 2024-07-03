@@ -52,6 +52,7 @@ export const LoginForm = () => {
                setUser({
                   id: res.user.uid,
                   email: authResponse?.payload.email,
+                  avatar: authResponse?.payload.avatar,
                });
             }
             login(response.payload.res.token);

@@ -38,9 +38,12 @@ import {
    arrayUnion,
    collection,
    doc,
+   getDocs,
+   query,
    serverTimestamp,
    setDoc,
    updateDoc,
+   where,
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import useUserFirebaseStore, { User } from "@/stores/user-firebase-store";
@@ -95,41 +98,60 @@ const PostUser = ({ categoryId }: CategoryId) => {
    const { selectedFilter, setSelectedFilter } = useFilterStore();
    const { searchText } = useSearchStore();
    console.log("Search:", searchText);
-   const [user, setUser] = useState<User>();
    const { currentUser } = useUserFirebaseStore((store) => store);
    const router = useRouter();
-   const handleAddUserChat = async () => {
-      const chatRef = collection(db, "chats");
-      const userChatsRef = collection(db, "userchats");
-      try {
-         const newChatRef = doc(chatRef);
-         await setDoc(newChatRef, {
-            createdAt: serverTimestamp(),
-            messages: [],
-         });
+   const handleAddUserChat = async (post: Posts) => {
+      if (post) {
+         const chatRef = collection(db, "chats");
+         const userChatsRef = collection(db, "userchats");
+         const userRef = collection(db, "users");
+         const username = post.user.email.split("@")[0];
+         try {
+            const q = query(userRef, where("username", "==", username));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+               // @ts-ignore
+               const foundUser = querySnapshot.docs[0].data();
+               console.log(foundUser);
+               const newChatRef = doc(chatRef); // Create a new chat document reference
+               await setDoc(newChatRef, {
+                  createdAt: serverTimestamp(),
+                  messages: [],
+               });
 
-         await updateDoc(doc(userChatsRef, user?.id), {
-            chats: arrayUnion({
-               chatId: newChatRef.id,
-               lastMessage: "",
-               receiverId: currentUser?.id,
-               updatedAt: Date.now(),
-            }),
-         });
+               // Check if the user and currentUser are properly set
+               if (!foundUser || !currentUser) {
+                  console.log("User data is missing");
+                  return;
+               }
 
-         await updateDoc(doc(userChatsRef, currentUser?.id), {
-            chats: arrayUnion({
-               chatId: newChatRef.id,
-               lastMessage: "",
-               receiverId: user?.id,
-               updatedAt: Date.now(),
-            }),
-         });
-         router.push("/inbox");
-      } catch (error) {
-         console.log(error);
+               await updateDoc(doc(userChatsRef, foundUser.id), {
+                  chats: arrayUnion({
+                     chatId: newChatRef.id,
+                     lastMessage: "",
+                     receiverId: currentUser.id,
+                     updatedAt: Date.now(),
+                  }),
+               });
+
+               await updateDoc(doc(userChatsRef, currentUser.id), {
+                  chats: arrayUnion({
+                     chatId: newChatRef.id,
+                     lastMessage: "",
+                     receiverId: foundUser.id,
+                     updatedAt: Date.now(),
+                  }),
+               });
+               router.push("/inbox");
+            } else {
+               console.log("No user found with the provided username");
+            }
+         } catch (error) {
+            console.log(error);
+         }
       }
    };
+
    useEffect(() => {
       setPosts([]);
       setPage(0);
@@ -365,7 +387,9 @@ const PostUser = ({ categoryId }: CategoryId) => {
                                           <Button
                                              variant="default"
                                              className="bg-[#EFF0F4]"
-                                             onClick={handleAddUserChat}
+                                             onClick={() =>
+                                                handleAddUserChat(post)
+                                             }
                                           >
                                              Send Message
                                           </Button>

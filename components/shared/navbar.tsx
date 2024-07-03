@@ -157,11 +157,14 @@ export const Navbar = () => {
                                  />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent
-                                 className="w-64 mt-[20%] ml-[5%]"
+                                 className="w-[270px] mt-[20%] ml-[5%]"
                                  side="left"
                               >
                                  <DropdownMenuLabel>
-                                    Your Message
+                                    <div className="flex items-center justify-between  text-[#424245] font-bold text-[12px]">
+                                       <div className="">Your Message</div>
+                                       <Link href="/inbox">View Inbox</Link>
+                                    </div>
                                  </DropdownMenuLabel>
                                  <DropdownMenuSeparator />
                                  <DropdownMenuGroup>
