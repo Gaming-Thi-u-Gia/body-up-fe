@@ -12,6 +12,7 @@ import DailyCourses from "./daily-courses";
 import SkeletonLoader from "./skeleton-daily";
 import { fetchJoinChallenge } from "@/utils/user";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import ModalChallenge from "./access-join-challenge";
 
 interface Category {
     id: number;
@@ -39,6 +40,7 @@ const Page = () => {
     const [loading, setLoading] = useState(true);
     const [workoutProgramById, setWorkoutProgramById] = useState<WorkoutProgram | null>(null);
     const sessionToken = useAuthStore((store) => store.sessionToken);
+    const [isModalOpen, setIsModalOpen] = useState(false); 
 
     const pathName = usePathname();
     const workoutProgramId = pathName.split('/')[2];
@@ -57,10 +59,14 @@ const Page = () => {
         getWorkoutProgramById();
     }, [workoutProgramId]);
 
-    const joinChallenge = async () => {
+    const joinWorkoutChallenge = async () => {
         const res = await fetchJoinChallenge(sessionToken!, Number(workoutProgramId));
         router.push("/my-fitness-journey");
     }
+
+    const joinChallenge = async () => {
+        setIsModalOpen(true);
+    };
 
     const getTypes = (categories: Category[] | undefined): string => {
         if (!categories) return '';
@@ -189,6 +195,12 @@ const Page = () => {
                         </div>
                     </div>
                 </div>
+
+                <ModalChallenge 
+                    isOpen={isModalOpen} 
+                    onClose={() => setIsModalOpen(false)} 
+                    onConfirm={joinWorkoutChallenge}
+                />
 
                 <div className="w-[75%] ml-10">
                     <div className="flex justify-between pb-4">

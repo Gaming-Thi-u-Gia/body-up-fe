@@ -6,11 +6,12 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "../ui/accordion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
 import { useAuthStore } from "../providers/auth-provider";
 import { markVideoDailyChallenge } from "@/utils/dailyExercise";
+import Modal from "@/app/(main)/workout-videos/video";
 
 type Props = {
     id: number;
@@ -44,17 +45,38 @@ export const VideoDailyCard = ({
             ? initialStatus
             : "incomplete";
     const [status, setStatus] = useState(validatedStatus);
+    const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+    const watchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-    const onClick = async () => {
+    const handleThumbnailClick = (videoId: string) => {
+        setSelectedVideoId(videoId);
+        if (status === "incomplete") {
+            startWatchTimer();
+        }
+    };
+
+    const startWatchTimer = () => {
+        watchTimerRef.current = setTimeout(() => {
+            completeVideo();
+        }, 6000);
+    };
+
+    const closeVideo = () => {
+        setSelectedVideoId(null);
+    };
+
+    const completeVideo = async () => {
         if (status === "complete" || day !== currDay) return;
         const res = await markVideoDailyChallenge(sessionToken!, id);
         if (res?.status === 200) {
             setStatus("complete");
         }
     };
+
     if (isLoading) {
         return <VideoDailyCardSkeleton />;
     }
+
     return (
         <>
             {status === "incomplete" ? (
@@ -62,14 +84,23 @@ export const VideoDailyCard = ({
                     <div
                         className='pb-[12%] min-w-[180px] bg-cover bg-center rounded-md relative bg-no-repeat cursor-pointer group overflow-hidden'
                         style={{ backgroundImage: `url(${img})` }}
+                        onClick={() => handleThumbnailClick(url)}
                     >
-                        <div onClick={onClick}>
+                        <div>
                             <div className='bg-black opacity-0 absolute left-0 bottom-0 right-0 top-0 z-1 group-hover:opacity-20 transition-all duration-300' />
                             <Badge className='absolute right-2 bottom-3'>
                                 {duration}
                             </Badge>
                         </div>
                     </div>
+
+                    {selectedVideoId && (
+                        <Modal
+                            isOpen={Boolean(selectedVideoId)}
+                            onClose={closeVideo}
+                            videoId={selectedVideoId}
+                        />
+                    )}
 
                     <div className='flex flex-col justify-between w-full ml-4'>
                         <div className='flex justify-between '>
@@ -124,6 +155,7 @@ export const VideoDailyCard = ({
                         </AccordionTrigger>
                         <AccordionContent className='flex pb-0'>
                             <div
+                                onClick={() => handleThumbnailClick(url)}
                                 style={{ backgroundImage: `url(${img})` }}
                                 className='pb-[12%] min-w-[180px] bg-cover bg-center rounded-md relative bg-no-repeat cursor-pointer group overflow-hidden'
                             >
@@ -132,6 +164,14 @@ export const VideoDailyCard = ({
                                     {duration}
                                 </Badge>
                             </div>
+
+                            {selectedVideoId && (
+                                <Modal
+                                    isOpen={Boolean(selectedVideoId)}
+                                    onClose={closeVideo}
+                                    videoId={selectedVideoId}
+                                />
+                            )}
 
                             <div className='flex flex-col justify-between w-full ml-4'>
                                 <div className='flex justify-between '>

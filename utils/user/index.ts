@@ -466,7 +466,7 @@ export const fetchJoinChallenge = async (
     workoutProgramId: number
 ) => {
     const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/addChallenge?workoutProgramId=${workoutProgramId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/userChallenge/addChallenge?workoutProgramId=${workoutProgramId}`,
         {
             method: "POST",
             headers: {
