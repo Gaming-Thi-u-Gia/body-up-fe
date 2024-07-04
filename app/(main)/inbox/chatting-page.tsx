@@ -10,8 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import ChatList from "./chat-list";
 import Chat from "./chat";
+import useChatFireBaseStore from "@/stores/chat-firebase-store";
+import ChatAI from "./chat-ai";
 
 export function ChattingPage() {
+   const { chatId } = useChatFireBaseStore((store) => store);
+
    return (
       <div className="grid min-h-screen w-full grid-cols-[260px_1fr] bg-background">
          <div className="flex flex-col border-r bg-muted/40">
@@ -39,9 +43,10 @@ export function ChattingPage() {
                   </DropdownMenuContent>
                </DropdownMenu>
             </div>
+
             <ChatList />
          </div>
-         <Chat />
+         {chatId === "AI" ? <ChatAI /> : <Chat />}
       </div>
    );
 }

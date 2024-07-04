@@ -12,6 +12,7 @@ import defaultProfile from "/public/default-iProfile.png";
 import { Button } from "@/components/ui/button";
 import useChatFireBaseStore from "@/stores/chat-firebase-store";
 import { useAddChatModel } from "@/stores/add-chat-user";
+import logo_ai from "/public/Ailogo.png";
 
 export type ChatListProps = {
    chatId: string;
@@ -83,6 +84,10 @@ const ChatList = () => {
       chat.user.username?.toLowerCase().includes(username.toLowerCase())
    );
 
+   const handleAIChatId = async (id: string) => {
+      changeChat(id, currentUser!);
+   };
+
    return (
       <div className="flex-1 overflow-auto">
          <div className="border-b bg-background px-4 py-3 flex items-center gap-2">
@@ -104,6 +109,29 @@ const ChatList = () => {
          </div>
 
          <div className="grid gap-2">
+            <Link
+               href="#"
+               className={`flex  items-center gap-3 rounded-md bg-muted/50 px-3 py-2 transition-colors hover:bg-muted`}
+               prefetch={false}
+               onClick={() => handleAIChatId("AI")}
+            >
+               <Avatar className="h-8 w-8 border">
+                  <Image
+                     src={logo_ai}
+                     alt="logo"
+                     width={32}
+                     height={32}
+                     className="cursor-pointer rounded-full"
+                  />
+               </Avatar>
+               <div className="flex-1 overflow-hidden">
+                  <div className="font-medium truncate">Health Care</div>
+                  <div className="text-sm text-muted-foreground line-clamp-1 break-all">
+                     Ask me anything...
+                  </div>
+               </div>
+            </Link>
+
             {filteredChats.map((chat) => (
                <Link
                   href="#"
