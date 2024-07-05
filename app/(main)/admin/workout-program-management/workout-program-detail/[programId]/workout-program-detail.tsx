@@ -116,27 +116,15 @@ const WorkoutProgramDetail = () => {
           morningRecipes:
             data.dailyExercises[i]?.dailyRecipes.filter(
               (r: any) => r.part === "morning"
-            ).length > 0
-              ? data.dailyExercises[i]?.dailyRecipes.filter(
-                  (r: any) => r.part === "morning"
-                )
-              : [],
+            ) || [],
           afternoonRecipes:
             data.dailyExercises[i]?.dailyRecipes.filter(
               (r: any) => r.part === "afternoon"
-            ).length > 0
-              ? data.dailyExercises[i]?.dailyRecipes.filter(
-                  (r: any) => r.part === "afternoon"
-                )
-              : [],
+            ) || [],
           eveningRecipes:
             data.dailyExercises[i]?.dailyRecipes.filter(
               (r: any) => r.part === "evening"
-            ).length > 0
-              ? data.dailyExercises[i]?.dailyRecipes.filter(
-                  (r: any) => r.part === "evening"
-                )
-              : [],
+            ) || [],
         }));
 
         setDayStates(initialDayStates);
@@ -206,11 +194,11 @@ const WorkoutProgramDetail = () => {
   }, []);
 
   return (
-    <div className="container mx-auto py-12">
+    <div className="container mx-auto py-12 px-4 md:px-6">
       <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
         <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link
-            href="#"
+            href="/admin"
             className="flex items-center gap-2 text-lg font-semibold md:text-base"
             prefetch={false}
           >
@@ -222,41 +210,45 @@ const WorkoutProgramDetail = () => {
             href="/admin/workout-program-management"
             className="text-lg font-semibold"
           >
-            Home
+            Back
           </Link>
         </div>
       </header>
-      <div className="space-y-6">
+      <div className="space-y-6 mt-6">
         <div>
-          <label className="block font-medium mb-2">Program Name</label>
-          <p>{program.name}</p>
+          <label className="block font-medium text-lg mb-2">
+            Program Name:
+          </label>
+          <span className="text-base">{program.name}</span>
         </div>
         <div>
-          <label className="block font-medium mb-2">Type</label>
-          <p>{program.type}</p>
+          <label className="block font-medium text-lg mb-2">Type:</label>
+          <span className="text-base">{program.type}</span>
         </div>
         <div>
-          <label className="block font-medium mb-2">Equipment</label>
-          <p>{program.equipment}</p>
+          <label className="block font-medium text-lg mb-2">Equipment:</label>
+          <span className="text-base">{program.equipment}</span>
         </div>
         <div>
-          <label className="block font-medium mb-2">Detail</label>
-          <p>{program.detail}</p>
+          <label className="block font-medium text-lg mb-2">Detail:</label>
+          <span className="text-base">{program.detail}</span>
         </div>
         <div>
-          <label className="block font-medium mb-2">Number of Days</label>
-          <p>{program.day}</p>
+          <label className="block font-medium text-lg mb-2">
+            Number of Days:
+          </label>
+          <span className="text-base">{program.day}</span>
         </div>
         <div>
-          <label className="block font-medium mb-2">Time</label>
-          <p>{program.time}</p>
+          <label className="block font-medium text-lg mb-2">Time:</label>
+          <span className="text-base">{program.time}</span>
         </div>
         <div>
-          <label className="block font-medium mb-2">Year</label>
-          <p>{program.year}</p>
+          <label className="block font-medium text-lg mb-2">Year:</label>
+          <span className="text-base">{program.year}</span>
         </div>
         <div>
-          <label className="block font-medium mb-2">Image</label>
+          <label className="block font-medium text-lg mb-2">Image:</label>
           {program.img && (
             <img
               src={program.img}
@@ -266,7 +258,7 @@ const WorkoutProgramDetail = () => {
           )}
         </div>
         <div>
-          <label className="block font-medium mb-2">Banner</label>
+          <label className="block font-medium text-lg mb-2">Banner</label>
           {program.banner && (
             <img
               src={program.banner}
@@ -276,27 +268,31 @@ const WorkoutProgramDetail = () => {
           )}
         </div>
         <div>
-          <label className="block font-medium mb-2">Program Topics</label>
+          <label className="block font-medium text-lg mb-2">
+            Program Topics:
+          </label>
           <div className="grid grid-cols-3 gap-4 mt-4">
             {program.programTopics.map((topic, index) => (
               <div
                 key={index}
                 className="bg-gray-100 rounded-md p-4 flex items-center"
               >
-                <span className="font-medium">{topic.name}</span>
+                <span className="font-medium text-base">{topic.name}</span>
               </div>
             ))}
           </div>
         </div>
         <div>
-          <label className="block font-medium mb-2">Program Categories</label>
+          <label className="block font-medium text-lg mb-2">
+            Program Categories:
+          </label>
           <div className="grid grid-cols-2 gap-4">
             {program.workoutProgramCategories.map((category, index) => (
               <div
                 key={index}
                 className="bg-gray-100 rounded-md p-4 flex items-center space-x-2"
               >
-                <span className="font-medium">{category.name}</span>
+                <span className="font-medium text-base">{category.name}</span>
               </div>
             ))}
           </div>
@@ -312,7 +308,9 @@ const WorkoutProgramDetail = () => {
             <div className="grid grid-cols-1 gap-2">
               {dayState.dailyVideos.map((video, videoIndex) => (
                 <div key={videoIndex} className="flex items-center">
-                  <p>{videos.find((v) => v.id === video.video.id)?.name}</p>
+                  <span className="text-base">
+                    {videos.find((v) => v.id === video.video.id)?.name}
+                  </span>
                 </div>
               ))}
             </div>
@@ -327,25 +325,25 @@ const WorkoutProgramDetail = () => {
                 {timeOfDay === "morning" &&
                   dayState.morningRecipes.map((recipe, recipeIndex) => (
                     <div key={recipeIndex} className="flex items-center">
-                      <p>
+                      <span className="text-base">
                         {recipes.find((r) => r.id === recipe.recipe.id)?.name}
-                      </p>
+                      </span>
                     </div>
                   ))}
                 {timeOfDay === "afternoon" &&
                   dayState.afternoonRecipes.map((recipe, recipeIndex) => (
                     <div key={recipeIndex} className="flex items-center">
-                      <p>
+                      <span className="text-base">
                         {recipes.find((r) => r.id === recipe.recipe.id)?.name}
-                      </p>
+                      </span>
                     </div>
                   ))}
                 {timeOfDay === "evening" &&
                   dayState.eveningRecipes.map((recipe, recipeIndex) => (
                     <div key={recipeIndex} className="flex items-center">
-                      <p>
+                      <span className="text-base">
                         {recipes.find((r) => r.id === recipe.recipe.id)?.name}
-                      </p>
+                      </span>
                     </div>
                   ))}
               </div>

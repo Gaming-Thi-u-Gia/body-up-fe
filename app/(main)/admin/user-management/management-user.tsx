@@ -65,16 +65,15 @@ export function ManagementUser() {
     try {
       const pageSize = 10;
       const data = await fetchGetUser(pageNo, pageSize, sessionToken!);
-
       if (data.totalElements === 0) {
         setHasMoreUsers(false);
         setIsLoading(false);
         return;
       }
-
+      const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
       setUsers((prevUsers) => [
         ...prevUsers,
-        ...data.content.map((user: any) => ({
+        ...sortedData.map((user: any) => ({
           ...user,
           name: `${user.firstName} ${user.lastName}`,
         })),

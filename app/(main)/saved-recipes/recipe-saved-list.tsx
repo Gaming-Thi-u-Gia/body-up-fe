@@ -8,7 +8,6 @@ import { RecipeCardType } from "@/utils/recipe/type";
 import Link from "next/link";
 import { handleSort } from "@/utils/recipe/handle-data";
 import { fetchGetSavedRecipe } from "@/utils/recipe/fetch";
-import { set } from "zod";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 const RecipeSavedList = () => {

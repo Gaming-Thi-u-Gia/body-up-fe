@@ -61,7 +61,8 @@ export function PostManagement() {
         setHasMorePost(false);
         setIsLoading(false);
       }
-      setPosts((prev) => [...prev, ...data.content]);
+      const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
+      setPosts((prev) => [...prev, ...sortedData]);
       setPageNo((previous) => previous + 1);
       setHasMorePost(!data.last);
     } catch (error) {

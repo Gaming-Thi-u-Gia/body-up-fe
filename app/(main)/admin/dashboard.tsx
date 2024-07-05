@@ -1,14 +1,24 @@
-"use client"
-import { Button } from "@/components/ui/button"
-import { Computer, CookingPot, Highlighter, Tags, Users, Video } from "lucide-react"
-import { useEffect, useState } from "react"
-import { fetchGetMonthlyUserCount, fetchGetTotalElements } from "@/utils/admin/fetch"
-import { useAuthStore } from "@/components/providers/auth-provider"
-import Link from "next/link"
-import { Card } from "@/components/ui/cart"
-import { ResponsiveBar } from '@nivo/bar';
-import { ResponsiveLine } from '@nivo/line';
-
+"use client";
+import { Button } from "@/components/ui/button";
+import {
+  Computer,
+  CookingPot,
+  Highlighter,
+  Tags,
+  Users,
+  Video,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  fetchGetMonthlyUserCount,
+  fetchGetTopUserCompltedChallenge,
+  fetchGetTotalElements,
+} from "@/utils/admin/fetch";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import Link from "next/link";
+import { Card } from "@/components/ui/cart";
+import { ResponsiveBar } from "@nivo/bar";
+import { ResponsiveLine } from "@nivo/line";
 
 export type TotalElementsType = {
   totalUser: number;
@@ -24,10 +34,24 @@ export type MonthlyUserCountType = {
   name: string;
   count: number;
 };
-const Dashboard = () =>{
+
+export type UserLeaderboardType = {
+  id: number;
+  userName: string;
+  userName2: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  userChallengeCompletedCount: number;
+};
+
+const Dashboard = () => {
   const { sessionToken } = useAuthStore((store) => store);
   const [totalElements, setTotalElements] = useState<TotalElementsType>();
-  const [monthlyUserCount, setMonthlyUserCount] = useState<MonthlyUserCountType[]>(
+  const [monthlyUserCount, setMonthlyUserCount] = useState<
+    MonthlyUserCountType[]
+  >([]);
+  const [userLeaderboard, setUserLeaderboard] = useState<UserLeaderboardType[]>(
     []
   );
 
@@ -35,7 +59,6 @@ const Dashboard = () =>{
     const getTotalElements = async () => {
       try {
         const response = await fetchGetTotalElements(sessionToken!);
-        console.log(response);
         setTotalElements(response);
       } catch (error) {
         console.log(error);
@@ -45,14 +68,22 @@ const Dashboard = () =>{
       try {
         const response = await fetchGetMonthlyUserCount(sessionToken!);
         setMonthlyUserCount(response);
-        console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    const getUserLeaderboard = async () => {
+      try {
+        const response = await fetchGetTopUserCompltedChallenge(sessionToken!);
+        setUserLeaderboard(response);
       } catch (error) {
         console.log(error);
       }
     };
     getTotalElements();
     getMonthlyUserCount();
-  }, []);
+    getUserLeaderboard();
+  }, [sessionToken]);
 
   if (!totalElements) {
     return <div>Loading...</div>;
@@ -66,49 +97,59 @@ const Dashboard = () =>{
             <div className="text-center">
               <Users className="h-6 w-6 mx-auto mb-2" />
               <h2 className="text-xl font-bold">Total Users</h2>
-              <p className="text-2xl font-bold">9</p>
+              <p className="text-2xl font-bold">{totalElements.totalUser}</p>
             </div>
           </Card>
           <Card className="flex items-center justify-center p-4">
             <div className="text-center">
               <Computer className="h-6 w-6 mx-auto mb-2" />
               <h2 className="text-xl font-bold">Total Workout Programs</h2>
-              <p className="text-2xl font-bold">35</p>
+              <p className="text-2xl font-bold">
+                {totalElements.totalWorkoutProgram}
+              </p>
             </div>
           </Card>
           <Card className="flex items-center justify-center p-4">
             <div className="text-center">
               <Video className="h-6 w-6 mx-auto mb-2" />
               <h2 className="text-xl font-bold">Total Workout Videos</h2>
-              <p className="text-2xl font-bold">60</p>
+              <p className="text-2xl font-bold">{totalElements.totalVideo}</p>
             </div>
           </Card>
           <Card className="flex items-center justify-center p-4">
             <div className="text-center">
               <CookingPot className="h-6 w-6 mx-auto mb-2" />
               <h2 className="text-xl font-bold">Total Recipes</h2>
-              <p className="text-2xl font-bold">60</p>
+              <p className="text-2xl font-bold">{totalElements.totalRecipe}</p>
             </div>
           </Card>
           <Card className="flex items-center justify-center p-4">
             <div className="text-center">
               <Tags className="h-6 w-6 mx-auto mb-2" />
               <h2 className="text-xl font-bold">Total Posts</h2>
-              <p className="text-2xl font-bold">25</p>
+              <p className="text-2xl font-bold">{totalElements.totalPost}</p>
             </div>
           </Card>
           <Card className="flex items-center justify-center p-4">
             <div className="text-center">
               <Highlighter className="h-6 w-6 mx-auto mb-2" />
-              <h2 className="text-xl font-bold">Total User Challenge Uncompleted</h2>
-              <p className="text-2xl font-bold">5</p>
+              <h2 className="text-xl font-bold">
+                Total User Challenge Uncompleted
+              </h2>
+              <p className="text-2xl font-bold">
+                {totalElements.totalUserChallengeUncompleted}
+              </p>
             </div>
           </Card>
           <Card className="flex items-center justify-center p-4">
             <div className="text-center">
               <Highlighter className="h-6 w-6 mx-auto mb-2" />
-              <h2 className="text-xl font-bold">Total User Challenge Completed</h2>
-              <p className="text-2xl font-bold">50</p>
+              <h2 className="text-xl font-bold">
+                Total User Challenge Completed
+              </h2>
+              <p className="text-2xl font-bold">
+                {totalElements.totalUserChallengeCompleted}
+              </p>
             </div>
           </Card>
         </div>
@@ -117,13 +158,19 @@ const Dashboard = () =>{
             <h2 className="text-xl font-bold mb-4">Actions</h2>
             <div className="space-y-2">
               <Button className="w-full" variant="default">
-                <Link className="w-full" href="/admin/create-workout-program">+ Create Workout Program</Link>
+                <Link className="w-full" href="/admin/create-workout-program">
+                  + Create Workout Program
+                </Link>
               </Button>
               <Button className="w-full" variant="default">
-               <Link className="w-full" href="/admin/add-new-video">+ Add New Video</Link>
+                <Link className="w-full" href="/admin/add-new-video">
+                  + Add New Video
+                </Link>
               </Button>
               <Button className="w-full" variant="default">
-              <Link className="w-full" href="/admin/add-new-recipe">+ Add New Recipe</Link>
+                <Link className="w-full" href="/admin/add-new-recipe">
+                  + Add New Recipe
+                </Link>
               </Button>
             </div>
           </Card>
@@ -131,19 +178,32 @@ const Dashboard = () =>{
             <h2 className="text-xl font-bold mb-4">Settings</h2>
             <div className="space-y-2">
               <Button className="w-full" variant="default">
-                <Link className="w-full" href="/admin/user-management">Users Management</Link>
+                <Link className="w-full" href="/admin/user-management">
+                  Users Management
+                </Link>
               </Button>
               <Button className="w-full" variant="default">
-               <Link className="w-full" href="/admin/workout-program-management">Workout Programs Management</Link>
+                <Link
+                  className="w-full"
+                  href="/admin/workout-program-management"
+                >
+                  Workout Programs Management
+                </Link>
               </Button>
               <Button className="w-full" variant="default">
-                <Link className="w-full" href="/admin/workout-video-management">Workout Videos Management</Link>
+                <Link className="w-full" href="/admin/workout-video-management">
+                  Workout Videos Management
+                </Link>
               </Button>
               <Button className="w-full" variant="default">
-                <Link className="w-full" href="/admin/recipes-management">Recipes Management</Link>
+                <Link className="w-full" href="/admin/recipes-management">
+                  Recipes Management
+                </Link>
               </Button>
               <Button className="w-full" variant="default">
-                <Link className="w-full" href="/admin/posts-management">Posts Management</Link>
+                <Link className="w-full" href="/admin/posts-management">
+                  Posts Management
+                </Link>
               </Button>
             </div>
           </Card>
@@ -156,17 +216,27 @@ const Dashboard = () =>{
         </Card>
         <Card className="p-4">
           <h2 className="text-xl font-bold mb-4">User Challenge</h2>
-          <CurvedlineChart  />
+          <CurvedlineChart />
+        </Card>
+      </section>
+      <section className="grid grid-cols-1 gap-4 mt-4">
+        <Card className="p-4">
+          <h2 className="text-xl font-bold mb-4">Top User Challenges</h2>
+          <UserLeaderboard userLeaderboard={userLeaderboard} />
         </Card>
       </section>
     </div>
-  )
-}
+  );
+};
 export default Dashboard;
 
-function BarChart({ monthlyUserCount }: { monthlyUserCount: MonthlyUserCountType[] }) {
+function BarChart({
+  monthlyUserCount,
+}: {
+  monthlyUserCount: MonthlyUserCountType[];
+}) {
   return (
-    <div className="aspect-[3]" >
+    <div className="aspect-[3]">
       <ResponsiveBar
         data={monthlyUserCount}
         keys={["count"]}
@@ -201,18 +271,18 @@ function BarChart({ monthlyUserCount }: { monthlyUserCount: MonthlyUserCountType
             },
           },
         }}
-        tooltipLabel={({ id}) => `${id}`}
+        tooltipLabel={({ id }) => `${id}`}
         enableLabel={false}
         role="application"
         ariaLabel="A bar chart showing data"
       />
     </div>
-  )
+  );
 }
 
 function CurvedlineChart() {
   return (
-    <div  className="w-full aspect-[3]">
+    <div className="w-full aspect-[3]">
       <ResponsiveLine
         data={[
           {
@@ -293,5 +363,60 @@ function CurvedlineChart() {
         </div>
       </div>
     </div>
-  )
+  );
+}
+
+function UserLeaderboard({
+  userLeaderboard,
+}: {
+  userLeaderboard: UserLeaderboardType[];
+}) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white border border-gray-200">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="py-2 px-4 border-b border-gray-200 text-left">ID</th>
+            <th className="py-2 px-4 border-b border-gray-200 text-left">
+              Username
+            </th>
+            <th className="py-2 px-4 border-b border-gray-200 text-left">
+              First Name
+            </th>
+            <th className="py-2 px-4 border-b border-gray-200 text-left">
+              Last Name
+            </th>
+            <th className="py-2 px-4 border-b border-gray-200 text-left">
+              Email
+            </th>
+            <th className="py-2 px-4 border-b border-gray-200 text-left">
+              User Challenge Completed Count
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {userLeaderboard.map((user, index) => (
+            <tr key={user.id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
+              <td className="py-2 px-4 border-b border-gray-200">{user.id}</td>
+              <td className="py-2 px-4 border-b border-gray-200">
+                {user.userName}
+              </td>
+              <td className="py-2 px-4 border-b border-gray-200">
+                {user.firstName}
+              </td>
+              <td className="py-2 px-4 border-b border-gray-200">
+                {user.lastName}
+              </td>
+              <td className="py-2 px-4 border-b border-gray-200">
+                {user.email}
+              </td>
+              <td className="py-2 px-4 border-b border-gray-200">
+                {user.userChallengeCompletedCount}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }

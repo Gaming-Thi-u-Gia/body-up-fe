@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Eye, Pen, Plus, Trash, X, Upload } from "lucide-react";
+import { Eye, Pen, Plus, Trash, X } from "lucide-react";
 import {
   RecipeDetailType,
   TableFilterRecipeType,
@@ -28,6 +28,7 @@ import {
 } from "@/utils/admin/fetch";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { toast } from "sonner";
 
 export type EditableRecipeType = Omit<
   RecipeDetailType,
@@ -96,7 +97,8 @@ const RecipeManagement = () => {
         setHasMoreRecipe(false);
         setIsLoading(false);
       }
-      setRecipes((prev) => [...prev, ...data.content]);
+      const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
+      setRecipes((prev) => [...prev, ...sortedData]);
       setPageNo((previous) => previous + 1);
       setHasMoreRecipe(!data.last);
     } catch (error) {
@@ -117,9 +119,21 @@ const RecipeManagement = () => {
       setRecipes(updatedRecipes);
       setEditingRecipe(null);
       setSelectedRecipe(null);
-      console.log(response);
+      toast.success(response, {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     } catch (error) {
-      console.error("Error while updating the recipe:");
+      toast.error("Error When Updating Recipe", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
 
@@ -131,11 +145,23 @@ const RecipeManagement = () => {
 
     try {
       const response = await fetchDeleteRecipe(id, sessionToken!);
+      toast.success(response, {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
       const updatedRecipes = recipes.filter((recipe) => recipe.id !== id);
-      console.log(response);
       setRecipes(updatedRecipes);
     } catch (error) {
-      console.log("error", error);
+      toast.error("Error When Deleting Recipe", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
 
@@ -153,7 +179,9 @@ const RecipeManagement = () => {
       const data = await fetchGetRecipeDetailById(recipeId, sessionToken!);
       const { id, avgStar, createAt, totalRating, ...editableFields } = data;
       setEditingRecipe({ id, ...editableFields });
-      setSelectedRecipe(data);
+      if (!selectedRecipe || selectedRecipe.id !== recipeId) {
+        setSelectedRecipe(data);
+      }
     } catch (error) {
       console.log("error", error);
     }
@@ -214,6 +242,65 @@ const RecipeManagement = () => {
         ...editingRecipe,
         recipeTopics: updatedTopics,
       });
+    }
+  };
+
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    field: string,
+    index?: number
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (editingRecipe) {
+          if (field === "img") {
+            setEditingRecipe((prevRecipe) => ({
+              ...prevRecipe!,
+              img: reader.result as string,
+            }));
+          } else if (field === "otherImageRecipes" && index !== undefined) {
+            const updatedOtherImages = [...editingRecipe.otherImageRecipes];
+            updatedOtherImages[index].img = reader.result as string;
+            setEditingRecipe((prevRecipe) => ({
+              ...prevRecipe!,
+              otherImageRecipes: updatedOtherImages,
+            }));
+          }
+        }
+      };
+      reader.onerror = () => {
+        toast.error("Error reading file. Please try again.");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAddItem = (field: string, newItem: any) => {
+    if (editingRecipe) {
+      const updatedField = [...(editingRecipe as any)[field], newItem];
+      setEditingRecipe({ ...editingRecipe, [field]: updatedField });
+    }
+  };
+
+  const handleRemoveItem = (field: string, index: number) => {
+    if (editingRecipe) {
+      const updatedField = [...(editingRecipe as any)[field]];
+      if (updatedField.length > 1) {
+        updatedField.splice(index, 1);
+        setEditingRecipe({ ...editingRecipe, [field]: updatedField });
+      }
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (editingRecipe) {
+      handleUpdateRecipe(editingRecipe);
     }
   };
 
@@ -428,14 +515,7 @@ const RecipeManagement = () => {
                 <X className="w-6 h-6" />
               </Button>
             </div>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (editingRecipe) {
-                  handleUpdateRecipe(editingRecipe);
-                }
-              }}
-            >
+            <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <Label htmlFor="name">Name</Label>
@@ -483,19 +563,22 @@ const RecipeManagement = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="img">Image URL</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="text"
-                      id="img"
-                      value={editingRecipe.img}
-                      onChange={(e) => handleFieldChange("img", e.target.value)}
-                      required
+                  <Label htmlFor="img">Image</Label>
+                  <Input
+                    type="file"
+                    id="img"
+                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    onChange={(e) => handleFileChange(e, "img")}
+                  />
+                  {editingRecipe.img && (
+                    <img
+                      src={editingRecipe.img}
+                      alt="Recipe"
+                      className="mt-2 rounded-lg"
+                      width={400}
+                      height={300}
                     />
-                    <Button variant="default" size="icon">
-                      <Upload className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="cookingInstruction">
@@ -550,32 +633,26 @@ const RecipeManagement = () => {
                       }}
                       required
                     />
-                    <Button
-                      variant="default"
-                      size="icon"
-                      onClick={() => {
-                        const updatedIngredients = [
-                          ...editingRecipe.ingredientRecipes,
-                        ];
-                        updatedIngredients.splice(index, 1);
-                        handleFieldChange(
-                          "ingredientRecipes",
-                          updatedIngredients
-                        );
-                      }}
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
+                    {editingRecipe.ingredientRecipes.length > 1 && (
+                      <Button
+                        variant="default"
+                        size="icon"
+                        type="button"
+                        onClick={() =>
+                          handleRemoveItem("ingredientRecipes", index)
+                        }
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
                 <Button
                   variant="default"
-                  onClick={() => {
-                    handleFieldChange("ingredientRecipes", [
-                      ...editingRecipe.ingredientRecipes,
-                      { name: "", amount: "" },
-                    ]);
-                  }}
+                  type="button"
+                  onClick={() =>
+                    handleAddItem("ingredientRecipes", { name: "", amount: "" })
+                  }
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Ingredient
@@ -595,27 +672,22 @@ const RecipeManagement = () => {
                       }}
                       required
                     />
-                    <Button
-                      variant="default"
-                      size="icon"
-                      onClick={() => {
-                        const updatedNotes = [...editingRecipe.noteRecipes];
-                        updatedNotes.splice(index, 1);
-                        handleFieldChange("noteRecipes", updatedNotes);
-                      }}
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
+                    {editingRecipe.noteRecipes.length > 1 && (
+                      <Button
+                        variant="default"
+                        size="icon"
+                        type="button"
+                        onClick={() => handleRemoveItem("noteRecipes", index)}
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
                 <Button
                   variant="default"
-                  onClick={() => {
-                    handleFieldChange("noteRecipes", [
-                      ...editingRecipe.noteRecipes,
-                      { detail: "" },
-                    ]);
-                  }}
+                  type="button"
+                  onClick={() => handleAddItem("noteRecipes", { detail: "" })}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Note
@@ -629,45 +701,43 @@ const RecipeManagement = () => {
                     className="grid grid-cols-[1fr_auto_auto] gap-4"
                   >
                     <Input
-                      type="text"
-                      placeholder="Image URL"
-                      value={image.img}
-                      onChange={(e) => {
-                        const updatedImages = [
-                          ...editingRecipe.otherImageRecipes,
-                        ];
-                        updatedImages[index].img = e.target.value;
-                        handleFieldChange("otherImageRecipes", updatedImages);
-                      }}
-                      required
+                      type="file"
+                      id={`upload-other-img-${index}`}
+                      className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      onChange={(e) =>
+                        handleFileChange(e, "otherImageRecipes", index)
+                      }
                     />
-                    <Button variant="default" size="icon">
-                      <Upload className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="default"
-                      size="icon"
-                      onClick={() => {
-                        const updatedImages = [
-                          ...editingRecipe.otherImageRecipes,
-                        ];
-                        updatedImages.splice(index, 1);
-                        handleFieldChange("otherImageRecipes", updatedImages);
-                      }}
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
+                    {editingRecipe.otherImageRecipes.length > 1 && (
+                      <Button
+                        variant="default"
+                        size="icon"
+                        type="button"
+                        onClick={() =>
+                          handleRemoveItem("otherImageRecipes", index)
+                        }
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    )}
+                    {image.img && (
+                      <img
+                        src={image.img}
+                        alt={`Additional ${index + 1}`}
+                        className="mt-2 rounded-lg"
+                        width={200}
+                        height={150}
+                      />
+                    )}
                   </div>
                 ))}
                 {editingRecipe.otherImageRecipes.length < 3 && (
                   <Button
                     variant="default"
-                    onClick={() => {
-                      handleFieldChange("otherImageRecipes", [
-                        ...editingRecipe.otherImageRecipes,
-                        { img: "" },
-                      ]);
-                    }}
+                    type="button"
+                    onClick={() =>
+                      handleAddItem("otherImageRecipes", { img: "" })
+                    }
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Image
@@ -714,6 +784,7 @@ const RecipeManagement = () => {
                             <Button
                               variant="default"
                               size="icon"
+                              type="button"
                               onClick={() =>
                                 handleRemoveCategory(category.type)
                               }
@@ -750,6 +821,7 @@ const RecipeManagement = () => {
                       variant="default"
                       size="icon"
                       className="ml-auto"
+                      type="button"
                       onClick={() => handleRemoveTopic(index)}
                     >
                       <X className="w-4 h-4" />
@@ -780,6 +852,7 @@ const ListRecipeCategorySkeleton = () => {
     </div>
   );
 };
+
 const RecipeCardSkeleton = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">

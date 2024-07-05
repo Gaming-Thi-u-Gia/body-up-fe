@@ -70,9 +70,8 @@ export function ViewAll() {
         setIsLoading(false);
         return;
       }
-
-      setWorkoutPrograms((prev) => [...prev, ...data.content]);
-
+      const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
+      setWorkoutPrograms((prev) => [...prev, ...sortedData]);
       setPageNo((previous) => previous + 1);
       setHasMoreWorkoutProgram(!data.last);
     } catch (error) {

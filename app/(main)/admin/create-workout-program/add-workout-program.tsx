@@ -21,6 +21,8 @@ import {
   fetchPostWorkoutProgram,
 } from "@/utils/admin/fetch";
 import Link from "next/link";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export type AddNewProgramType = {
   name: string;
@@ -82,6 +84,7 @@ type ExerciseError = {
 
 const AddWorkoutProgram = () => {
   const { sessionToken } = useAuthStore((store) => store);
+  const router = useRouter();
   const [program, setProgram] = useState<AddNewProgramType>({
     name: "",
     type: "",
@@ -139,25 +142,32 @@ const AddWorkoutProgram = () => {
     }));
   };
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    field: string
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProgram((prevProgram) => ({
-        ...prevProgram,
-        img: imageUrl,
-      }));
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        img: "",
-      }));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setProgram((prevProgram) => ({
+          ...prevProgram,
+          [field]: base64String,
+        }));
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [field]: "",
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleRemoveImage = () => {
+  const handleRemoveImage = (field: string) => {
     setProgram((prevProgram) => ({
       ...prevProgram,
-      img: "",
+      [field]: "",
     }));
   };
 
@@ -165,7 +175,6 @@ const AddWorkoutProgram = () => {
     const getTopics = async () => {
       try {
         const data = await fetchWorkoutCategoryData();
-        console.log(data);
         setTopics(data);
       } catch (error) {
         console.error(error);
@@ -178,7 +187,6 @@ const AddWorkoutProgram = () => {
     const getVideos = async () => {
       try {
         const data = await fetchGetAllVideoSelectForAdmin(sessionToken!);
-        console.log(data);
         setVideos(data);
       } catch (error) {
         console.error(error);
@@ -191,7 +199,6 @@ const AddWorkoutProgram = () => {
     const getRecipes = async () => {
       try {
         const data = await fetchGetAllRecipeSelectForAdmin(sessionToken!);
-        console.log(data);
         setRecipes(data);
       } catch (error) {
         console.error(error);
@@ -292,7 +299,7 @@ const AddWorkoutProgram = () => {
       }
 
       const newDayStates = Array.from({ length: program.day }, () => ({
-        dailyVideos: [],
+        dailyVideos: [{ video: { id: 0, name: "" } }],
         morningRecipes: [{ recipe: { id: 0, name: "" }, part: "morning" }],
         afternoonRecipes: [{ recipe: { id: 0, name: "" }, part: "afternoon" }],
         eveningRecipes: [{ recipe: { id: 0, name: "" }, part: "evening" }],
@@ -468,6 +475,7 @@ const AddWorkoutProgram = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     const updatedDailyExercises = dayStates.map((dayState, dayIndex) => ({
       day: dayIndex + 1,
       dailyVideos: dayState.dailyVideos,
@@ -476,10 +484,6 @@ const AddWorkoutProgram = () => {
         ...dayState.afternoonRecipes,
         ...dayState.eveningRecipes,
       ],
-    }));
-    setProgram((prevProgram) => ({
-      ...prevProgram,
-      dailyExercises: updatedDailyExercises,
     }));
 
     let hasError = false;
@@ -518,7 +522,6 @@ const AddWorkoutProgram = () => {
           updatedExercise[`${part}RecipeError`] = "";
         }
       });
-      console.log(updatedExercise);
       return updatedExercise;
     });
 
@@ -534,20 +537,49 @@ const AddWorkoutProgram = () => {
       }));
       return;
     } else {
-      postWorkoutProgram();
+      const finalProgram = {
+        ...program,
+        dailyExercises: validatedDailyExercises,
+      };
+
+      try {
+        await postWorkoutProgram(finalProgram);
+        router.push("/admin/workout-program-management");
+      } catch (error) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          dailyExercises: "Failed to submit program",
+        }));
+        console.error(error);
+      }
     }
   };
 
-  const postWorkoutProgram = async () => {
+  const postWorkoutProgram = async (finalProgram: AddNewProgramType) => {
     try {
-      const response = await fetchPostWorkoutProgram(program, sessionToken!);
-      console.log(response);
+      const response = await fetchPostWorkoutProgram(
+        finalProgram,
+        sessionToken!
+      );
+      toast.success(response, {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     } catch (error) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         dailyExercises: "Failed to submit program",
       }));
-      console.error(error);
+      toast.error("Fail To Add New Workout Program", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
 
@@ -768,7 +800,7 @@ const AddWorkoutProgram = () => {
                 type="file"
                 id="img"
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                onChange={handleImageChange}
+                onChange={(e) => handleImageChange(e, "img")}
               />
               {program.img && (
                 <div className="relative mt-4">
@@ -781,7 +813,7 @@ const AddWorkoutProgram = () => {
                     variant="default"
                     size="icon"
                     className="absolute top-2 right-2"
-                    onClick={handleRemoveImage}
+                    onClick={() => handleRemoveImage("img")}
                   >
                     <X className="w-4 h-4" />
                   </Button>
@@ -796,15 +828,28 @@ const AddWorkoutProgram = () => {
                 Banner
               </label>
               <input
-                type="text"
+                type="file"
                 id="banner"
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                placeholder="Enter banner URL"
-                value={program.banner}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInputChange("banner", e.target.value)
-                }
+                onChange={(e) => handleImageChange(e, "banner")}
               />
+              {program.banner && (
+                <div className="relative mt-4">
+                  <img
+                    src={program.banner}
+                    alt="Program Banner"
+                    className="w-64 h-64 object-cover rounded-md"
+                  />
+                  <Button
+                    variant="default"
+                    size="icon"
+                    className="absolute top-2 right-2"
+                    onClick={() => handleRemoveImage("banner")}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
               {errors.banner && (
                 <p className="text-red-500">{errors.banner.toString()}</p>
               )}
@@ -965,18 +1010,16 @@ const AddWorkoutProgram = () => {
                             ))}
                           </SelectContent>
                         </Select>
-                        {dayState.dailyVideos.length > 1 && (
-                          <Button
-                            variant="default"
-                            size="icon"
-                            className="ml-2"
-                            onClick={(e) =>
-                              handleRemoveVideo(dayIndex, videoIndex, e)
-                            }
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        )}
+                        <Button
+                          variant="default"
+                          size="icon"
+                          className="ml-2"
+                          onClick={(e) =>
+                            handleRemoveVideo(dayIndex, videoIndex, e)
+                          }
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
                       </div>
                     ))}
                     {errors.dailyExercises &&
@@ -993,6 +1036,12 @@ const AddWorkoutProgram = () => {
                       </Button>
                     )}
                   </div>
+                  {dayState.dailyVideos.length > 0 &&
+                    dayState.dailyVideos[0].video.id === 0 && (
+                      <p className="text-red-500 mt-2">
+                        {errors.dailyExercises.toString()}
+                      </p>
+                    )}
                 </div>
 
                 {["morning", "afternoon", "evening"].map((timeOfDay) => (
@@ -1038,25 +1087,28 @@ const AddWorkoutProgram = () => {
                                 )}
                               </SelectContent>
                             </Select>
-                            {dayState.morningRecipes.length > 1 && (
-                              <Button
-                                variant="default"
-                                size="icon"
-                                className="ml-2"
-                                onClick={(e) =>
-                                  handleRemoveRecipe(
-                                    dayIndex,
-                                    recipeIndex,
-                                    "morning",
-                                    e
-                                  )
-                                }
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            )}
+                            <Button
+                              variant="default"
+                              size="icon"
+                              className="ml-2"
+                              onClick={(e) =>
+                                handleRemoveRecipe(
+                                  dayIndex,
+                                  recipeIndex,
+                                  "morning",
+                                  e
+                                )
+                              }
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
                           </div>
                         ))}
+                      {errors[`${timeOfDay}RecipeError`] && (
+                        <p className="text-red-500 mt-2">
+                          {errors[`${timeOfDay}RecipeError`].toString()}
+                        </p>
+                      )}
                       {timeOfDay === "afternoon" &&
                         dayState.afternoonRecipes.map((recipe, recipeIndex) => (
                           <div key={recipeIndex} className="flex items-center">
@@ -1092,25 +1144,28 @@ const AddWorkoutProgram = () => {
                                 )}
                               </SelectContent>
                             </Select>
-                            {dayState.afternoonRecipes.length > 1 && (
-                              <Button
-                                variant="default"
-                                size="icon"
-                                className="ml-2"
-                                onClick={(e) =>
-                                  handleRemoveRecipe(
-                                    dayIndex,
-                                    recipeIndex,
-                                    "afternoon",
-                                    e
-                                  )
-                                }
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            )}
+                            <Button
+                              variant="default"
+                              size="icon"
+                              className="ml-2"
+                              onClick={(e) =>
+                                handleRemoveRecipe(
+                                  dayIndex,
+                                  recipeIndex,
+                                  "afternoon",
+                                  e
+                                )
+                              }
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
                           </div>
                         ))}
+                      {errors[`${timeOfDay}RecipeError`] && (
+                        <p className="text-red-500 mt-2">
+                          {errors[`${timeOfDay}RecipeError`].toString()}
+                        </p>
+                      )}
                       {timeOfDay === "evening" &&
                         dayState.eveningRecipes.map((recipe, recipeIndex) => (
                           <div key={recipeIndex} className="flex items-center">
@@ -1146,27 +1201,25 @@ const AddWorkoutProgram = () => {
                                 )}
                               </SelectContent>
                             </Select>
-                            {dayState.eveningRecipes.length > 1 && (
-                              <Button
-                                variant="default"
-                                size="icon"
-                                className="ml-2"
-                                onClick={(e) =>
-                                  handleRemoveRecipe(
-                                    dayIndex,
-                                    recipeIndex,
-                                    "evening",
-                                    e
-                                  )
-                                }
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            )}
+                            <Button
+                              variant="default"
+                              size="icon"
+                              className="ml-2"
+                              onClick={(e) =>
+                                handleRemoveRecipe(
+                                  dayIndex,
+                                  recipeIndex,
+                                  "evening",
+                                  e
+                                )
+                              }
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
                           </div>
                         ))}
                       {errors[`${timeOfDay}RecipeError`] && (
-                        <p className="text-red-500">
+                        <p className="text-red-500 mt-2">
                           {errors[`${timeOfDay}RecipeError`].toString()}
                         </p>
                       )}

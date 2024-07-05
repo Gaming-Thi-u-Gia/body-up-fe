@@ -78,6 +78,28 @@ export const fetchPostRecipe = async (
   recipe: AddNewRecipeType,
   sessionToken: string
 ) => {
+  const { img, otherImageRecipes, ...rest } = recipe;
+  const resultFromServer = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/recipe`,
+    {
+      method: "POST",
+      body: JSON.stringify({ img, otherImageRecipes }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then(async (res) => {
+    const payload = await res.json();
+    const data = { status: res.status, payload };
+    if (!res.ok) {
+      throw new Error("Error while upload img to cloudinary");
+    }
+    return data;
+  });
+  const updatedOtherImage = otherImageRecipes.map((objImg, index) => {
+    objImg.img = resultFromServer.payload.results2[index].secure_url;
+    return objImg;
+  });
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/create-recipe`,
@@ -87,7 +109,11 @@ export const fetchPostRecipe = async (
           "Content-Type": "application/json",
           Authorization: `Bearer ${sessionToken}`,
         },
-        body: JSON.stringify(recipe),
+        body: JSON.stringify({
+          ...rest,
+          img: resultFromServer.payload.results1.secure_url,
+          otherImageRecipes: updatedOtherImage,
+        }),
       }
     );
 
@@ -176,6 +202,29 @@ export const fetchPutRecipe = async (
   sessionToken: string,
   updatedRecipe: EditableRecipeType
 ) => {
+  console.log(updatedRecipe);
+  const { img, otherImageRecipes, ...rest } = updatedRecipe;
+  const resultFromServer = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/recipe`,
+    {
+      method: "POST",
+      body: JSON.stringify({ img, otherImageRecipes }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then(async (res) => {
+    const payload = await res.json();
+    const data = { status: res.status, payload };
+    if (!res.ok) {
+      throw new Error("Error while upload img to cloudinary");
+    }
+    return data;
+  });
+  const updatedOtherImage = otherImageRecipes.map((objImg, index) => {
+    objImg.img = resultFromServer.payload.results2[index].secure_url;
+    return objImg;
+  });
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/update-recipe`,
@@ -185,7 +234,11 @@ export const fetchPutRecipe = async (
           "Content-Type": "application/json",
           Authorization: `Bearer ${sessionToken}`,
         },
-        body: JSON.stringify(updatedRecipe),
+        body: JSON.stringify({
+          ...rest,
+          img: resultFromServer.payload.results1.secure_url,
+          otherImageRecipes: updatedOtherImage,
+        }),
       }
     );
     if (!response.ok) {
@@ -426,10 +479,29 @@ export const fetchGetAllRecipeSelectForAdmin = async (sessionToken: string) => {
     throw new Error(`Error while get recipe select`);
   }
 };
+
 export const fetchPostWorkoutProgram = async (
   workoutProgram: AddNewProgramType,
   sessionToken: string
 ) => {
+  const { img, banner, ...rest } = workoutProgram;
+  const resultFromServer = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/workout-program`,
+    {
+      method: "POST",
+      body: JSON.stringify({ img, banner }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then(async (res) => {
+    const payload = await res.json();
+    const data = { status: res.status, payload };
+    if (!res.ok) {
+      throw new Error("Error while upload img and to cloudinary");
+    }
+    return data;
+  });
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/create-program`,
@@ -439,7 +511,11 @@ export const fetchPostWorkoutProgram = async (
           "Content-Type": "application/json",
           Authorization: `Bearer ${sessionToken}`,
         },
-        body: JSON.stringify(workoutProgram),
+        body: JSON.stringify({
+          ...rest,
+          img: resultFromServer.payload.results1.secure_url,
+          banner: resultFromServer.payload.results2.secure_url,
+        }),
       }
     );
 
@@ -521,6 +597,24 @@ export const fetchPutWorkoutProgram = async (
   sessionToken: string,
   updateWorkoutProgram: EditProgramType
 ) => {
+  const { img, banner, ...rest } = updateWorkoutProgram;
+  const resultFromServer = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/workout-program`,
+    {
+      method: "POST",
+      body: JSON.stringify({ img, banner }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then(async (res) => {
+    const payload = await res.json();
+    const data = { status: res.status, payload };
+    if (!res.ok) {
+      throw new Error("Error while upload img and to cloudinary");
+    }
+    return data;
+  });
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/update-workout-program`,
@@ -530,7 +624,11 @@ export const fetchPutWorkoutProgram = async (
           "Content-Type": "application/json",
           Authorization: `Bearer ${sessionToken}`,
         },
-        body: JSON.stringify(updateWorkoutProgram),
+        body: JSON.stringify({
+          ...rest,
+          img: resultFromServer.payload.results1.secure_url,
+          banner: resultFromServer.payload.results2.secure_url,
+        }),
       }
     );
     if (!response.ok) {
@@ -540,5 +638,25 @@ export const fetchPutWorkoutProgram = async (
     return data;
   } catch (error) {
     throw new Error(`Error while updating the Workout Program`);
+  }
+};
+export const fetchGetTopUserCompltedChallenge = async (
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/top3-completed-challenges`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get Top User Completed Challenge`);
   }
 };

@@ -27,8 +27,10 @@ import {
 } from "@/utils/admin/fetch";
 import { toast } from "sonner";
 import { useAuthStore } from "@/components/providers/auth-provider";
+import { useRouter } from "next/navigation";
 
 const AddNewRecipe = () => {
+  const router = useRouter();
   const { sessionToken } = useAuthStore((store) => store);
   const [recipe, setRecipe] = useState<AddNewRecipeType>({
     name: "",
@@ -41,7 +43,7 @@ const AddNewRecipe = () => {
     noteRecipes: [{ detail: "" }],
     recipeCategories: [],
     recipeTopics: [],
-    otherImageRecipes: [],
+    otherImageRecipes: [{ img: "" }],
   });
 
   const [topics, setTopics] = useState<TopicType[]>([]);
@@ -204,7 +206,7 @@ const AddNewRecipe = () => {
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: any) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -219,7 +221,7 @@ const AddNewRecipe = () => {
     }
   };
 
-  const handleAddOtherImage = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleAddOtherImage = (e: any) => {
     e.preventDefault();
     if (recipe.otherImageRecipes.some((image) => image.img === "")) {
       setErrors((prevErrors) => ({
@@ -417,11 +419,22 @@ const AddNewRecipe = () => {
 
     try {
       const response = await fetchPostRecipe(recipe, sessionToken!);
-      toast.success("Recipe submitted successfully!");
-      console.log(response);
+      toast.success(response, {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
+      router.push("/admin/recipes-management");
     } catch (error) {
-      toast.error("Failed to submit recipe");
-      console.error(error);
+      toast.error("Error When Adding Recipe", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
 

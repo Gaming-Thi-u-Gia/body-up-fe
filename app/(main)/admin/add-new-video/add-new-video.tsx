@@ -7,7 +7,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { Router, X } from "lucide-react";
 import {
   AddNewVideoType,
   TableFilterVideoType,
@@ -20,9 +20,11 @@ import { toast } from "sonner";
 import { fetchPostVideo } from "@/utils/admin/fetch";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function AddNewVideo() {
   const { sessionToken } = useAuthStore((store) => store);
+  const router = useRouter();
   const [video, setVideo] = useState<AddNewVideoType>({
     name: "",
     url: "",
@@ -194,11 +196,22 @@ export function AddNewVideo() {
 
     try {
       const response = await fetchPostVideo(video, sessionToken!);
-      toast.success("Video submitted successfully!");
-      console.log(response);
+      toast.success(response, {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
+      router.push("/admin/workout-video-management");
     } catch (error) {
-      toast.error("Failed to submit video");
-      console.error(error);
+      toast.error("Error When Adding Video", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
 
@@ -284,7 +297,7 @@ export function AddNewVideo() {
                   size="icon"
                   className="ml-auto"
                   onClick={(e) => {
-                    e.preventDefault(); // Prevent form submit when removing
+                    e.preventDefault();
                     handleRemoveTopic(index);
                   }}
                 >
@@ -343,7 +356,7 @@ export function AddNewVideo() {
                           variant="default"
                           size="icon"
                           onClick={(e) => {
-                            e.preventDefault(); // Prevent form submit when removing
+                            e.preventDefault();
                             handleRemoveCategory(filteredCategory.type);
                           }}
                         >

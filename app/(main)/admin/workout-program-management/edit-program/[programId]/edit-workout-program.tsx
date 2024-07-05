@@ -21,8 +21,9 @@ import {
   fetchPutWorkoutProgram,
   fetchGetWorkoutProgramDetailById,
 } from "@/utils/admin/fetch";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export type EditProgramType = {
   id: number;
@@ -84,6 +85,7 @@ type ExerciseError = {
 };
 
 const EditWorkoutProgram = () => {
+  const router = useRouter();
   const { sessionToken } = useAuthStore((store) => store);
   const { programId } = useParams();
   const workoutProgramIdNumber = Number(programId);
@@ -148,7 +150,10 @@ const EditWorkoutProgram = () => {
         setInitialDays(data.day);
 
         const initialDayStates = Array.from({ length: data.day }, (_, i) => ({
-          dailyVideos: data.dailyExercises[i]?.dailyVideos || [],
+          dailyVideos:
+            data.dailyExercises[i]?.dailyVideos.length > 0
+              ? data.dailyExercises[i]?.dailyVideos
+              : [{ video: { id: 0, name: "" } }],
           morningRecipes:
             data.dailyExercises[i]?.dailyRecipes.filter(
               (r: any) => r.part === "morning"
@@ -194,25 +199,27 @@ const EditWorkoutProgram = () => {
     }));
   };
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    field: string
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProgram((prevProgram) => ({
-        ...prevProgram,
-        img: imageUrl,
-      }));
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        img: "",
-      }));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProgram((prevProgram) => ({
+          ...prevProgram,
+          [field]: reader.result as string,
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleRemoveImage = () => {
+  const handleRemoveImage = (field: string) => {
     setProgram((prevProgram) => ({
       ...prevProgram,
-      img: "",
+      [field]: "",
     }));
   };
 
@@ -345,7 +352,10 @@ const EditWorkoutProgram = () => {
 
       if (program.day !== dayStates.length) {
         const newDayStates = Array.from({ length: program.day }, (_, i) => ({
-          dailyVideos: dayStates[i]?.dailyVideos || [],
+          dailyVideos:
+            dayStates[i]?.dailyVideos.length > 0
+              ? dayStates[i].dailyVideos
+              : [{ video: { id: 0, name: "" } }],
           morningRecipes:
             dayStates[i]?.morningRecipes.length > 0
               ? dayStates[i].morningRecipes
@@ -531,6 +541,7 @@ const EditWorkoutProgram = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     const updatedDailyExercises = dayStates.map((dayState, dayIndex) => ({
       day: dayIndex + 1,
       dailyVideos: dayState.dailyVideos,
@@ -539,10 +550,6 @@ const EditWorkoutProgram = () => {
         ...dayState.afternoonRecipes,
         ...dayState.eveningRecipes,
       ],
-    }));
-    setProgram((prevProgram) => ({
-      ...prevProgram,
-      dailyExercises: updatedDailyExercises,
     }));
 
     let hasError = false;
@@ -583,27 +590,43 @@ const EditWorkoutProgram = () => {
       });
       return updatedExercise;
     });
-
-    setProgram((prevProgram) => ({
-      ...prevProgram,
+    const finalProgram = {
+      ...program,
       dailyExercises: validatedDailyExercises,
-    }));
-
+    };
     if (hasError) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         dailyExercises: "Please fix the errors before submitting.",
       }));
       return;
-    } else {
-      updateWorkoutProgram();
+    }
+
+    try {
+      await updateWorkoutProgram(finalProgram);
+    } catch (error) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        dailyExercises: "Failed to submit program",
+      }));
+      console.error(error);
     }
   };
 
-  const updateWorkoutProgram = async () => {
+  const updateWorkoutProgram = async (finalProgram: EditProgramType) => {
     try {
-      const response = await fetchPutWorkoutProgram(sessionToken!, program);
-      console.log(response);
+      const response = await fetchPutWorkoutProgram(
+        sessionToken!,
+        finalProgram
+      );
+      toast.error(response, {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
+      router.push("/admin/workout-program-management");
     } catch (error) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -699,7 +722,7 @@ const EditWorkoutProgram = () => {
               </Link>
             </nav>
             <div className="ml-auto">
-              <Link href="/" className="text-lg font-semibold">
+              <Link href="/admin" className="text-lg font-semibold">
                 Home
               </Link>
             </div>
@@ -838,7 +861,7 @@ const EditWorkoutProgram = () => {
                 type="file"
                 id="img"
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                onChange={handleImageChange}
+                onChange={(e) => handleImageChange(e, "img")}
               />
               {program.img && (
                 <div className="relative mt-4">
@@ -851,7 +874,7 @@ const EditWorkoutProgram = () => {
                     variant="default"
                     size="icon"
                     className="absolute top-2 right-2"
-                    onClick={handleRemoveImage}
+                    onClick={() => handleRemoveImage("img")}
                   >
                     <X className="w-4 h-4" />
                   </Button>
@@ -866,15 +889,28 @@ const EditWorkoutProgram = () => {
                 Banner
               </label>
               <input
-                type="text"
+                type="file"
                 id="banner"
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                placeholder="Enter banner URL"
-                value={program.banner}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInputChange("banner", e.target.value)
-                }
+                onChange={(e) => handleImageChange(e, "banner")}
               />
+              {program.banner && (
+                <div className="relative mt-4">
+                  <img
+                    src={program.banner}
+                    alt="Program Banner"
+                    className="w-64 h-64 object-cover rounded-md"
+                  />
+                  <Button
+                    variant="default"
+                    size="icon"
+                    className="absolute top-2 right-2"
+                    onClick={() => handleRemoveImage("banner")}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
               {errors.banner && (
                 <p className="text-red-500">{errors.banner.toString()}</p>
               )}

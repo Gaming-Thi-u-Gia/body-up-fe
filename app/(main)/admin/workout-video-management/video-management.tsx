@@ -69,7 +69,8 @@ export function VideoManagement() {
       if (data.totalElements === 0) {
         setHasMoreVideo(false);
       }
-      setVideos((prev) => [...prev, ...data.content]);
+      const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
+      setVideos((prev) => [...prev, ...sortedData]);
       setPageNo((previous) => previous + 1);
       setHasMoreVideo(!data.last);
     } catch (error) {
