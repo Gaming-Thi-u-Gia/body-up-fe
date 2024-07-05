@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -45,6 +45,7 @@ export type VideoType = {
 };
 
 export function VideoManagement() {
+  const [searchQuery, setSearchQuery] = useState("");
   const { sessionToken } = useAuthStore((store) => store);
   const [videos, setVideos] = useState<VideoType[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -56,22 +57,24 @@ export function VideoManagement() {
   const [pageNo, setPageNo] = useState(0);
 
   useEffect(() => {
-    getVideos();
     getVideoTopics();
     getVideoCategories();
   }, []);
 
-  const getVideos = async () => {
+  useEffect(() => {
+    getVideos(pageNo, searchQuery);
+  }, [pageNo, searchQuery]);
+
+  const getVideos = async (page: number, query: string) => {
     try {
       setIsLoading(true);
       const pageSize = 15;
-      const data = await fetchGetVideos(pageNo, pageSize, sessionToken!);
+      const data = await fetchGetVideos(page, pageSize, query, sessionToken!);
       if (data.totalElements === 0) {
         setHasMoreVideo(false);
       }
       const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
-      setVideos((prev) => [...prev, ...sortedData]);
-      setPageNo((previous) => previous + 1);
+      setVideos((prev) => (page === 0 ? sortedData : [...prev, ...sortedData]));
       setHasMoreVideo(!data.last);
     } catch (error) {
       console.log(error);
@@ -102,8 +105,6 @@ export function VideoManagement() {
   const [editingVideo, setEditingVideo] = useState<VideoType | null>(null);
 
   const handleUpdateVideo = async (updatedVideo: VideoType) => {
-    console.log(updatedVideo);
-
     try {
       const response = await fetchPutVideo(sessionToken!, updatedVideo);
       const updatedVideos = videos.map((video) =>
@@ -111,7 +112,6 @@ export function VideoManagement() {
       );
       setVideos(updatedVideos);
       setEditingVideo(null);
-      console.log(response);
     } catch (error) {
       console.error("Error while updating the video:", error);
     }
@@ -211,6 +211,21 @@ export function VideoManagement() {
     }
   };
 
+  const handleSearchChange = (event: any) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setPageNo(0);
+  };
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      setPageNo(0);
+    }
+  };
+
   return (
     <div className="container mx-auto py-12">
       <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
@@ -229,12 +244,28 @@ export function VideoManagement() {
           </Link>
         </div>
       </header>
+      <div className="flex items-center">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Search videos..."
+          className="w-full p-2 border border-gray-300 rounded-l-md"
+        />
+        <button
+          onClick={clearSearch}
+          className="bg-transparent border border-gray-300 text-gray-500 hover:text-red-500 p-2 rounded-r-md focus:outline-none"
+        >
+          Clear
+        </button>
+      </div>
       {isLoading && videos.length === 0 ? (
         <ListSkeleton />
       ) : (
         <InfiniteScroll
           dataLength={videos.length}
-          next={getVideos}
+          next={() => setPageNo(pageNo + 1)}
           hasMore={hasMoreVideo}
           loader={<ListSkeleton />}
           endMessage={<p>No more videos to show</p>}

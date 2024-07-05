@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import {
   fetchDeleteWorkoutProgram,
@@ -50,18 +51,26 @@ export function ViewAll() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasMoreWorkoutProgram, setHasMoreWorkoutProgram] = useState(true);
   const [pageNo, setPageNo] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    getWorkoutProgram();
-  }, []);
+    setPageNo(0);
+    setWorkoutPrograms([]);
+    getWorkoutProgram(0, searchQuery);
+  }, [searchQuery]);
 
-  const getWorkoutProgram = async () => {
+  useEffect(() => {
+    if (pageNo > 0) getWorkoutProgram(pageNo, searchQuery);
+  }, [pageNo]);
+
+  const getWorkoutProgram = async (page: number, query: string) => {
     setIsLoading(true);
     try {
       const pageSize = 4;
       const data = await fetchGetWorkoutPrograms(
-        pageNo,
+        page,
         pageSize,
+        query,
         sessionToken!
       );
 
@@ -71,8 +80,9 @@ export function ViewAll() {
         return;
       }
       const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
-      setWorkoutPrograms((prev) => [...prev, ...sortedData]);
-      setPageNo((previous) => previous + 1);
+      setWorkoutPrograms((prev) =>
+        page === 0 ? sortedData : [...prev, ...sortedData]
+      );
       setHasMoreWorkoutProgram(!data.last);
     } catch (error) {
       console.log(error);
@@ -107,6 +117,21 @@ export function ViewAll() {
     );
   };
 
+  const handleSearchChange = (event: any) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      setPageNo(0);
+      setWorkoutPrograms([]);
+    }
+  };
+
   return (
     <div className="max-w-7xl m-auto h-full flex flex-col">
       <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
@@ -126,9 +151,25 @@ export function ViewAll() {
         </div>
       </header>
       <main className="flex-1 overflow-auto p-6">
+        <div className="flex items-center mb-4">
+          <Input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
+            placeholder="Search workout programs..."
+            className="w-full p-2 border border-gray-300 rounded-l-md"
+          />
+          <Button
+            onClick={clearSearch}
+            className="bg-transparent border border-gray-300 text-gray-500 hover:text-red-500 p-2 rounded-r-md focus:outline-none"
+          >
+            Clear
+          </Button>
+        </div>
         <InfiniteScroll
           dataLength={workoutPrograms.length}
-          next={getWorkoutProgram}
+          next={() => setPageNo(pageNo + 1)}
           hasMore={hasMoreWorkoutProgram}
           loader={<SkeletonCard />}
           endMessage={<p>No more workout programs to show</p>}
@@ -219,6 +260,7 @@ export function ViewAll() {
     </div>
   );
 }
+
 function SkeletonLoader() {
   return (
     <div className="grid gap-6">

@@ -197,11 +197,12 @@ export const fetchPostVideo = async (
 export const fetchGetRecipes = async (
   pageNo: number,
   pageSize: number,
+  name: string,
   sessionToken: string
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-recipe?pageNo=${pageNo}&pageSize=${pageSize}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-recipe?pageNo=${pageNo}&pageSize=${pageSize}&name=${name}`,
       {
         method: "GET",
         headers: {
@@ -242,7 +243,6 @@ export const fetchPutRecipe = async (
   sessionToken: string,
   updatedRecipe: EditableRecipeType
 ) => {
-  console.log(updatedRecipe);
   const { img, otherImageRecipes, ...rest } = updatedRecipe;
   const resultFromServer = await fetch(
     `${process.env.NEXT_PUBLIC_API}/recipe`,
@@ -314,11 +314,12 @@ export const fetchDeleteRecipe = async (
 export const fetchGetUser = async (
   pageNo: number,
   pageSize: number,
+  name: string,
   sessionToken: string
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-user?pageNo=${pageNo}&pageSize=${pageSize}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-user?pageNo=${pageNo}&pageSize=${pageSize}&name=${name}`,
       {
         method: "GET",
         headers: {
@@ -336,11 +337,12 @@ export const fetchGetUser = async (
 export const fetchGetVideos = async (
   pageNo: number,
   pageSize: number,
+  name: string,
   sessionToken: string
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-video?pageNo=${pageNo}&pageSize=${pageSize}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-video?pageNo=${pageNo}&pageSize=${pageSize}&name=${name}`,
       {
         method: "GET",
         headers: {
@@ -349,6 +351,10 @@ export const fetchGetVideos = async (
         },
       }
     );
+    console.log(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-video?pageNo=${pageNo}&pageSize=${pageSize}&name=${name}`
+    );
+
     const data = await response.json();
     return data;
   } catch (error) {
@@ -404,11 +410,12 @@ export const fetchPutVideo = async (
 export const fetchGetPosts = async (
   pageNo: number,
   pageSize: number,
+  name: string,
   sessionToken: string
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-post?pageNo=${pageNo}&pageSize=${pageSize}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-post?pageNo=${pageNo}&pageSize=${pageSize}&name=${name}`,
       {
         method: "GET",
         headers: {
@@ -572,11 +579,12 @@ export const fetchPostWorkoutProgram = async (
 export const fetchGetWorkoutPrograms = async (
   pageNo: number,
   pageSize: number,
+  name: string,
   sessionToken: string
 ) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-workout-program?pageNo=${pageNo}&pageSize=${pageSize}`,
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-workout-program?pageNo=${pageNo}&pageSize=${pageSize}&name=${name}`,
       {
         method: "GET",
         headers: {

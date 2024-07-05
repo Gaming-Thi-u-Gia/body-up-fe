@@ -33,7 +33,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { MoveVertical, Search, Users } from "lucide-react";
+import { MoveVertical, Users } from "lucide-react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { fetchGetUser } from "@/utils/admin/fetch";
 import { useAuthStore } from "@/components/providers/auth-provider";
@@ -52,39 +52,50 @@ export function ManagementUser() {
   const { sessionToken } = useAuthStore((store) => store);
   const [users, setUsers] = useState<UserType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasMoreUsers, setHasMoreUsers] = useState(false);
+  const [hasMoreUsers, setHasMoreUsers] = useState(true);
   const [pageNo, setPageNo] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
 
   useEffect(() => {
-    getUsers();
-  }, []);
+    getUsers(pageNo, searchQuery);
+  }, [pageNo, searchQuery]);
 
-  const getUsers = async () => {
+  const getUsers = async (page: number, query: string) => {
     setIsLoading(true);
     try {
       const pageSize = 10;
-      const data = await fetchGetUser(pageNo, pageSize, sessionToken!);
+      const data = await fetchGetUser(page, pageSize, query, sessionToken!);
       if (data.totalElements === 0) {
-        setHasMoreUsers(false);
         setIsLoading(false);
-        return;
+        setHasMoreUsers(false);
       }
       const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
-      setUsers((prevUsers) => [
-        ...prevUsers,
-        ...sortedData.map((user: any) => ({
-          ...user,
-          name: `${user.firstName} ${user.lastName}`,
-        })),
-      ]);
-
-      setPageNo((previous) => previous + 1);
+      setUsers((prevUsers) =>
+        page === 0 ? sortedData : [...prevUsers, ...sortedData]
+      );
       setHasMoreUsers(!data.last);
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSearchChange = (event: any) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setPageNo(0);
+    setUsers([]);
+  };
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      setPageNo(0);
+      setUsers([]);
     }
   };
 
@@ -114,9 +125,25 @@ export function ManagementUser() {
             <CardDescription>Manage your users here.</CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="flex items-center mb-4">
+              <Input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={handleKeyDown}
+                placeholder="Search users..."
+                className="w-full p-2 border border-gray-300 rounded-l-md"
+              />
+              <Button
+                onClick={clearSearch}
+                className="bg-transparent border border-gray-300 text-gray-500 hover:text-red-500 p-2  focus:outline-none"
+              >
+                Clear
+              </Button>
+            </div>
             <InfiniteScroll
               dataLength={users.length}
-              next={getUsers}
+              next={() => setPageNo(pageNo + 1)}
               hasMore={hasMoreUsers}
               loader={<h4>Loading...</h4>}
               endMessage={<p>No more users to show</p>}
@@ -144,7 +171,6 @@ export function ManagementUser() {
                       <TableCell>
                         <Avatar>
                           <AvatarImage src={user.avatar} />
-                          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                       </TableCell>
                       <TableCell className="text-ellipsis text-nowrap max-w-3 overflow-hidden">

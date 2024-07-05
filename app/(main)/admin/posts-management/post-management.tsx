@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   fetchDeletePost,
   fetchGetPostDetailById,
@@ -47,28 +48,49 @@ export function PostManagement() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasMorePost, setHasMorePost] = useState<boolean>(false);
   const [pageNo, setPageNo] = useState<number>(0);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
-    getPosts();
-  }, []);
+    getPosts(pageNo, searchQuery);
+  }, [pageNo, searchQuery]);
 
-  const getPosts = async () => {
+  useEffect(() => {
+    if (pageNo > 0) getPosts(pageNo, searchQuery);
+  }, [pageNo]);
+
+  const getPosts = async (page: number, query: string) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       const pageSize = 12;
-      const data = await fetchGetPosts(pageNo, pageSize, sessionToken!);
+      const data = await fetchGetPosts(page, pageSize, query, sessionToken!);
       if (data.totalElements === 0) {
         setHasMorePost(false);
         setIsLoading(false);
       }
       const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
-      setPosts((prev) => [...prev, ...sortedData]);
-      setPageNo((previous) => previous + 1);
+      setPosts((prev) => (page === 0 ? sortedData : [...prev, ...sortedData]));
       setHasMorePost(!data.last);
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSearchChange = (event: any) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setPageNo(0);
+    setPosts([]);
+  };
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      setPageNo(0);
+      setPosts([]);
     }
   };
 
@@ -103,6 +125,22 @@ export function PostManagement() {
           </Button>
         </Link>
       </div>
+      <div className="flex items-center mb-4">
+        <Input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Search posts..."
+          className="w-full p-2 border border-gray-300 rounded-l-md"
+        />
+        <Button
+          onClick={clearSearch}
+          className="bg-transparent border border-gray-300 text-gray-500 hover:text-red-500 p-2 rounded-r-md focus:outline-none"
+        >
+          Clear
+        </Button>
+      </div>
       {isLoading && posts.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array(9)
@@ -114,7 +152,7 @@ export function PostManagement() {
       ) : (
         <InfiniteScroll
           dataLength={posts.length}
-          next={getPosts}
+          next={() => setPageNo(pageNo + 1)}
           hasMore={hasMorePost}
           loader={
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -49,6 +49,7 @@ const RecipeManagement = () => {
   const [pageNo, setPageNo] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [hasMoreRecipe, setHasMoreRecipe] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const getTableFilter = async () => {
@@ -85,26 +86,49 @@ const RecipeManagement = () => {
   }, []);
 
   useEffect(() => {
-    getRecipes();
-  }, []);
+    setPageNo(0);
+    setRecipes([]);
+    getRecipes(0, searchQuery);
+  }, [searchQuery]);
+  useEffect(() => {
+    if (pageNo > 0) getRecipes(pageNo, searchQuery);
+  }, [pageNo]);
 
-  const getRecipes = async () => {
+  const getRecipes = async (page: number, query: string) => {
     try {
       setIsLoading(true);
       const pageSize = 8;
-      const data = await fetchGetRecipes(pageNo, pageSize, sessionToken!);
+      const data = await fetchGetRecipes(page, pageSize, query, sessionToken!);
       if (data.totalElements === 0) {
         setHasMoreRecipe(false);
         setIsLoading(false);
       }
       const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
-      setRecipes((prev) => [...prev, ...sortedData]);
-      setPageNo((previous) => previous + 1);
+      setRecipes((prev) =>
+        page === 0 ? sortedData : [...prev, ...sortedData]
+      );
       setHasMoreRecipe(!data.last);
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSearchChange = (event: any) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setPageNo(0);
+    setRecipes([]);
+  };
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      setPageNo(0);
+      setRecipes([]);
     }
   };
 
@@ -314,6 +338,22 @@ const RecipeManagement = () => {
           </Button>
         </Link>
       </div>
+      <div className="flex items-center mb-4">
+        <Input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Search recipes..."
+          className="w-full p-2 border border-gray-300 rounded-l-md"
+        />
+        <Button
+          onClick={clearSearch}
+          className="bg-transparent border border-gray-300 text-gray-500 hover:text-red-500 p-2 rounded-r-md focus:outline-none"
+        >
+          Clear
+        </Button>
+      </div>
 
       {isLoading && recipes.length === 0 ? (
         <div>
@@ -324,7 +364,7 @@ const RecipeManagement = () => {
         <div>
           <InfiniteScroll
             dataLength={recipes.length}
-            next={getRecipes}
+            next={() => setPageNo(pageNo + 1)}
             hasMore={hasMoreRecipe}
             loader={<ListRecipeCategorySkeleton />}
           >
