@@ -131,7 +131,7 @@ const ChatAI = () => {
                      />
                      <AvatarFallback>AC</AvatarFallback>
                   </Avatar>
-                  <div className="text-sm font-medium">Health Assistance</div>
+                  <div className="text-sm font-medium">Health Assistant</div>
                </div>
                <DropdownMenu>
                   <DropdownMenuTrigger asChild>

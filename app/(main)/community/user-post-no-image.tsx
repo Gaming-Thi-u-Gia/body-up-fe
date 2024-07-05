@@ -76,7 +76,6 @@ const PostUser = ({ categoryId }: CategoryId) => {
    );
    const { selectedFilter, setSelectedFilter } = useFilterStore();
    const { searchText } = useSearchStore();
-   console.log("Search:", searchText);
    useEffect(() => {
       setPosts([]);
       setPage(0);
