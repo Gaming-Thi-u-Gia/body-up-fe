@@ -25,8 +25,6 @@ export type ChatListProps = {
 
 const ChatList = () => {
    const [chats, setChats] = useState<ChatListProps[]>([]);
-   const [addMode, setAddMode] = useState(false);
-   //    const [user, setUser] = useState<User>({});
    const { currentUser } = useUserFirebaseStore((store) => store);
    const [username, setUsername] = useState("");
    const { open } = useAddChatModel();
@@ -136,7 +134,7 @@ const ChatList = () => {
                <Link
                   href="#"
                   className={`flex ${
-                     chat?.isSeen ? "bg-transparent" : "bg-[#5183fe]"
+                     chat?.isSeen ? "bg-transparent" : "bg-[#5886fc]"
                   } items-center gap-3 rounded-md bg-muted/50 px-3 py-2 transition-colors hover:bg-muted`}
                   prefetch={false}
                   key={chat.chatId}
