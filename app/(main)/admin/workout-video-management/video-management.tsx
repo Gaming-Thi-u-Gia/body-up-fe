@@ -23,7 +23,6 @@ import {
 import { TableFilterVideoType } from "@/utils/admin/type";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Link from "next/link";
-
 type Topic = {
   id: number;
   name: string;
@@ -42,6 +41,9 @@ export type VideoType = {
   featured: boolean;
   videoTopics: Topic[];
   videoCategories: Category[];
+  img: string;
+  date: string;
+  duration: string;
 };
 
 export function VideoManagement() {
@@ -62,8 +64,14 @@ export function VideoManagement() {
   }, []);
 
   useEffect(() => {
-    getVideos(pageNo, searchQuery);
-  }, [pageNo, searchQuery]);
+    setPageNo(0);
+    setVideos([]);
+    getVideos(0, searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (pageNo > 0) getVideos(pageNo, searchQuery);
+  }, [pageNo]);
 
   const getVideos = async (page: number, query: string) => {
     try {
@@ -136,7 +144,6 @@ export function VideoManagement() {
   const handleViewVideo = async (id: number) => {
     try {
       const video = await fetchGetVideoDetailById(id, sessionToken!);
-      console.log(video);
       setSelectedVideo(video);
     } catch (error) {
       console.error("Error fetching video details:", error);
@@ -322,9 +329,18 @@ export function VideoManagement() {
                 <X className="w-6 h-6" />
               </Button>
             </div>
+            <img
+              src={selectedVideo.img}
+              alt={selectedVideo.name}
+              className="mb-4"
+            />
             <p className="text-gray-600 mb-4">URL: {selectedVideo.url}</p>
             <p className="text-gray-600 mb-4">
               Featured: {selectedVideo.featured ? "Yes" : "No"}
+            </p>
+            <p className="text-gray-600 mb-4">Date: {selectedVideo.date}</p>
+            <p className="text-gray-600 mb-4">
+              Duration: {selectedVideo.duration}
             </p>
             <h3 className="text-lg font-bold mb-2">Topics</h3>
             <div className="flex flex-wrap gap-2">

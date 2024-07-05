@@ -59,11 +59,14 @@ type AddNewDailyRecipeType = {
 type RecipeType = {
   id: number;
   name: string;
+  img: string;
 };
 
 type VideoType = {
   id: number;
   name: string;
+  duration: string;
+  img: string;
 };
 
 const WorkoutProgramDetail = () => {
@@ -87,12 +90,6 @@ const WorkoutProgramDetail = () => {
     dailyExercises: [],
   });
 
-  const [topics, setTopics] = useState<TopicType[]>([]);
-  const [workoutProgramCategories, setWorkoutProgramCategories] = useState<
-    TableFilterProgramType[]
-  >([]);
-  const [videos, setVideos] = useState<VideoType[]>([]);
-  const [recipes, setRecipes] = useState<RecipeType[]>([]);
   const [dayStates, setDayStates] = useState<
     {
       dailyVideos: AddNewDailyVideoType[];
@@ -134,64 +131,6 @@ const WorkoutProgramDetail = () => {
     };
     getProgram();
   }, [workoutProgramIdNumber, sessionToken]);
-
-  useEffect(() => {
-    const getTopics = async () => {
-      try {
-        const data = await fetchWorkoutCategoryData();
-        setTopics(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getTopics();
-  }, []);
-
-  useEffect(() => {
-    const getVideos = async () => {
-      try {
-        const data = await fetchGetAllVideoSelectForAdmin(sessionToken!);
-        setVideos(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getVideos();
-  }, [sessionToken]);
-
-  useEffect(() => {
-    const getRecipes = async () => {
-      try {
-        const data = await fetchGetAllRecipeSelectForAdmin(sessionToken!);
-        setRecipes(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getRecipes();
-  }, [sessionToken]);
-
-  useEffect(() => {
-    const getProgramCategories = async () => {
-      try {
-        const response = await fetchAllFilterCategoryWorkoutProgram();
-        const sortedResponse = response
-          .sort((a: TableFilterProgramType, b: TableFilterProgramType) =>
-            a.type.localeCompare(b.type)
-          )
-          .map((category: TableFilterProgramType) => ({
-            ...category,
-            workoutProgramCategories: category.workoutCategories.sort(
-              (a: any, b: any) => a.name.localeCompare(b.name)
-            ),
-          }));
-        setWorkoutProgramCategories(sortedResponse);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getProgramCategories();
-  }, []);
 
   return (
     <div className="container mx-auto py-12 px-4 md:px-6">
@@ -306,13 +245,35 @@ const WorkoutProgramDetail = () => {
           <div className="mb-4">
             <h4 className="text-lg font-bold mb-2">Videos</h4>
             <div className="grid grid-cols-1 gap-2">
-              {dayState.dailyVideos.map((video, videoIndex) => (
-                <div key={videoIndex} className="flex items-center">
-                  <span className="text-base">
-                    {videos.find((v) => v.id === video.video.id)?.name}
-                  </span>
-                </div>
-              ))}
+              {dayState.dailyVideos.map((video, videoIndex) => {
+                const videoDetails = video.video;
+                console.log("Video Details:", videoDetails);
+                return (
+                  <div key={videoIndex} className="flex items-center">
+                    {videoDetails && (
+                      <>
+                        <img
+                          src={videoDetails.img}
+                          alt={videoDetails.name}
+                          className="w-20 h-20 object-cover rounded-md mr-4"
+                          onError={(e) =>
+                            (e.currentTarget.src =
+                              "/default-image-placeholder.png")
+                          }
+                        />
+                        <div>
+                          <span className="text-base font-medium">
+                            {videoDetails.name}
+                          </span>
+                          <div className="text-sm text-gray-600">
+                            {videoDetails.duration}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -322,30 +283,39 @@ const WorkoutProgramDetail = () => {
                 {timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1)} Recipes
               </h4>
               <div className="grid grid-cols-1 gap-2">
-                {timeOfDay === "morning" &&
-                  dayState.morningRecipes.map((recipe, recipeIndex) => (
-                    <div key={recipeIndex} className="flex items-center">
-                      <span className="text-base">
-                        {recipes.find((r) => r.id === recipe.recipe.id)?.name}
-                      </span>
-                    </div>
-                  ))}
-                {timeOfDay === "afternoon" &&
-                  dayState.afternoonRecipes.map((recipe, recipeIndex) => (
-                    <div key={recipeIndex} className="flex items-center">
-                      <span className="text-base">
-                        {recipes.find((r) => r.id === recipe.recipe.id)?.name}
-                      </span>
-                    </div>
-                  ))}
-                {timeOfDay === "evening" &&
-                  dayState.eveningRecipes.map((recipe, recipeIndex) => (
-                    <div key={recipeIndex} className="flex items-center">
-                      <span className="text-base">
-                        {recipes.find((r) => r.id === recipe.recipe.id)?.name}
-                      </span>
-                    </div>
-                  ))}
+                {dayState[`${timeOfDay}Recipes` as keyof typeof dayState].map(
+                  (recipe, recipeIndex) => {
+                    if ("recipe" in recipe) {
+                      const recipeDetails = recipe.recipe;
+                      console.log("Recipe Details:", recipeDetails);
+                      return (
+                        <div key={recipeIndex} className="flex items-center">
+                          {recipeDetails && (
+                            <>
+                              <img
+                                src={
+                                  recipeDetails.img ||
+                                  "/default-image-placeholder.png"
+                                }
+                                alt={recipeDetails.name}
+                                className="w-20 h-20 object-cover rounded-md mr-4"
+                                onError={(e) =>
+                                  (e.currentTarget.src =
+                                    "/default-image-placeholder.png")
+                                }
+                              />
+                              <span className="text-base">
+                                {recipeDetails.name}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      );
+                    } else {
+                      return null;
+                    }
+                  }
+                )}
               </div>
             </div>
           ))}

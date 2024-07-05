@@ -1,28 +1,3 @@
-const fetchVideoIdsFromDatabase = async () => {
-  try {
-    const response = await fetch(
-      "http://localhost:8080/api/v1/workout-video/getVideoAll"
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (!data || !Array.isArray(data)) {
-      throw new Error("Invalid data format");
-    }
-
-    return data.map((item) => ({
-      id: item.id,
-      name: item.name,
-      url: item.url,
-    }));
-  } catch (error) {
-    console.error("Error fetching videoIds from database:", error);
-    return [];
-  }
-};
-
 interface VideoItem {
   id: string;
   title: string;
@@ -32,16 +7,17 @@ interface VideoItem {
   duration: string;
 }
 
-const fetchVideos = async () => {
+const fetchVideos = async (fetchVideo: Promise<any>) => {
   try {
-    const videoDataFromDb = await fetchVideoIdsFromDatabase();
+    const videoDataFromDb = await fetchVideo;
+    console.log("videoDataFromDb", videoDataFromDb);
     if (!videoDataFromDb.length) {
       console.error("No video data found");
       return [];
     }
 
     const playlistId = "UUCgLoMYIyP0U56dEhEL1wXQ";
-    const apiKey = "AIzaSyC7RV-Yf4DiF8L4Xj4DprWjceASn5r-S6s";
+    const apiKey = "AIzaSyCK_pKQdZhpHFnBgXDxslUsjdP3QJyNOCU";
 
     let matchedVideos: VideoItem[] = [];
     let nextPageToken = "";
@@ -59,25 +35,33 @@ const fetchVideos = async () => {
         playlistData.items.map(async (item: any) => {
           const videoId = item.snippet.resourceId.videoId;
           const videoData = videoDataFromDb.find(
-            (video) => video.url === videoId
+            (video) => video.video.url === videoId
           );
+          console.log("videoData", videoData);
           if (videoData) {
             const videoResponse = await fetch(
-              `https://youtube.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoId}&key=${apiKey}`
+              `https://youtube.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoData.video.url}&key=${apiKey}`
             );
             if (!videoResponse.ok) {
               throw new Error(`HTTP error! status: ${videoResponse.status}`);
             }
             const videoResponseData = await videoResponse.json();
             const videoInfo = videoResponseData.items[0];
-
+            const categories = videoData.video.videoCategories
+              .map((cat) => cat.name)
+              .join(", ");
             return {
               id: videoId,
-              title: videoData.name,
+              title: videoData.video.name,
               img: item.snippet.thumbnails.high.url,
               views: formatViews(videoInfo.statistics.viewCount),
               date: formatDate(new Date(item.snippet.publishedAt)),
               duration: convertDuration(videoInfo.contentDetails.duration),
+              categories: categories,
+              decription: videoData.description,
+              bookmarked: videoData.video.bookmarked,
+              name: videoData.name,
+              url: videoData.video.url,
             };
           }
           return null;
@@ -98,7 +82,7 @@ const fetchVideos = async () => {
   }
 };
 
-export const convertDuration = (duration: string) => {
+const convertDuration = (duration: string) => {
   const regex = /PT(\d+H)?(\d+M)?(\d+S)?/;
   const matches = duration.match(regex);
 
@@ -117,7 +101,7 @@ export const convertDuration = (duration: string) => {
   return `${formattedMinutes}:${formattedSeconds}`;
 };
 
-export const formatViews = (views: string) => {
+const formatViews = (views: string) => {
   const num = parseInt(views);
   if (num >= 1000000) {
     return (num / 1000000).toFixed(0) + "M";
@@ -128,7 +112,7 @@ export const formatViews = (views: string) => {
   }
 };
 
-export const formatDate = (date: Date) => {
+const formatDate = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = { month: "long", day: "numeric" };
   return date.toLocaleDateString("en-US", options);
 };

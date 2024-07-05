@@ -56,6 +56,8 @@ export function ManagementUser() {
   const [pageNo, setPageNo] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   useEffect(() => {
     getUsers(pageNo, searchQuery);
@@ -97,6 +99,31 @@ export function ManagementUser() {
       setPageNo(0);
       setUsers([]);
     }
+  };
+
+  const toggleSelectUser = (userId: number) => {
+    setSelectedUsers((prevSelected) =>
+      prevSelected.includes(userId)
+        ? prevSelected.filter((id) => id !== userId)
+        : [...prevSelected, userId]
+    );
+  };
+
+  const toggleSelectAllUsers = () => {
+    if (selectedUsers.length === users.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(users.map((user) => user.id));
+    }
+  };
+
+  const sendNotification = () => {
+    // Thêm logic gửi thông báo tới user được chọn
+    console.log(
+      "Sending notification to users: ",
+      selectedUsers,
+      notificationMessage
+    );
   };
 
   return (
@@ -151,6 +178,12 @@ export function ManagementUser() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>
+                      <Checkbox
+                        checked={selectedUsers.length === users.length}
+                        onCheckedChange={toggleSelectAllUsers}
+                      />
+                    </TableHead>
                     <TableHead>Id</TableHead>
                     <TableHead>userName</TableHead>
                     <TableHead>Name</TableHead>
@@ -164,6 +197,12 @@ export function ManagementUser() {
                 <TableBody>
                   {users.map((user) => (
                     <TableRow key={user.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedUsers.includes(user.id)}
+                          onCheckedChange={() => toggleSelectUser(user.id)}
+                        />
+                      </TableCell>
                       <TableCell>{user.id}</TableCell>
                       <TableCell>{user.userName}</TableCell>
                       <TableCell>{user.name}</TableCell>
@@ -201,6 +240,17 @@ export function ManagementUser() {
             </InfiniteScroll>
           </CardContent>
         </Card>
+        <div className="mt-4 p-4 border rounded-md">
+          <h3 className="text-lg font-semibold mb-2">Send Notification</h3>
+          <Input
+            type="text"
+            value={notificationMessage}
+            onChange={(e) => setNotificationMessage(e.target.value)}
+            placeholder="Enter notification message..."
+            className="w-full mb-2 p-2 border border-gray-300 rounded-md"
+          />
+          <Button onClick={sendNotification}>Send Notification</Button>
+        </div>
       </main>
       {selectedUser && (
         <Dialog
@@ -246,3 +296,11 @@ export function ManagementUser() {
     </div>
   );
 }
+const Checkbox = ({ checked, onCheckedChange }: any) => (
+  <input
+    type="checkbox"
+    checked={checked}
+    onChange={(e) => onCheckedChange(e.target.checked)}
+    className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+  />
+);

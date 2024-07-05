@@ -3,6 +3,11 @@ import { AddNewRecipeType, AddNewVideoType } from "./type";
 import { VideoType } from "@/app/(main)/admin/workout-video-management/video-management";
 import { AddNewProgramType } from "@/app/(main)/admin/create-workout-program/add-workout-program";
 import { EditProgramType } from "@/app/(main)/admin/workout-program-management/edit-program/[programId]/edit-workout-program";
+import fetchVideos, {
+  convertDuration,
+  formatDate,
+  formatViews,
+} from "@/utils/video/index";
 
 export const fetchGetTotalElements = async (sessionToken: string) => {
   try {
@@ -484,12 +489,36 @@ export const fetchGetVideoDetailById = async (
         },
       }
     );
-    const data = await response.json();
-    return data;
+    const dataFromDB = await response.json();
+    console.log("dataFromDB", dataFromDB);
+    const extractedVideoId = dataFromDB.url;
+    const apiKey = "AIzaSyC7RV-Yf4DiF8L4Xj4DprWjceASn5r-S6s";
+    const videoResponse = await fetch(
+      `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${extractedVideoId}&key=${apiKey}`
+    );
+    if (!videoResponse.ok) {
+      throw new Error(`HTTP error! status: ${videoResponse.status}`);
+    }
+    const videoResponseData = await videoResponse.json();
+    const videoInfo = videoResponseData.items[0];
+    const img = videoInfo.snippet.thumbnails.high.url;
+    const date = new Date(videoInfo.snippet.publishedAt).toLocaleDateString();
+    const duration = convertDuration(videoInfo.contentDetails.duration);
+    if (extractedVideoId === videoInfo.id) {
+      dataFromDB.img = img;
+      dataFromDB.date = date;
+      dataFromDB.duration = duration;
+    } else {
+      console.log("The video IDs do not match.");
+    }
+    console.log("dataFromDB", dataFromDB);
+    return dataFromDB;
   } catch (error) {
-    throw new Error(`Error while get video details`);
+    console.error(`Error while getting video details: ${error}`);
+    throw new Error(`Error while getting video details`);
   }
 };
+
 export const fetchGetAllVideoSelectForAdmin = async (sessionToken: string) => {
   try {
     const response = await fetch(
@@ -502,6 +531,7 @@ export const fetchGetAllVideoSelectForAdmin = async (sessionToken: string) => {
         },
       }
     );
+
     const data = await response.json();
     return data;
   } catch (error) {
@@ -635,10 +665,42 @@ export const fetchGetWorkoutProgramDetailById = async (
         },
       }
     );
+
     const data = await response.json();
+    const apiKey = "AIzaSyC7RV-Yf4DiF8L4Xj4DprWjceASn5r-S6s";
+    for (const dailyExercise of data.dailyExercises) {
+      for (const dailyVideo of dailyExercise.dailyVideos) {
+        const videoId = dailyVideo.video.url;
+        console.log("videoId", videoId);
+        const videoResponse = await fetch(
+          `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${videoId}&key=${apiKey}`
+        );
+
+        if (!videoResponse.ok) {
+          throw new Error(`HTTP error! status: ${videoResponse.status}`);
+        }
+
+        const videoResponseData = await videoResponse.json();
+        const videoInfo = videoResponseData.items[0];
+
+        if (videoId === videoInfo.id) {
+          dailyVideo.video.img = videoInfo.snippet.thumbnails.high.url;
+          dailyVideo.video.date = new Date(
+            videoInfo.snippet.publishedAt
+          ).toLocaleDateString();
+          dailyVideo.video.duration = convertDuration(
+            videoInfo.contentDetails.duration
+          );
+        } else {
+          console.log("The video IDs do not match.");
+        }
+      }
+    }
+    console.log(data);
     return data;
   } catch (error) {
-    throw new Error(`Error while get workout program detail`);
+    console.error(`Error while getting workout program detail: ${error}`);
+    throw new Error(`Error while getting workout program detail`);
   }
 };
 export const fetchPutWorkoutProgram = async (
