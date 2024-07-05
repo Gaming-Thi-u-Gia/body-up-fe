@@ -10,8 +10,10 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
+  fetchGetMonthlyUserChallengeCompletedCount,
+  fetchGetMonthlyUserChallengeUncompletedCount,
   fetchGetMonthlyUserCount,
-  fetchGetTopUserCompltedChallenge,
+  fetchGetTopUserCompletedChallenge,
   fetchGetTotalElements,
 } from "@/utils/admin/fetch";
 import { useAuthStore } from "@/components/providers/auth-provider";
@@ -38,7 +40,6 @@ export type MonthlyUserCountType = {
 export type UserLeaderboardType = {
   id: number;
   userName: string;
-  userName2: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -47,13 +48,21 @@ export type UserLeaderboardType = {
 
 const Dashboard = () => {
   const { sessionToken } = useAuthStore((store) => store);
-  const [totalElements, setTotalElements] = useState<TotalElementsType>();
+  const [totalElements, setTotalElements] = useState<TotalElementsType | null>(
+    null
+  );
   const [monthlyUserCount, setMonthlyUserCount] = useState<
     MonthlyUserCountType[]
   >([]);
   const [userLeaderboard, setUserLeaderboard] = useState<UserLeaderboardType[]>(
     []
   );
+  const [userChallengeCompleted, setUserChallengeCompleted] = useState<
+    MonthlyUserCountType[]
+  >([]);
+  const [userChallengeUncompleted, setUserChallengeUncompleted] = useState<
+    MonthlyUserCountType[]
+  >([]);
 
   useEffect(() => {
     const getTotalElements = async () => {
@@ -64,25 +73,68 @@ const Dashboard = () => {
         console.log(error);
       }
     };
+
     const getMonthlyUserCount = async () => {
       try {
         const response = await fetchGetMonthlyUserCount(sessionToken!);
-        setMonthlyUserCount(response);
+        if (Array.isArray(response)) {
+          setMonthlyUserCount(response);
+        } else {
+          console.error("Expected array but got:", response);
+        }
       } catch (error) {
         console.log(error);
       }
     };
+
     const getUserLeaderboard = async () => {
       try {
-        const response = await fetchGetTopUserCompltedChallenge(sessionToken!);
-        setUserLeaderboard(response);
+        const response = await fetchGetTopUserCompletedChallenge(sessionToken!);
+        if (Array.isArray(response)) {
+          setUserLeaderboard(response);
+        } else {
+          console.error("Expected array but got:", response);
+        }
       } catch (error) {
         console.log(error);
       }
     };
+
+    const getUserChallengeUncomplete = async () => {
+      try {
+        const response = await fetchGetMonthlyUserChallengeUncompletedCount(
+          sessionToken!
+        );
+        if (Array.isArray(response)) {
+          setUserChallengeUncompleted(response);
+        } else {
+          console.error("Expected array but got:", response);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const getUserChallengeCompleted = async () => {
+      try {
+        const response = await fetchGetMonthlyUserChallengeCompletedCount(
+          sessionToken!
+        );
+        if (Array.isArray(response)) {
+          setUserChallengeCompleted(response);
+        } else {
+          console.error("Expected array but got:", response);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     getTotalElements();
     getMonthlyUserCount();
     getUserLeaderboard();
+    getUserChallengeUncomplete();
+    getUserChallengeCompleted();
   }, [sessionToken]);
 
   if (!totalElements) {
@@ -216,7 +268,10 @@ const Dashboard = () => {
         </Card>
         <Card className="p-4">
           <h2 className="text-xl font-bold mb-4">User Challenge</h2>
-          <CurvedlineChart />
+          <CurvedlineChart
+            userChallengeCompleted={userChallengeCompleted}
+            userChallengeUncompleted={userChallengeUncompleted}
+          />
         </Card>
       </section>
       <section className="grid grid-cols-1 gap-4 mt-4">
@@ -280,32 +335,24 @@ function BarChart({
   );
 }
 
-function CurvedlineChart() {
+function CurvedlineChart({
+  userChallengeCompleted,
+  userChallengeUncompleted,
+}: {
+  userChallengeCompleted: MonthlyUserCountType[];
+  userChallengeUncompleted: MonthlyUserCountType[];
+}) {
   return (
     <div className="w-full aspect-[3]">
       <ResponsiveLine
         data={[
           {
-            id: "Desktop",
-            data: [
-              { x: "Jan", y: 43 },
-              { x: "Feb", y: 137 },
-              { x: "Mar", y: 61 },
-              { x: "Apr", y: 145 },
-              { x: "May", y: 26 },
-              { x: "Jun", y: 154 },
-            ],
+            id: "Completed",
+            data: userChallengeCompleted,
           },
           {
-            id: "Mobile",
-            data: [
-              { x: "Jan", y: 60 },
-              { x: "Feb", y: 48 },
-              { x: "Mar", y: 177 },
-              { x: "Apr", y: 78 },
-              { x: "May", y: 96 },
-              { x: "Jun", y: 204 },
-            ],
+            id: "Uncompleted",
+            data: userChallengeUncompleted,
           },
         ]}
         margin={{ top: 10, right: 10, bottom: 40, left: 40 }}

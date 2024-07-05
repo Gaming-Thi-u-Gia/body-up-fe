@@ -40,6 +40,46 @@ export const fetchGetMonthlyUserCount = async (sessionToken: string) => {
     throw new Error(`Fail To Get Monthly User Count`);
   }
 };
+export const fetchGetMonthlyUserChallengeCompletedCount = async (
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/monthly-user-challenge-completed-count`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Fail To Get Monthly User Count`);
+  }
+};
+export const fetchGetMonthlyUserChallengeUncompletedCount = async (
+  sessionToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/monthly-user-challenge-uncompleted-count`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Fail To Get Monthly User Count`);
+  }
+};
 export const fetchGetRecipeTopic = async () => {
   try {
     const response = await fetch(
@@ -640,7 +680,7 @@ export const fetchPutWorkoutProgram = async (
     throw new Error(`Error while updating the Workout Program`);
   }
 };
-export const fetchGetTopUserCompltedChallenge = async (
+export const fetchGetTopUserCompletedChallenge = async (
   sessionToken: string
 ) => {
   try {
