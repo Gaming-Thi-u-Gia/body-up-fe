@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import useChatFireBaseStore from "@/stores/chat-firebase-store";
 import { useAddChatModel } from "@/stores/add-chat-user";
 import logo_ai from "/public/Ailogo.png";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export type ChatListProps = {
    chatId: string;
@@ -29,6 +31,7 @@ const ChatList = () => {
    const [username, setUsername] = useState("");
    const { open } = useAddChatModel();
    const { changeChat } = useChatFireBaseStore((store) => store);
+   const router = useRouter();
    useEffect(() => {
       if (currentUser?.id) {
          const unsub = onSnapshot(
@@ -54,6 +57,7 @@ const ChatList = () => {
          };
       }
    }, [currentUser?.id]);
+
    console.log(username);
    const handleSelect = async (chat: ChatListProps) => {
       const userChats = chats.map((item) => {
@@ -85,6 +89,12 @@ const ChatList = () => {
    const handleAIChatId = async (id: string) => {
       changeChat(id, currentUser!);
    };
+
+   if (!currentUser) {
+      toast.error("Please login to continue");
+      router.push("/login");
+      return null;
+   }
 
    return (
       <div className="flex-1 overflow-auto">
