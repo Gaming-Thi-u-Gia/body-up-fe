@@ -57,7 +57,6 @@ export function ManagementUser() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-  const [notificationMessage, setNotificationMessage] = useState("");
 
   useEffect(() => {
     getUsers(pageNo, searchQuery);
@@ -117,15 +116,6 @@ export function ManagementUser() {
     }
   };
 
-  const sendNotification = () => {
-    // Thêm logic gửi thông báo tới user được chọn
-    console.log(
-      "Sending notification to users: ",
-      selectedUsers,
-      notificationMessage
-    );
-  };
-
   return (
     <div className="flex flex-col max-w-7xl m-auto min-h-screen">
       <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
@@ -178,12 +168,6 @@ export function ManagementUser() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>
-                      <Checkbox
-                        checked={selectedUsers.length === users.length}
-                        onCheckedChange={toggleSelectAllUsers}
-                      />
-                    </TableHead>
                     <TableHead>Id</TableHead>
                     <TableHead>userName</TableHead>
                     <TableHead>Name</TableHead>
@@ -197,12 +181,6 @@ export function ManagementUser() {
                 <TableBody>
                   {users.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedUsers.includes(user.id)}
-                          onCheckedChange={() => toggleSelectUser(user.id)}
-                        />
-                      </TableCell>
                       <TableCell>{user.id}</TableCell>
                       <TableCell>{user.userName}</TableCell>
                       <TableCell>{user.name}</TableCell>
@@ -240,17 +218,6 @@ export function ManagementUser() {
             </InfiniteScroll>
           </CardContent>
         </Card>
-        <div className="mt-4 p-4 border rounded-md">
-          <h3 className="text-lg font-semibold mb-2">Send Notification</h3>
-          <Input
-            type="text"
-            value={notificationMessage}
-            onChange={(e) => setNotificationMessage(e.target.value)}
-            placeholder="Enter notification message..."
-            className="w-full mb-2 p-2 border border-gray-300 rounded-md"
-          />
-          <Button onClick={sendNotification}>Send Notification</Button>
-        </div>
       </main>
       {selectedUser && (
         <Dialog
@@ -296,11 +263,3 @@ export function ManagementUser() {
     </div>
   );
 }
-const Checkbox = ({ checked, onCheckedChange }: any) => (
-  <input
-    type="checkbox"
-    checked={checked}
-    onChange={(e) => onCheckedChange(e.target.checked)}
-    className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
-  />
-);

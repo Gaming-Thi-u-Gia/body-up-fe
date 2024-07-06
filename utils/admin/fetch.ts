@@ -770,3 +770,21 @@ export const fetchGetTopUserCompletedChallenge = async (
     throw new Error(`Error while get Top User Completed Challenge`);
   }
 };
+export const fetchGetNotification = async (sessionToken: string) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/notification`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Error while get notification`);
+  }
+};
