@@ -31,11 +31,19 @@ const RecipeCategoryList = () => {
         pageNo,
         pageSize
       );
+      console.log(data);
+
       if (data.totalElements === 0) {
         setHasMoreTopic(false);
         setIsLoading(false);
       }
-      setTopicRecipes((prev) => [...prev, ...data.content]);
+      const sortedContent = data.content.map((topic: RecipesTopicType) => ({
+        ...topic,
+        recipes: topic.recipes.sort((a: any, b: any) =>
+          a.name.localeCompare(b.name)
+        ),
+      }));
+      setTopicRecipes((prev) => [...prev, ...sortedContent]);
       setPageNo((previous) => previous + 1);
       setHasMoreTopic(!data.last);
     } catch (error) {
@@ -44,7 +52,6 @@ const RecipeCategoryList = () => {
       setIsLoading(false);
     }
   };
-  console.log(topicRecipes);
 
   return (
     <div className="max-w-7xl m-auto">
