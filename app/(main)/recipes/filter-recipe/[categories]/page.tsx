@@ -7,12 +7,11 @@ import {
   RecipeCategories,
   RecipesCategoriesType,
 } from "@/utils/recipe/type";
-import { useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import HeaderFilter from "./header-filter";
 import BodyFilter from "./body-filter";
-import { set } from "zod";
 
 const Page = () => {
   const [recipeCategory, setRecipeCategory] = useState<RecipeCategories[]>([]);
@@ -24,6 +23,7 @@ const Page = () => {
   const [hasMoreRecipe, setHasMoreRecipe] = useState<boolean>(false);
   const [pageNo, setPageNo] = useState<number>(0);
   const [totalFilterResult, setTotalFilterResult] = useState(0);
+  const router = useRouter();
   let parts: string[] = [];
   if (typeof categories === "string") {
     parts = categories.split("categoryId");
@@ -33,9 +33,10 @@ const Page = () => {
 
   useEffect(() => {
     getRecipeByCategories();
-  }, [sessionToken]);
-  const getRecipeByCategories = async () => {
-    if (parts.length < 2) {
+  }, [sessionToken, categories]);
+
+  const getRecipeByCategories = async (categories = parts.slice(1)) => {
+    if (categories.length < 1) {
       toast.error("Categories Not Exists", {
         description: `${new Date().toLocaleString()}`,
         action: {
@@ -48,7 +49,7 @@ const Page = () => {
       try {
         const sizePage = 8;
         const data = await fetchGetRecipeByCategories(
-          parts.slice(1),
+          categories,
           sessionToken!,
           pageNo,
           sizePage
@@ -88,6 +89,22 @@ const Page = () => {
     }
   };
 
+  const removeCategory = (id: string) => {
+    const updatedCategories = parts.filter((part) => part !== id);
+    setRecipeCategory((prev) =>
+      prev.filter((category) => category.id.toString() !== id)
+    );
+    setPageNo(0);
+    setRecipes([]);
+    if (updatedCategories.length === 1) {
+      router.push("/recipes");
+    } else {
+      router.push(
+        `/recipes/filter-recipe/${updatedCategories.join("categoryId")}`
+      );
+    }
+  };
+
   const handleSortType = (type: string) => {
     const sortedRecipes = handleSort(recipes, type);
     setRecipes([...sortedRecipes]);
@@ -99,6 +116,7 @@ const Page = () => {
         totalSearchResult={totalFilterResult}
         handleSortType={handleSortType}
         recipeCategories={recipeCategory}
+        removeCategory={removeCategory}
       />
       <BodyFilter
         recipes={recipes}

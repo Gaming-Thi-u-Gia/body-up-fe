@@ -9,10 +9,12 @@ const HeaderSearch = ({
   totalSearchResult,
   handleSortType,
   recipeCategories,
+  removeCategory,
 }: {
   totalSearchResult: number;
   handleSortType: (type: string) => void;
   recipeCategories: RecipesCategoriesType[];
+  removeCategory: (id: string) => void;
 }) => {
   const [isSortOpen, setIsSortOpen] = useState<boolean>(false);
   const typeSort = ["Most current", "Rating", "A to Z", "Z to A"];
@@ -26,17 +28,18 @@ const HeaderSearch = ({
             <span className="whitespace-nowrap">
               Showing <b>{totalSearchResult} Recipes</b> Recipes matching
             </span>
-            {recipeCategories.map((recipeCatgory, index) => (
+            {recipeCategories.map((recipeCategory, index) => (
               <div
                 key={index}
                 className="relative flex justify-center items-center px-3 py-1 m-1 rounded-2xl bg-gray-200 text-gray-800 font-bold"
               >
-                <span>{recipeCatgory.name}</span>
+                <span>{recipeCategory.name}</span>
                 <span>
                   <CircleX
-                    className="absolute -top-2 -right-2"
+                    className="absolute -top-2 -right-2 cursor-pointer"
                     fill="black"
                     color="white"
+                    onClick={() => removeCategory(recipeCategory.id.toString())}
                   />
                 </span>
               </div>
