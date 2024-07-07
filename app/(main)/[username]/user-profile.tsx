@@ -49,12 +49,12 @@ export const UserProfile = () => {
         toast.success("Copied to clipboard");
     };
     useEffect(() => {
-        getUserByUserName2(username).then((res) => {
-            if (res.status !== 200) {
-                toast.error("User not found");
-            }
+        const getUser = async () => {
+            const res = await getUserByUserName2(username);
+            console.log(res.payload);
             setUser(res.payload);
-        });
+        };
+        getUser();
     }, [username]);
     return (
         <>

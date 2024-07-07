@@ -14,24 +14,32 @@ export const UserChallenges = () => {
             setChallenges(res);
         };
         getAllChallenges();
-    }, []);
+    }, [sessionToken]);
     return (
         <>
             <div className='mt-6 w-full bg-[#fafafa] py-[52px] rounded-lg'>
                 {challenges ? (
                     <div className='flex gap-4 flex-wrap'>
                         {challenges.map((challenge) => (
-                            // @ts-ignore
                             <CardProgram
+                                // @ts-ignore
                                 key={challenge.workoutProgram.id}
+                                // @ts-ignore
+
                                 days={challenge.workoutProgram.day}
+                                // @ts-ignore
                                 equipment={challenge.workoutProgram.equipment}
+                                // @ts-ignore
                                 imgUrl={challenge.workoutProgram.img}
                                 releaseDate={
+                                    // @ts-ignore
                                     challenge.workoutProgram.releaseDate
                                 }
+                                // @ts-ignore
                                 time={challenge.workoutProgram.time}
+                                // @ts-ignore
                                 title={challenge.workoutProgram.name}
+                                // @ts-ignore
                                 type={challenge.workoutProgram.type}
                             />
                         ))}
