@@ -24,6 +24,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "../providers/auth-provider";
 import { handleLogout } from "@/utils/auth";
+import { auth, db } from "@/firebase";
+import useUserFirebaseStore from "@/stores/user-firebase-store";
+import { Avatar } from "../ui/avatar";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { ChatListProps } from "@/app/(main)/inbox/chat-list";
+import useChatFireBaseStore from "@/stores/chat-firebase-store";
 import Notifications from "./Notification";
 import { useEffect, useState } from "react";
 import { fetchGetNotification } from "@/utils/admin/fetch";
@@ -31,32 +37,78 @@ import { useNotification } from "@/stores/User-store/use-notification";
 
 export const Navbar = () => {
   const router = useRouter();
-  const { isLoggedIn, logout, user, sessionToken } = useAuthStore(
-    (store) => store
-  );
+  const { isLoggedIn, logout, user } = useAuthStore((store) => store);
+  const { setUser } = useUserFirebaseStore((store) => store);
   const pathname = usePathname();
+  const [chats, setChats] = useState<ChatListProps[]>([]);
+  const { currentUser } = useUserFirebaseStore((store) => store);
+  const [countIsSeenMessage, setCountIsSeenMessage] = useState<number>(0);
+  const { changeChat } = useChatFireBaseStore();
   const onClick = async (event: React.MouseEvent) => {
     event.preventDefault();
     await handleLogout().then(() => {
       logout();
+      auth.signOut();
+      setUser(null);
       router.push("/");
     });
   };
-  const { notifications, setNotifications, setTotalElements, totalElements } =
-    useNotification();
+  console.log("chatsData:", chats);
 
   useEffect(() => {
-    const getNotifications = async () => {
+    if (currentUser?.id) {
+      const unsub = onSnapshot(
+        doc(db, "userchats", currentUser.id),
+        async (res) => {
+          const data = res.data();
+          if (data && data.chats) {
+            const items = data.chats;
+
+            const promises = items.map(async (item: ChatListProps) => {
+              const userDocRef = doc(db, "users", item.receiverId);
+              const userDocSnap = await getDoc(userDocRef);
+              const user = userDocSnap.data();
+              return { ...item, user };
+            });
+            const chatData = await Promise.all(promises);
+            setCountIsSeenMessage(
+              chatData.filter((chat) => chat.isSeen === false).length
+            );
+            setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
+          }
+        }
+      );
+      return () => {
+        unsub();
+      };
+    }
+  }, [currentUser?.id]);
+
+  const handleSelect = async (chat: ChatListProps) => {
+    const userChats = chats.map((item) => {
+      const { user, ...rest } = item;
+      return rest;
+    });
+    const chatIndex = userChats.findIndex(
+      (item) => item.chatId === chat.chatId
+    );
+    userChats[chatIndex].isSeen = true;
+    if (currentUser?.id) {
+      const userChatsRef = doc(db, "userchats", currentUser?.id);
       try {
-        const data = await fetchGetNotification(sessionToken!);
-        setNotifications(data.content);
-        setTotalElements(data.totalElements);
+        await updateDoc(userChatsRef, {
+          chats: userChats,
+        });
       } catch (error) {
         console.log(error);
       }
-    };
-    getNotifications();
-  }, []);
+    }
+    if (chat) {
+      changeChat(chat.chatId, chat.user);
+    }
+    router.push("/inbox");
+  };
+
   return (
     <nav className="bg-[#F7F7F7] border-b border-[#C4C4C4] fixed w-full z-50">
       <div className="max-w-7xl px-2 sm:px-6 lg:px-8 mx-auto ">
@@ -96,17 +148,98 @@ export const Navbar = () => {
                   type="button"
                   className="relative rounded-full p-1 text-gray-400 hover:text-white"
                 >
-                  <Image src={message} alt="message"></Image>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Image
+                        src={message || defaultProfile}
+                        alt="Profile"
+                        width={0}
+                        height={0}
+                        sizes="100"
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-[270px] mt-[20%] ml-[5%]"
+                      side="left"
+                    >
+                      <DropdownMenuLabel>
+                        <div className="flex items-center justify-between  text-[#424245] font-bold text-[12px]">
+                          <div className="">Your Message</div>
+                          <Link href="/inbox">View Inbox</Link>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        {chats.map((chat) => (
+                          <DropdownMenuItem key={chat.chatId}>
+                            <Link
+                              href="#"
+                              className={`flex
+                                              ${
+                                                chat?.isSeen
+                                                  ? "bg-transparent"
+                                                  : "bg-[#4b7af0]"
+                                              } items-center w-full gap-3 rounded-md bg-muted/50 px-3 py-2 transition-colors hover:bg-muted`}
+                              prefetch={false}
+                              onClick={() => handleSelect(chat)}
+                            >
+                              <Avatar className="h-8 w-8 border">
+                                <Image
+                                  src={
+                                    chat.user.blocked?.includes(
+                                      currentUser?.id!
+                                    )
+                                      ? defaultProfile
+                                      : chat.user.avatar ?? ""
+                                  }
+                                  alt="logo"
+                                  width={32}
+                                  height={32}
+                                  className="cursor-pointer rounded-full"
+                                />
+                              </Avatar>
+                              <div className="flex-1 overflow-hidden">
+                                <div className="font-medium truncate">
+                                  {chat.user.blocked?.includes(currentUser?.id!)
+                                    ? "User"
+                                    : chat.user.username}
+                                </div>
+                                <div
+                                  className={`${
+                                    chat.isSeen
+                                      ? "text-muted-foreground"
+                                      : "font-bold text-black"
+                                  } text-sm  line-clamp-1 break-all`}
+                                >
+                                  {chat.lastMessage}
+                                </div>
+                              </div>
+                            </Link>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </button>
+                <span
+                  className={`${
+                    countIsSeenMessage === 0 ? "hidden" : "inline-flex"
+                  } absolute top-1 right-1  items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full`}
+                >
+                  {countIsSeenMessage}
+                </span>
+              </div>
+              <div className="relative">
+                <Notifications
+                  notifications={notifications}
+                  totalElements={totalElements}
+                  setTotalElements={setTotalElements}
+                />
                 <span className="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
                   3
                 </span>
               </div>
-              <Notifications
-                notifications={notifications}
-                totalElements={totalElements}
-                setTotalElements={setTotalElements}
-              />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Image
@@ -123,7 +256,7 @@ export const Navbar = () => {
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
                       <Link
-                        href="/profile"
+                        href={`/${currentUser?.username}`}
                         className="w-full flex items-center"
                       >
                         <User className="mr-2 h-4 w-4" />

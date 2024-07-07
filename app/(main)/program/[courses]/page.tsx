@@ -7,8 +7,12 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { AlignJustify, Calendar, CalendarCheck, Clock4, Ellipsis } from "lucide-react";
 import { fetchWorkoutProgramDataById } from "@/utils/video/workoutVideoCollection";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import DailyCourses from "./daily-courses";
+import SkeletonLoader from "./skeleton-daily";
+import { fetchJoinChallenge } from "@/utils/user";
+import { useAuthStore } from "@/components/providers/auth-provider";
+import ModalChallenge from "./access-join-challenge";
 
 interface Category {
     id: number;
@@ -27,45 +31,63 @@ interface WorkoutProgram {
     year: string;
     banner: string;
     releaseDate: string;
-    workoutProgramCategories: Category[]; 
+    workoutProgramCategories: Category[];
 }
 
 const Page = () => {
     const [showDetails, setShowDetails] = useState(false);
-
     const [showDiv, setShowDiv] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [workoutProgramById, setWorkoutProgramById] = useState<WorkoutProgram | null>(null);
+    const sessionToken = useAuthStore((store) => store.sessionToken);
+    const [isModalOpen, setIsModalOpen] = useState(false); 
+
+    const pathName = usePathname();
+    const workoutProgramId = pathName.split('/')[2];
+    const router = useRouter();
 
     const toggleDetails = () => {
         setShowDetails(!showDetails);
     };
 
-    const pathName = usePathname(); 
-    const workoutProgramId = pathName.split('/')[2];
-
-    const [workoutProgramById, setWorkoutProgramById] = useState<WorkoutProgram>([]);
-
     useEffect(() => {
         const getWorkoutProgramById = async () => {
             const workoutProgram = await fetchWorkoutProgramDataById(Number(workoutProgramId));
             setWorkoutProgramById(workoutProgram);
+            setLoading(false);
         };
         getWorkoutProgramById();
-    }, [pathName]);
+    }, [workoutProgramId]);
+
+    const joinWorkoutChallenge = async () => {
+        const res = await fetchJoinChallenge(sessionToken!, Number(workoutProgramId));
+        router.push("/my-fitness-journey");
+    }
+
+    const joinChallenge = async () => {
+        setIsModalOpen(true);
+    };
 
     const getTypes = (categories: Category[] | undefined): string => {
         if (!categories) return '';
         return categories.filter(cat => cat.type === 'FOCUS AREA').map(cat => cat.name).join(', ');
     };
-    
+
     const getEquipment = (categories: Category[] | undefined): string => {
         if (!categories) return '';
         return categories.filter(cat => cat.type === 'EQUIPMENT').map(cat => cat.name).join(', ');
     };
 
-    function formatDate(dateString) {
+    function formatDate(dateString: string) {
         const date = new Date(dateString);
         return date.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
-    }    
+    }
+
+    if (loading) {
+        return <SkeletonLoader />;
+    }
+
+    console.log("workoutProgramById", workoutProgramById);
 
     return (
         <div className="max-w-7xl flex items-center justify-center mx-auto my-8">
@@ -74,26 +96,26 @@ const Page = () => {
                     <div className="flex-row bg-transparent border-r border-gray-200/50 bg-white rounded-2xl pb-[1px]">
                         <div className="relative">
                             <img
-                                src={workoutProgramById.banner}
+                                src={workoutProgramById?.banner}
                                 alt=""
                                 className="w-full h-auto rounded-2xl"
                             />
                             <div className="absolute bottom-2 left-2 flex gap-2">
                                 <div className="flex gap-1 text-center items-center px-2 py-1 rounded-full bg-[#F7F7F7]">
                                     <Calendar width={16} height={16} />
-                                    <span className="text-[12px]">{workoutProgramById.day}</span>
+                                    <span className="text-[12px]">{workoutProgramById?.day}</span>
                                 </div>
                                 <div className="flex gap-1 text-center items-center px-2 py-1 rounded-full bg-[#F7F7F7]">
                                     <Clock4 width={16} height={16} />
                                     <span className="text-[12px]">
-                                        {workoutProgramById.time}
+                                        {workoutProgramById?.time}
                                     </span>
                                 </div>
                             </div>
                         </div>
                         <div className="flex-row my-4 mx-5">
                             <span className="text-xs font-bold tracking-wider text-[#868A93]">
-                                {workoutProgramById.releaseDate ? formatDate(workoutProgramById.releaseDate) : 'N/A'}
+                                {workoutProgramById?.releaseDate ? formatDate(workoutProgramById.releaseDate) : 'N/A'}
                             </span>
                             <div className="flex gap-1 my-2">
                                 <Image
@@ -103,7 +125,7 @@ const Page = () => {
                                     alt="conflict"
                                 />
                                 <span className="text-[14px]">
-                                    {getTypes(workoutProgramById.workoutProgramCategories)}
+                                    {workoutProgramById?.type}
                                 </span>
                             </div>
                             <div className="flex gap-2 my-2">
@@ -116,7 +138,7 @@ const Page = () => {
                                     />
                                 </div>
                                 <p className="text-[14px]">
-                                    {getEquipment(workoutProgramById.workoutProgramCategories)}
+                                    {workoutProgramById?.equipment}
                                 </p>
                             </div>
 
@@ -130,7 +152,7 @@ const Page = () => {
                                             showDetails ? "" : "line-clamp-2"
                                         }`}
                                     >
-                                        {workoutProgramById.detail}
+                                        {workoutProgramById?.detail}
                                     </p>
                                     {!showDetails && (
                                         <div
@@ -166,6 +188,7 @@ const Page = () => {
                                 className="mt-2 py-2 ml-0"
                                 variant="active"
                                 size="default"
+                                onClick={joinChallenge}
                             >
                                 Start Challenge
                             </Button>
@@ -173,10 +196,16 @@ const Page = () => {
                     </div>
                 </div>
 
+                <ModalChallenge 
+                    isOpen={isModalOpen} 
+                    onClose={() => setIsModalOpen(false)} 
+                    onConfirm={joinWorkoutChallenge}
+                />
+
                 <div className="w-[75%] ml-10">
                     <div className="flex justify-between pb-4">
                         <span className="text-3xl font-bold mb-4 text-center">
-                            {workoutProgramById.name}
+                            {workoutProgramById?.name}
                         </span>
                         <div className="flex gap-6 items-center">
                             <div className="flex items-center justify-center w-10 h-10 bg-[#d6d1fe] rounded-full">
