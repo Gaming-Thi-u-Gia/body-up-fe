@@ -36,6 +36,7 @@ import { fetchGetNotification } from "@/utils/admin/fetch";
 import { useNotification } from "@/stores/User-store/use-notification";
 
 export const Navbar = () => {
+  const { sessionToken } = useAuthStore((store) => store);
   const router = useRouter();
   const { isLoggedIn, logout, user } = useAuthStore((store) => store);
   const { setUser } = useUserFirebaseStore((store) => store);
@@ -44,6 +45,8 @@ export const Navbar = () => {
   const { currentUser } = useUserFirebaseStore((store) => store);
   const [countIsSeenMessage, setCountIsSeenMessage] = useState<number>(0);
   const { changeChat } = useChatFireBaseStore();
+  const { notifications, setNotifications, setTotalElements, totalElements } =
+    useNotification();
   const onClick = async (event: React.MouseEvent) => {
     event.preventDefault();
     await handleLogout().then(() => {
@@ -83,6 +86,20 @@ export const Navbar = () => {
       };
     }
   }, [currentUser?.id]);
+
+  useEffect(() => {
+    const getNotifications = async () => {
+      try {
+        const data = await fetchGetNotification(sessionToken!);
+        console.log(data, "data notifications");
+        setNotifications(data.content);
+        setTotalElements(data.totalElements);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getNotifications();
+  }, []);
 
   const handleSelect = async (chat: ChatListProps) => {
     const userChats = chats.map((item) => {
@@ -230,15 +247,12 @@ export const Navbar = () => {
                   {countIsSeenMessage}
                 </span>
               </div>
-              <div className="relative">
+              <div>
                 <Notifications
                   notifications={notifications}
                   totalElements={totalElements}
                   setTotalElements={setTotalElements}
                 />
-                <span className="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
-                  3
-                </span>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

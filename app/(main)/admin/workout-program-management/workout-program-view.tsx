@@ -14,6 +14,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import Link from "next/link";
+import { toast } from "sonner";
 
 type ProgramTopic = {
   id: number;
@@ -102,12 +103,24 @@ export function ViewAll() {
     if (!isConfirmed) return;
     try {
       const response = await fetchDeleteWorkoutProgram(id, sessionToken!);
-      console.log(response);
+      toast.success(response, {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
       setWorkoutPrograms((prevPrograms) =>
         prevPrograms.filter((program) => program.id !== id)
       );
     } catch (error) {
-      console.log(error);
+      toast.error("Error When deleting workout program", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
 
