@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { fetchVideoWithTopicData } from "@/utils/video/workoutVideoCollection";
-import fetchVideos from "@/utils/video";
+
 import SkeletonVideoCard from "./skeleton-video";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -12,6 +12,7 @@ import Modal from "./video";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import VideoCard from "./video-card";
 import Link from "next/link";
+import fetchVideos from "@/utils/video";
 
 type VideoItem = {
     videoId: number;

@@ -1,29 +1,4 @@
 
-
-const fetchVideoIdsFromDatabase = async () => {
-    try {
-        const response = await fetch("http://localhost:8080/api/v1/workout-video/getVideoAll");
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (!data || !Array.isArray(data)) {
-            throw new Error("Invalid data format");
-        }
-
-        return data.map((item) => ({
-            id: item.id,
-            name: item.name,
-            url: item.url
-        })); 
-    } catch (error) {
-        console.error("Error fetching videoIds from database:", error);
-        return [];
-    }
-};
-
-
 interface VideoItem {
     id: string;
     title: string;

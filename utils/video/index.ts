@@ -40,7 +40,7 @@ const fetchVideos = async () => {
         }
 
         const playlistId = "UUCgLoMYIyP0U56dEhEL1wXQ";
-        const apiKey = "AIzaSyC7RV-Yf4DiF8L4Xj4DprWjceASn5r-S6s"; 
+        const apiKey = "AIzaSyCK_pKQdZhpHFnBgXDxslUsjdP3QJyNOCU"; 
 
         let matchedVideos: VideoItem[] = [];
         let nextPageToken = "";
