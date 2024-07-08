@@ -71,6 +71,8 @@ export function ManagementUser() {
         setIsLoading(false);
         setHasMoreUsers(false);
       }
+      console.log(data.content);
+
       const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
       setUsers((prevUsers) =>
         page === 0 ? sortedData : [...prevUsers, ...sortedData]

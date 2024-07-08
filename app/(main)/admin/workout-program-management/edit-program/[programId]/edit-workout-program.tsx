@@ -949,6 +949,7 @@ const EditWorkoutProgram = () => {
                   </div>
                 ))}
               </div>
+
               {errors.programTopics && (
                 <p className="text-red-500">
                   {errors.programTopics.toString()}
@@ -1002,15 +1003,19 @@ const EditWorkoutProgram = () => {
                             <span className="font-medium">
                               {filteredCategory.name}
                             </span>
-                            <Button
-                              variant="default"
-                              size="icon"
-                              onClick={(e) =>
-                                handleRemoveCategory(filteredCategory.type, e)
-                              }
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
+                            {program.workoutProgramCategories.filter(
+                              (cat) => cat.type === category.type
+                            ) && (
+                              <Button
+                                variant="default"
+                                size="icon"
+                                onClick={(e) =>
+                                  handleRemoveCategory(filteredCategory.type, e)
+                                }
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         ))}
                     </div>
@@ -1072,7 +1077,12 @@ const EditWorkoutProgram = () => {
                           }
                           value={video.video.id.toString() || ""}
                         >
-                          <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                          <SelectTrigger
+                            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            style={{
+                              color: video.video.id === 0 ? "red" : "inherit",
+                            }}
+                          >
                             <SelectValue>
                               {videos.find((v) => v.id === video.video.id)
                                 ?.name || "Select Video"}
@@ -1141,7 +1151,13 @@ const EditWorkoutProgram = () => {
                               }
                               value={recipe.recipe.id.toString() || ""}
                             >
-                              <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                              <SelectTrigger
+                                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                style={{
+                                  color:
+                                    recipe.recipe.id === 0 ? "red" : "inherit",
+                                }}
+                              >
                                 <SelectValue>
                                   {recipes.find(
                                     (r) => r.id === recipe.recipe.id
@@ -1195,7 +1211,13 @@ const EditWorkoutProgram = () => {
                               }
                               value={recipe.recipe.id.toString() || ""}
                             >
-                              <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                              <SelectTrigger
+                                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                style={{
+                                  color:
+                                    recipe.recipe.id === 0 ? "red" : "inherit",
+                                }}
+                              >
                                 <SelectValue>
                                   {recipes.find(
                                     (r) => r.id === recipe.recipe.id
@@ -1249,7 +1271,13 @@ const EditWorkoutProgram = () => {
                               }
                               value={recipe.recipe.id.toString() || ""}
                             >
-                              <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                              <SelectTrigger
+                                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                style={{
+                                  color:
+                                    recipe.recipe.id === 0 ? "red" : "inherit",
+                                }}
+                              >
                                 <SelectValue>
                                   {recipes.find(
                                     (r) => r.id === recipe.recipe.id
