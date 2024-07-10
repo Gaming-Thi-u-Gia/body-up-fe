@@ -14,7 +14,7 @@ const layout = ({ children }: Props) => {
             <div>
                <CommunitySideBar />
             </div>
-            <div className="flex flex-col w-[45%] ml-[30%] mt-[75px]">
+            <div className="flex flex-col w-[45%] ml-[30%] mt-[4%]">
                <CommunityFilter />
                <div className="flex w-full justify-center items-center">
                   {children}
