@@ -10,6 +10,7 @@ import HeaderNavWorkoutVideos from "../../header-nav-workout-videos";
 import TableVideoCategory from "../../filter-workout-video";
 import SkeletonVideoCard from "../../skeleton-video";
 import InfiniteScroll from "react-infinite-scroll-component";
+import Link from "next/link";
 
 type VideoItem = {
     videoId: number;
@@ -31,6 +32,7 @@ const VideoFilter = () => {
     const [showFilterModal, setShowFilterModal] = useState(false);
     const toggleFilterModal = () => setShowFilterModal(!showFilterModal);
     const [hasMoreVideo, setHasMoreVideo] = useState(false);
+    const [totalSearchResult, setTotalSearchResult] = useState(0);
 
     const [pageNo, setPageNo] = useState<number>(0);
 
@@ -71,6 +73,7 @@ const VideoFilter = () => {
             setVideos((prev) => [...prev, ...filterVideos]);
             setPageNo(pageNo + 1);
             setHasMoreVideo(!filterData.last);
+            setTotalSearchResult(filterData.totalElements);
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -86,6 +89,20 @@ const VideoFilter = () => {
         <div className="max-w-7xl h-full mx-auto">
             <HeaderNavWorkoutVideos onCategoryChange={() => {}} onFilterClick={toggleFilterModal} />
             {showFilterModal && <TableVideoCategory onClose={() => setShowFilterModal(false)} />}
+            <div className="flex-1 bg-white py-2 my-3 flex justify-between items-center px-5 rounded-2xl">
+                <div>
+                    Showing <b>{totalSearchResult}</b> matching{" "}
+                    <b>Search Criteria</b>
+                </div>
+                <div>
+                    <Link
+                        href="http://localhost:3000/workout-videos"
+                        className="text-red-500 cursor-pointer"
+                    >
+                        Clear
+                    </Link>
+                </div>
+            </div>
             {loading && <div className="grid grid-cols-5 gap-5 my-5">
                 {[1, 2, 3, 4, 5].map((index) => (
                     <SkeletonVideoCard key={index} />

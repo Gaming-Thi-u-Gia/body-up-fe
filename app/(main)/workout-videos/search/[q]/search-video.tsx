@@ -5,6 +5,8 @@ import { fetchSearchVideoData } from "@/utils/video/workoutVideoCollection";
 import Modal from "../../video";
 import HeaderNavWorkoutVideos from "../../header-nav-workout-videos";
 import SkeletonVideoCard from "../../skeleton-video";
+import Link from "next/link";
+import TableVideoCategory from "../../filter-workout-video";
 
 type VideoItem = {
     id: string;
@@ -23,6 +25,8 @@ const SearchVideo = ({ query }: SearchVideosProps) => {
     const [videos, setVideos] = useState<VideoItem[]>([]);
     const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [totalSearchResult, setTotalSearchResult] = useState(0);
+    const [showFilterModal, setShowFilterModal] = useState(false);
 
     const handleThumbnailClick = (id: string) => {
         setSelectedVideoId(id);
@@ -35,21 +39,31 @@ const SearchVideo = ({ query }: SearchVideosProps) => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const fetchedVideos = await fetchVideos();
 
-            if (query) {
-                const searchUrls = await fetchSearchVideoData(query);
-                const filteredVideos = fetchedVideos.filter((video) =>
-                    searchUrls.some(
-                        (searchVideo: { url: string }) => searchVideo.url === video.id
-                    )
-                );
-                setVideos(filteredVideos);
-            } else {
-                setVideos(fetchedVideos);
+            try {
+                const fetchedVideos = await fetchVideos();
+                if (query) {
+                    const searchUrls = await fetchSearchVideoData(query);
+                    const filteredVideos = fetchedVideos.filter((video) =>
+                        searchUrls.some(
+                            (searchVideo: { url: string }) => searchVideo.url === video.id
+                        )
+                    );
+                    setVideos(filteredVideos);
+                    setTotalSearchResult(filteredVideos.length);
+                } else {
+                    setVideos([]);
+                    setTotalSearchResult(fetchedVideos.length);
+                }
+            } catch (error) {
+                console.error("Error fetching videos:", error);
+                setVideos([]);
+                setTotalSearchResult(0);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
+
         fetchData();
     }, [query]);
 
@@ -57,9 +71,26 @@ const SearchVideo = ({ query }: SearchVideosProps) => {
         console.log("Category Name:", categoryName);
     };
 
+    const toggleFilterModal = () => setShowFilterModal(!showFilterModal);
+
     return (
         <div>
-            <HeaderNavWorkoutVideos onCategoryChange={handleCategoryChange} />
+            <HeaderNavWorkoutVideos onCategoryChange={handleCategoryChange} onFilterClick={toggleFilterModal} />
+            {showFilterModal && <TableVideoCategory onClose={() => setShowFilterModal(false)} />}
+            <div className="flex-1 bg-white py-2 my-3 flex justify-between items-center px-5 rounded-2xl">
+                <div>
+                    Showing <b>{totalSearchResult}</b> matching{" "}
+                    <b>Search Criteria</b>
+                </div>
+                <div>
+                    <Link
+                        href="http://localhost:3000/workout-videos"
+                        className="text-red-500 cursor-pointer"
+                    >
+                        Clear
+                    </Link>
+                </div>
+            </div>
             <div className="grid grid-cols-5 gap-5 my-5">
                 {loading ? (
                     [1, 2, 3, 4, 5].map((index) => (

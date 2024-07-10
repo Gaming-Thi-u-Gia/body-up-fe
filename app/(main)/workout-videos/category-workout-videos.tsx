@@ -10,7 +10,6 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import Modal from "./video";
 import { useAuthStore } from "@/components/providers/auth-provider";
-import { Heart } from "lucide-react";
 import VideoCard from "./video-card";
 import Link from "next/link";
 
