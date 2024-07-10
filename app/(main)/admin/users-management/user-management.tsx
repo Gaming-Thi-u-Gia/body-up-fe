@@ -3,13 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableHeader,
@@ -41,14 +35,16 @@ import { useAuthStore } from "@/components/providers/auth-provider";
 type UserType = {
   id: number;
   userName: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  avatar: string;
-  bio: string;
+  avatar: string | null;
+  bio: string | null;
+  role: string;
   createAt: string;
 };
 
-export function ManagementUser() {
+const UserManagement = () => {
   const { sessionToken } = useAuthStore((store) => store);
   const [users, setUsers] = useState<UserType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,7 +52,6 @@ export function ManagementUser() {
   const [pageNo, setPageNo] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
 
   useEffect(() => {
     getUsers(pageNo, searchQuery);
@@ -71,6 +66,7 @@ export function ManagementUser() {
         setIsLoading(false);
         setHasMoreUsers(false);
       }
+      console.log(data.content);
       const sortedData = data.content.sort((a: any, b: any) => b.id - a.id);
       setUsers((prevUsers) =>
         page === 0 ? sortedData : [...prevUsers, ...sortedData]
@@ -93,32 +89,9 @@ export function ManagementUser() {
     setUsers([]);
   };
 
-  const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
-      setPageNo(0);
-      setUsers([]);
-    }
-  };
-
-  const toggleSelectUser = (userId: number) => {
-    setSelectedUsers((prevSelected) =>
-      prevSelected.includes(userId)
-        ? prevSelected.filter((id) => id !== userId)
-        : [...prevSelected, userId]
-    );
-  };
-
-  const toggleSelectAllUsers = () => {
-    if (selectedUsers.length === users.length) {
-      setSelectedUsers([]);
-    } else {
-      setSelectedUsers(users.map((user) => user.id));
-    }
-  };
-
   return (
     <div className="flex flex-col max-w-7xl m-auto min-h-screen">
-      <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
+      <header className="flex items-center rounded-lg h-16 px-4 border-b shrink-0 md:px-6 bg-slate-700 text-white fixed top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-screen-2xl z-50">
         <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link
             href="#"
@@ -135,29 +108,26 @@ export function ManagementUser() {
           </Link>
         </div>
       </header>
+
       <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 p-4 md:gap-8 md:p-10">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Users</CardTitle>
-            <CardDescription>Manage your users here.</CardDescription>
-          </CardHeader>
           <CardContent>
-            <div className="flex items-center mb-4">
+            <div className="flex mt-10 items-center">
               <Input
                 type="text"
                 value={searchQuery}
                 onChange={handleSearchChange}
-                onKeyDown={handleKeyDown}
                 placeholder="Search users..."
                 className="w-full p-2 border border-gray-300 rounded-l-md"
               />
               <Button
                 onClick={clearSearch}
-                className="bg-transparent border border-gray-300 text-gray-500 hover:text-red-500 p-2  focus:outline-none"
+                className="bg-transparent border border-gray-300 text-gray-500 hover:text-red-500 p-2 rounded-r-md focus:outline-none"
               >
                 Clear
               </Button>
             </div>
+
             <InfiniteScroll
               dataLength={users.length}
               next={() => setPageNo(pageNo + 1)}
@@ -169,12 +139,8 @@ export function ManagementUser() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Id</TableHead>
-                    <TableHead>userName</TableHead>
-                    <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Avatar</TableHead>
-                    <TableHead>Bio</TableHead>
-                    <TableHead>Created At</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -182,18 +148,15 @@ export function ManagementUser() {
                   {users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>{user.id}</TableCell>
-                      <TableCell>{user.userName}</TableCell>
-                      <TableCell>{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
                         <Avatar>
-                          <AvatarImage src={user.avatar} />
+                          <AvatarImage
+                            src={user.avatar || "/default-avatar.png"}
+                          />
+                          <AvatarFallback>{user.firstName[0]}</AvatarFallback>
                         </Avatar>
                       </TableCell>
-                      <TableCell className="text-ellipsis text-nowrap max-w-3 overflow-hidden">
-                        {user.bio}
-                      </TableCell>
-                      <TableCell>{user.createAt}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -233,10 +196,16 @@ export function ManagementUser() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid items-center grid-cols-4 gap-4">
+                <Label htmlFor="id" className="text-right">
+                  ID
+                </Label>
+                <div className="col-span-3">{selectedUser.id}</div>
+              </div>
+              <div className="grid items-center grid-cols-4 gap-4">
                 <Label htmlFor="name" className="text-right">
                   Name
                 </Label>
-                <div className="col-span-3">{selectedUser.name}</div>
+                <div className="col-span-3">{`${selectedUser.firstName} ${selectedUser.lastName}`}</div>
               </div>
               <div className="grid items-center grid-cols-4 gap-4">
                 <Label htmlFor="email" className="text-right">
@@ -248,18 +217,30 @@ export function ManagementUser() {
                 <Label htmlFor="role" className="text-right">
                   Role
                 </Label>
-                <div className="col-span-3">Admin</div>
+                <div className="col-span-3">{selectedUser.role}</div>
               </div>
               <div className="grid items-center grid-cols-4 gap-4">
                 <Label htmlFor="joined" className="text-right">
                   Joined
                 </Label>
-                <div className="col-span-3">{selectedUser.createAt}</div>
+                <div className="col-span-3">
+                  {new Date(selectedUser.createAt).toLocaleDateString()}
+                </div>
               </div>
+              {selectedUser.bio && (
+                <div className="grid items-center grid-cols-4 gap-4">
+                  <Label htmlFor="bio" className="text-right">
+                    Bio
+                  </Label>
+                  <div className="col-span-3">{selectedUser.bio}</div>
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>
       )}
     </div>
   );
-}
+};
+
+export default UserManagement;

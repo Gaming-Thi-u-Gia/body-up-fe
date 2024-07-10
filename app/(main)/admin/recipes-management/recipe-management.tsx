@@ -125,13 +125,6 @@ const RecipeManagement = () => {
     setRecipes([]);
   };
 
-  const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
-      setPageNo(0);
-      setRecipes([]);
-    }
-  };
-
   const handleUpdateRecipe = async (updatedRecipe: EditableRecipeType) => {
     try {
       const response = await fetchPutRecipe(sessionToken!, updatedRecipe);
@@ -298,7 +291,13 @@ const RecipeManagement = () => {
         }
       };
       reader.onerror = () => {
-        toast.error("Error reading file. Please try again.");
+        toast.error("Error reading file. Please try again", {
+          description: `${new Date().toLocaleString()}`,
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -330,20 +329,27 @@ const RecipeManagement = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center bg-black text-white p-4 mb-6">
-        <h1 className="text-3xl font-bold">Manage Recipes</h1>
-        <Link href="/admin">
-          <Button variant="secondary" className="text-lg">
+      <header className="flex items-center rounded-lg h-16 px-4 border-b shrink-0 md:px-6 bg-slate-700 text-white fixed top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-screen-2xl z-50">
+        <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+          <Link
+            href="#"
+            className="flex items-center gap-2 text-lg font-semibold md:text-base"
+            prefetch={false}
+          >
+            <span>Recipe Management</span>
+          </Link>
+        </nav>
+        <div className="ml-auto">
+          <Link href="/admin" className="text-lg font-semibold">
             Home
-          </Button>
-        </Link>
-      </div>
-      <div className="flex items-center mb-4">
+          </Link>
+        </div>
+      </header>
+      <div className="flex mt-10 items-center">
         <Input
           type="text"
           value={searchQuery}
           onChange={handleSearchChange}
-          onKeyDown={handleKeyDown}
           placeholder="Search recipes..."
           className="w-full p-2 border border-gray-300 rounded-l-md"
         />
@@ -354,7 +360,6 @@ const RecipeManagement = () => {
           Clear
         </Button>
       </div>
-
       {isLoading && recipes.length === 0 ? (
         <div>
           <ListRecipeCategorySkeleton />
@@ -895,7 +900,7 @@ const ListRecipeCategorySkeleton = () => {
 
 const RecipeCardSkeleton = () => {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+    <div className="bg-white rounded-lg shadow-md px-6 pb-6 animate-pulse">
       <div className="flex items-center justify-between mb-4">
         <div className="flex flex-col space-y-2 w-full">
           <div className="h-8 bg-gray-300 rounded w-2/3"></div>

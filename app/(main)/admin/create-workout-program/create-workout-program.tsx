@@ -82,7 +82,7 @@ type ExerciseError = {
   eveningRecipeError?: string;
 };
 
-const AddWorkoutProgram = () => {
+const CreateWorkoutProgram = () => {
   const { sessionToken } = useAuthStore((store) => store);
   const router = useRouter();
   const [program, setProgram] = useState<AddNewProgramType>({
@@ -544,7 +544,7 @@ const AddWorkoutProgram = () => {
 
       try {
         await postWorkoutProgram(finalProgram);
-        router.push("/admin/workout-program-management");
+        router.push("/admin/workout-programs-management");
       } catch (error) {
         setErrors((prevErrors) => ({
           ...prevErrors,
@@ -656,17 +656,25 @@ const AddWorkoutProgram = () => {
 
   return (
     <div className="container mx-auto py-12">
-      <header className="bg-black py-4 px-6 flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-white">Add Workout Program</h1>
-        <Link href="/admin">
-          <Button variant="secondary" className="text-lg">
+      <header className="flex items-center rounded-lg h-16 px-4 border-b shrink-0 md:px-6 bg-slate-700 text-white fixed top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-screen-2xl z-50">
+        <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+          <Link
+            href="#"
+            className="flex items-center gap-2 text-lg font-semibold md:text-base"
+            prefetch={false}
+          >
+            <span>Create Workout Program</span>
+          </Link>
+        </nav>
+        <div className="ml-auto">
+          <Link href="/admin" className="text-lg font-semibold">
             Home
-          </Button>
-        </Link>
+          </Link>
+        </div>
       </header>
       {currentStep === 1 && (
         <>
-          <form className="space-y-6" onSubmit={handleNextStep}>
+          <form className="space-y-6 mt-8" onSubmit={handleNextStep}>
             <div>
               <label htmlFor="name" className="block font-medium mb-2">
                 Program Name
@@ -698,6 +706,9 @@ const AddWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("type", e.target.value)
                 }
+                style={{
+                  color: program.type === "" ? "red" : "inherit",
+                }}
               />
               {errors.type && (
                 <p className="text-red-500">{errors.type.toString()}</p>
@@ -716,6 +727,9 @@ const AddWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("equipment", e.target.value)
                 }
+                style={{
+                  color: program.equipment === "" ? "red" : "inherit",
+                }}
               />
               {errors.equipment && (
                 <p className="text-red-500">{errors.equipment.toString()}</p>
@@ -733,6 +747,9 @@ const AddWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
                   handleInputChange("detail", e.target.value)
                 }
+                style={{
+                  color: program.detail === "" ? "red" : "inherit",
+                }}
               />
               {errors.detail && (
                 <p className="text-red-500">{errors.detail.toString()}</p>
@@ -751,6 +768,9 @@ const AddWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("day", parseInt(e.target.value))
                 }
+                style={{
+                  color: program.day === 0 ? "red" : "inherit",
+                }}
               />
               {errors.day && (
                 <p className="text-red-500">{errors.day.toString()}</p>
@@ -769,6 +789,9 @@ const AddWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("time", e.target.value)
                 }
+                style={{
+                  color: program.time === "" ? "red" : "inherit",
+                }}
               />
               {errors.time && (
                 <p className="text-red-500">{errors.time.toString()}</p>
@@ -787,6 +810,9 @@ const AddWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("year", parseInt(e.target.value))
                 }
+                style={{
+                  color: program.year === 0 ? "red" : "inherit",
+                }}
               />
               {errors.year && (
                 <p className="text-red-500">{errors.year.toString()}</p>
@@ -877,14 +903,16 @@ const AddWorkoutProgram = () => {
                     className="bg-gray-100 rounded-md p-4 flex items-center"
                   >
                     <span className="font-medium">{topic.name}</span>
-                    <Button
-                      variant="default"
-                      size="icon"
-                      className="ml-auto"
-                      onClick={(e) => handleRemoveTopic(index, e)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+                    {program.programTopics.length > 1 && (
+                      <Button
+                        variant="default"
+                        size="icon"
+                        className="ml-auto"
+                        onClick={(e) => handleRemoveTopic(index, e)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -941,15 +969,19 @@ const AddWorkoutProgram = () => {
                             <span className="font-medium">
                               {filteredCategory.name}
                             </span>
-                            <Button
-                              variant="default"
-                              size="icon"
-                              onClick={(e) =>
-                                handleRemoveCategory(filteredCategory.type, e)
-                              }
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
+                            {program.workoutProgramCategories.filter(
+                              (cat) => cat.type === category.type
+                            ).length > 1 && (
+                              <Button
+                                variant="default"
+                                size="icon"
+                                onClick={(e) =>
+                                  handleRemoveCategory(filteredCategory.type, e)
+                                }
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         ))}
                     </div>
@@ -973,7 +1005,9 @@ const AddWorkoutProgram = () => {
 
       {currentStep === 2 && (
         <>
-          <h1 className="text-3xl font-bold mb-8">Select Videos and Recipes</h1>
+          <h1 className="text-3xl font-bold mb-8 mt-8">
+            Select Videos and Recipes
+          </h1>
           <form className="space-y-6" onSubmit={handleSubmit}>
             {dayStates.map((dayState, dayIndex) => (
               <div key={dayIndex} className="mb-8">
@@ -993,7 +1027,12 @@ const AddWorkoutProgram = () => {
                           }
                           value={video.video.id.toString() || ""}
                         >
-                          <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                          <SelectTrigger
+                            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            style={{
+                              color: video.video.id === 0 ? "red" : "inherit",
+                            }}
+                          >
                             <SelectValue>
                               {videos.find((v) => v.id === video.video.id)
                                 ?.name || "Select Video"}
@@ -1010,16 +1049,18 @@ const AddWorkoutProgram = () => {
                             ))}
                           </SelectContent>
                         </Select>
-                        <Button
-                          variant="default"
-                          size="icon"
-                          className="ml-2"
-                          onClick={(e) =>
-                            handleRemoveVideo(dayIndex, videoIndex, e)
-                          }
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
+                        {dayState.dailyVideos.length > 1 && (
+                          <Button
+                            variant="default"
+                            size="icon"
+                            className="ml-2"
+                            onClick={(e) =>
+                              handleRemoveVideo(dayIndex, videoIndex, e)
+                            }
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     ))}
                     {errors.dailyExercises &&
@@ -1066,7 +1107,13 @@ const AddWorkoutProgram = () => {
                               }
                               value={recipe.recipe.id.toString() || ""}
                             >
-                              <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                              <SelectTrigger
+                                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                style={{
+                                  color:
+                                    recipe.recipe.id === 0 ? "red" : "inherit",
+                                }}
+                              >
                                 <SelectValue>
                                   {recipes.find(
                                     (r) => r.id === recipe.recipe.id
@@ -1087,21 +1134,23 @@ const AddWorkoutProgram = () => {
                                 )}
                               </SelectContent>
                             </Select>
-                            <Button
-                              variant="default"
-                              size="icon"
-                              className="ml-2"
-                              onClick={(e) =>
-                                handleRemoveRecipe(
-                                  dayIndex,
-                                  recipeIndex,
-                                  "morning",
-                                  e
-                                )
-                              }
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
+                            {dayState.morningRecipes.length > 1 && (
+                              <Button
+                                variant="default"
+                                size="icon"
+                                className="ml-2"
+                                onClick={(e) =>
+                                  handleRemoveRecipe(
+                                    dayIndex,
+                                    recipeIndex,
+                                    "morning",
+                                    e
+                                  )
+                                }
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         ))}
                       {errors[`${timeOfDay}RecipeError`] && (
@@ -1123,7 +1172,13 @@ const AddWorkoutProgram = () => {
                               }
                               value={recipe.recipe.id.toString() || ""}
                             >
-                              <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                              <SelectTrigger
+                                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                style={{
+                                  color:
+                                    recipe.recipe.id === 0 ? "red" : "inherit",
+                                }}
+                              >
                                 <SelectValue>
                                   {recipes.find(
                                     (r) => r.id === recipe.recipe.id
@@ -1144,21 +1199,23 @@ const AddWorkoutProgram = () => {
                                 )}
                               </SelectContent>
                             </Select>
-                            <Button
-                              variant="default"
-                              size="icon"
-                              className="ml-2"
-                              onClick={(e) =>
-                                handleRemoveRecipe(
-                                  dayIndex,
-                                  recipeIndex,
-                                  "afternoon",
-                                  e
-                                )
-                              }
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
+                            {dayState.afternoonRecipes.length > 1 && (
+                              <Button
+                                variant="default"
+                                size="icon"
+                                className="ml-2"
+                                onClick={(e) =>
+                                  handleRemoveRecipe(
+                                    dayIndex,
+                                    recipeIndex,
+                                    "afternoon",
+                                    e
+                                  )
+                                }
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         ))}
                       {errors[`${timeOfDay}RecipeError`] && (
@@ -1180,7 +1237,13 @@ const AddWorkoutProgram = () => {
                               }
                               value={recipe.recipe.id.toString() || ""}
                             >
-                              <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                              <SelectTrigger
+                                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                style={{
+                                  color:
+                                    recipe.recipe.id === 0 ? "red" : "inherit",
+                                }}
+                              >
                                 <SelectValue>
                                   {recipes.find(
                                     (r) => r.id === recipe.recipe.id
@@ -1201,21 +1264,23 @@ const AddWorkoutProgram = () => {
                                 )}
                               </SelectContent>
                             </Select>
-                            <Button
-                              variant="default"
-                              size="icon"
-                              className="ml-2"
-                              onClick={(e) =>
-                                handleRemoveRecipe(
-                                  dayIndex,
-                                  recipeIndex,
-                                  "evening",
-                                  e
-                                )
-                              }
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
+                            {dayState.eveningRecipes.length > 1 && (
+                              <Button
+                                variant="default"
+                                size="icon"
+                                className="ml-2"
+                                onClick={(e) =>
+                                  handleRemoveRecipe(
+                                    dayIndex,
+                                    recipeIndex,
+                                    "evening",
+                                    e
+                                  )
+                                }
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         ))}
                       {errors[`${timeOfDay}RecipeError`] && (
@@ -1270,4 +1335,4 @@ const AddWorkoutProgram = () => {
   );
 };
 
-export default AddWorkoutProgram;
+export default CreateWorkoutProgram;

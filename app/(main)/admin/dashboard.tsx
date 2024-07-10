@@ -215,12 +215,12 @@ const Dashboard = () => {
                 </Link>
               </Button>
               <Button className="w-full" variant="default">
-                <Link className="w-full" href="/admin/add-new-video">
+                <Link className="w-full" href="/admin/add-video">
                   + Add New Video
                 </Link>
               </Button>
               <Button className="w-full" variant="default">
-                <Link className="w-full" href="/admin/add-new-recipe">
+                <Link className="w-full" href="/admin/add-recipe">
                   + Add New Recipe
                 </Link>
               </Button>
@@ -230,20 +230,23 @@ const Dashboard = () => {
             <h2 className="text-xl font-bold mb-4">Settings</h2>
             <div className="space-y-2">
               <Button className="w-full" variant="default">
-                <Link className="w-full" href="/admin/user-management">
+                <Link className="w-full" href="/admin/users-management">
                   Users Management
                 </Link>
               </Button>
               <Button className="w-full" variant="default">
                 <Link
                   className="w-full"
-                  href="/admin/workout-program-management"
+                  href="/admin/workout-programs-management"
                 >
                   Workout Programs Management
                 </Link>
               </Button>
               <Button className="w-full" variant="default">
-                <Link className="w-full" href="/admin/workout-video-management">
+                <Link
+                  className="w-full"
+                  href="/admin/workout-videos-management"
+                >
                   Workout Videos Management
                 </Link>
               </Button>

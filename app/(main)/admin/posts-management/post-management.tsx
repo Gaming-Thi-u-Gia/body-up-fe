@@ -12,6 +12,7 @@ import {
 } from "@/utils/admin/fetch";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { toast } from "sonner";
 
 interface UserType {
   id: number;
@@ -41,7 +42,7 @@ interface Post extends PostCard {
   createdAt: string;
 }
 
-export function PostManagement() {
+const PostManagement = () => {
   const { sessionToken } = useAuthStore((store) => store);
   const [posts, setPosts] = useState<PostCard[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
@@ -51,9 +52,10 @@ export function PostManagement() {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
-    getPosts(pageNo, searchQuery);
-  }, [pageNo, searchQuery]);
-
+    setPageNo(0);
+    setPosts([]);
+    getPosts(0, searchQuery);
+  }, [searchQuery]);
   useEffect(() => {
     if (pageNo > 0) getPosts(pageNo, searchQuery);
   }, [pageNo]);
@@ -97,7 +99,6 @@ export function PostManagement() {
   const handleViewDetails = async (postId: number) => {
     setIsLoading(true);
     const postDetails = await fetchGetPostDetailById(postId, sessionToken!);
-    console.log(postDetails);
     setSelectedPost(postDetails);
     setIsLoading(false);
   };
@@ -108,24 +109,45 @@ export function PostManagement() {
     );
     if (!isConfirmed) return;
     try {
-      await fetchDeletePost(postId, sessionToken!);
+      const response = await fetchDeletePost(postId, sessionToken!);
       setPosts(posts.filter((post) => post.id !== postId));
+      toast.success(response, {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     } catch (error) {
-      console.log("Error when delete post Id" + postId);
+      toast.error("Error when delete post Id" + postId, {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
 
   return (
     <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center bg-black text-white p-4 mb-6">
-        <h1 className="text-3xl font-bold">Post Management</h1>
-        <Link href="/admin">
-          <Button variant="secondary" className="text-lg">
+      <header className="flex items-center rounded-lg h-16 px-4 border-b shrink-0 md:px-6 bg-slate-700 text-white fixed top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-screen-2xl z-50">
+        <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+          <Link
+            href="#"
+            className="flex items-center gap-2 text-lg font-semibold md:text-base"
+            prefetch={false}
+          >
+            <span>Post Management</span>
+          </Link>
+        </nav>
+        <div className="ml-auto">
+          <Link href="/admin" className="text-lg font-semibold">
             Home
-          </Button>
-        </Link>
-      </div>
-      <div className="flex items-center mb-4">
+          </Link>
+        </div>
+      </header>
+      <div className="flex mt-10 items-center">
         <Input
           type="text"
           value={searchQuery}
@@ -141,6 +163,7 @@ export function PostManagement() {
           Clear
         </Button>
       </div>
+
       {isLoading && posts.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array(9)
@@ -201,7 +224,7 @@ export function PostManagement() {
       {isLoading && <p>Loading...</p>}
       {selectedPost && !isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl w-full">
+          <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center mb-4">
               <img
                 src={selectedPost.user.avatar || "/placeholder.svg"}
@@ -276,8 +299,8 @@ export function PostManagement() {
       )}
     </div>
   );
-}
-
+};
+export default PostManagement;
 const PostCardSkeleton = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">

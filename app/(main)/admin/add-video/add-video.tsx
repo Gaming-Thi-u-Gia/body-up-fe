@@ -22,7 +22,7 @@ import { useAuthStore } from "@/components/providers/auth-provider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export function AddNewVideo() {
+const AddVideo = () => {
   const { sessionToken } = useAuthStore((store) => store);
   const router = useRouter();
   const [video, setVideo] = useState<AddNewVideoType>({
@@ -44,6 +44,7 @@ export function AddNewVideo() {
     videoTopics: "",
     videoCategories: "",
   });
+  const [isVideoValid, setIsVideoValid] = useState(false);
 
   useEffect(() => {
     const getTopics = async () => {
@@ -149,6 +150,44 @@ export function AddNewVideo() {
     }));
   };
 
+  const checkVideoExists = async (videoId: string) => {
+    const apiKey = "AIzaSyC7RV-Yf4DiF8L4Xj4DprWjceASn5r-S6s";
+    try {
+      const response = await fetch(
+        `https://youtube.googleapis.com/youtube/v3/videos?part=id&id=${videoId}&key=${apiKey}`
+      );
+      const data = await response.json();
+      if (data.items.length > 0) {
+        setIsVideoValid(true);
+        toast.success("Video Exists", {
+          description: `${new Date().toLocaleString()}`,
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+        });
+      } else {
+        setIsVideoValid(false);
+        toast.error("Video does not exists", {
+          description: `${new Date().toLocaleString()}`,
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+        });
+      }
+    } catch (error) {
+      setIsVideoValid(false);
+      toast.error("Error when checking video", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -194,6 +233,11 @@ export function AddNewVideo() {
       return;
     }
 
+    if (!isVideoValid) {
+      toast.error("Please check the video ID before submitting");
+      return;
+    }
+
     try {
       const response = await fetchPostVideo(video, sessionToken!);
       toast.success(response, {
@@ -203,7 +247,7 @@ export function AddNewVideo() {
           onClick: () => console.log("Close"),
         },
       });
-      router.push("/admin/workout-video-management");
+      router.push("/admin/workout-videos-management");
     } catch (error) {
       toast.error("Error When Adding Video", {
         description: `${new Date().toLocaleString()}`,
@@ -217,14 +261,22 @@ export function AddNewVideo() {
 
   return (
     <div className="container mx-auto py-12">
-      <div className="flex items-center justify-between bg-black text-white p-4 rounded-lg">
-        <h1 className="text-3xl font-bold">Add New Video</h1>
-        <Link href="/admin" passHref>
-          <Button variant="primary" className="text-lg">
+      <header className="flex items-center rounded-lg h-16 px-4 border-b shrink-0 md:px-6 bg-slate-700 text-white fixed top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-screen-2xl z-50">
+        <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+          <Link
+            href="#"
+            className="flex items-center gap-2 text-lg font-semibold md:text-base"
+            prefetch={false}
+          >
+            <span>Add Video</span>
+          </Link>
+        </nav>
+        <div className="ml-auto">
+          <Link href="/admin" className="text-lg font-semibold">
             Home
-          </Button>
-        </Link>
-      </div>
+          </Link>
+        </div>
+      </header>
       <form className="space-y-6 mt-8" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name" className="block font-medium mb-2">
@@ -242,16 +294,26 @@ export function AddNewVideo() {
         </div>
         <div>
           <label htmlFor="url" className="block font-medium mb-2">
-            Video URL
+            Video ID
           </label>
-          <input
-            type="text"
-            id="url"
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            placeholder="Enter video URL"
-            value={video.url}
-            onChange={(e) => handleInputChange("url", e.target.value)}
-          />
+          <div className="flex items-center space-x-4">
+            <input
+              type="text"
+              id="url"
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              placeholder="Enter video ID"
+              value={video.url}
+              onChange={(e) => handleInputChange("url", e.target.value)}
+            />
+            <Button
+              type="button"
+              variant="primary"
+              className="text-lg"
+              onClick={() => checkVideoExists(video.url)}
+            >
+              Check
+            </Button>
+          </div>
           {errors.url && <p className="text-red-500">{errors.url}</p>}
         </div>
         <div>
@@ -380,4 +442,5 @@ export function AddNewVideo() {
       </form>
     </div>
   );
-}
+};
+export default AddVideo;
