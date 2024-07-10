@@ -1,9 +1,9 @@
-import AddWorkoutProgram from "./add-workout-program";
+import CreateWorkoutProgram from "./create-workout-program";
 
 const page = () => {
   return (
     <div>
-      <AddWorkoutProgram />
+      <CreateWorkoutProgram />
     </div>
   );
 };

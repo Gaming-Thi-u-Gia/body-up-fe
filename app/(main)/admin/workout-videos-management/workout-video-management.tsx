@@ -23,6 +23,7 @@ import {
 import { TableFilterVideoType } from "@/utils/admin/type";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Link from "next/link";
+import { toast } from "sonner";
 type Topic = {
   id: number;
   name: string;
@@ -46,7 +47,7 @@ export type VideoType = {
   duration: string;
 };
 
-export function VideoManagement() {
+const WorkoutVideoManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { sessionToken } = useAuthStore((store) => store);
   const [videos, setVideos] = useState<VideoType[]>([]);
@@ -57,6 +58,7 @@ export function VideoManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasMoreVideo, setHasMoreVideo] = useState(true);
   const [pageNo, setPageNo] = useState(0);
+  const [isVideoValid, setIsVideoValid] = useState(false);
 
   useEffect(() => {
     getVideoTopics();
@@ -120,8 +122,21 @@ export function VideoManagement() {
       );
       setVideos(updatedVideos);
       setEditingVideo(null);
+      toast.success(response, {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     } catch (error) {
-      console.error("Error while updating the video:", error);
+      toast.error("Error while updating the video:", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
 
@@ -162,6 +177,7 @@ export function VideoManagement() {
   const handleFieldChange = (field: string, value: any) => {
     if (editingVideo) {
       setEditingVideo({ ...editingVideo, [field]: value });
+      setIsVideoValid(false);
     }
   };
 
@@ -233,9 +249,47 @@ export function VideoManagement() {
     }
   };
 
+  const checkVideoExists = async (videoId: string) => {
+    const apiKey = "AIzaSyC7RV-Yf4DiF8L4Xj4DprWjceASn5r-S6s";
+    try {
+      const response = await fetch(
+        `https://youtube.googleapis.com/youtube/v3/videos?part=id&id=${videoId}&key=${apiKey}`
+      );
+      const data = await response.json();
+      if (data.items.length > 0) {
+        setIsVideoValid(true);
+        toast.success("Video exists", {
+          description: `${new Date().toLocaleString()}`,
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+        });
+      } else {
+        setIsVideoValid(false);
+        toast.error("Video does not exists", {
+          description: `${new Date().toLocaleString()}`,
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+        });
+      }
+    } catch (error) {
+      setIsVideoValid(false);
+      toast.error("Error when checking video", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto py-12">
-      <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
+      <header className="flex items-center rounded-lg h-16 px-4 border-b shrink-0 md:px-6 bg-slate-700 text-white fixed top-[56px] left-1/2 transform -translate-x-1/2 w-full max-w-screen-2xl z-50">
         <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link
             href="#"
@@ -251,7 +305,7 @@ export function VideoManagement() {
           </Link>
         </div>
       </header>
-      <div className="flex items-center">
+      <div className="flex mt-5 items-center">
         <input
           type="text"
           value={searchQuery}
@@ -400,14 +454,24 @@ export function VideoManagement() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="url">URL</Label>
-                  <Input
-                    type="text"
-                    id="url"
-                    value={editingVideo.url}
-                    onChange={(e) => handleFieldChange("url", e.target.value)}
-                    required
-                  />
+                  <Label htmlFor="url">Video ID</Label>
+                  <div className="flex items-center space-x-4">
+                    <Input
+                      type="text"
+                      id="url"
+                      value={editingVideo.url}
+                      onChange={(e) => handleFieldChange("url", e.target.value)}
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="primary"
+                      className="text-lg"
+                      onClick={() => checkVideoExists(editingVideo.url)}
+                    >
+                      Check
+                    </Button>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="featured">Featured</Label>
@@ -510,7 +574,9 @@ export function VideoManagement() {
                 ))}
               </div>
               <div className="flex justify-end mt-4">
-                <Button type="submit">Save</Button>
+                <Button type="submit" disabled={!isVideoValid}>
+                  Save
+                </Button>
               </div>
             </form>
           </div>
@@ -518,7 +584,8 @@ export function VideoManagement() {
       )}
     </div>
   );
-}
+};
+export default WorkoutVideoManagement;
 
 export const ListSkeleton = () => {
   return (

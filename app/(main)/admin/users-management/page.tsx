@@ -1,9 +1,9 @@
-import PostManagement from "./post-management";
+import UserManagement from "./user-management";
 
 const page = () => {
   return (
     <div>
-      <PostManagement />
+      <UserManagement />
     </div>
   );
 };

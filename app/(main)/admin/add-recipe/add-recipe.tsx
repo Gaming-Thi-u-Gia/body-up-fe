@@ -29,7 +29,7 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { useRouter } from "next/navigation";
 
-const AddNewRecipe = () => {
+const AddRecipe = () => {
   const router = useRouter();
   const { sessionToken } = useAuthStore((store) => store);
   const [recipe, setRecipe] = useState<AddNewRecipeType>({
@@ -440,14 +440,22 @@ const AddNewRecipe = () => {
 
   return (
     <div className="container mx-auto py-12">
-      <div className="flex items-center justify-between bg-black text-white p-4 rounded-lg">
-        <h1 className="text-4xl font-bold">Add New Recipe</h1>
-        <Link href="/admin" passHref>
-          <Button variant="primary" className="text-lg">
+      <header className="flex items-center rounded-lg h-16 px-4 border-b shrink-0 md:px-6 bg-slate-700 text-white fixed top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-screen-2xl z-50">
+        <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+          <Link
+            href="#"
+            className="flex items-center gap-2 text-lg font-semibold md:text-base"
+            prefetch={false}
+          >
+            <span>Create Workout Program</span>
+          </Link>
+        </nav>
+        <div className="ml-auto">
+          <Link href="/admin" className="text-lg font-semibold">
             Home
-          </Button>
-        </Link>
-      </div>
+          </Link>
+        </div>
+      </header>
       <form className="space-y-6 mt-8" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name" className="block text-lg font-medium mb-2">
@@ -798,4 +806,4 @@ const AddNewRecipe = () => {
   );
 };
 
-export default AddNewRecipe;
+export default AddRecipe;

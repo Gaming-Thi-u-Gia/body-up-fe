@@ -1,9 +1,9 @@
-import PostManagement from "./post-management";
+import AddVideo from "./add-video";
 
 const page = () => {
   return (
     <div>
-      <PostManagement />
+      <AddVideo />
     </div>
   );
 };

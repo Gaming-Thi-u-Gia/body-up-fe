@@ -1,9 +1,9 @@
-import { ViewAll } from "./workout-program-view";
+import AddRecipe from "./add-recipe";
 
 const page = () => {
   return (
     <div>
-      <ViewAll />
+      <AddRecipe />
     </div>
   );
 };

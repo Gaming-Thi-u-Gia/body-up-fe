@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,7 +10,6 @@ import {
 } from "@/utils/admin/fetch";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import InfiniteScroll from "react-infinite-scroll-component";
-import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -45,7 +43,7 @@ type WorkoutProgram = {
   workoutProgramCategories: WorkoutProgramCategory[];
 };
 
-export function ViewAll() {
+const ListWorkoutProgram = () => {
   const { sessionToken } = useAuthStore((store) => store);
   const router = useRouter();
   const [workoutPrograms, setWorkoutPrograms] = useState<WorkoutProgram[]>([]);
@@ -93,7 +91,9 @@ export function ViewAll() {
   };
 
   const handleEdit = (id: number) => {
-    router.push(`/admin/workout-program-management/edit-program/${id}`);
+    router.push(
+      `/admin/workout-programs-management/edit-workout-program/${id}`
+    );
   };
 
   const handleDelete = async (id: number) => {
@@ -126,7 +126,7 @@ export function ViewAll() {
 
   const handleViewDetail = (id: number) => {
     router.push(
-      `/admin/workout-program-management/workout-program-detail/${id}`
+      `/admin/workout-programs-management/workout-program-detail/${id}`
     );
   };
 
@@ -147,7 +147,7 @@ export function ViewAll() {
 
   return (
     <div className="max-w-7xl m-auto h-full flex flex-col">
-      <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
+      <header className="flex mt-[60px] rounded-lg items-center h-16 px-4 border-b shrink-0 md:px-6 bg-slate-700 text-white fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-screen-2xl z-50">
         <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link
             href="#"
@@ -163,7 +163,8 @@ export function ViewAll() {
           </Link>
         </div>
       </header>
-      <main className="flex-1 overflow-auto p-6">
+      <main className="flex-1 overflow-auto pt-20 p-6">
+        {" "}
         <div className="flex items-center mb-4">
           <Input
             type="text"
@@ -272,17 +273,8 @@ export function ViewAll() {
       </main>
     </div>
   );
-}
-
-function SkeletonLoader() {
-  return (
-    <div className="grid gap-6">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <SkeletonCard key={index} />
-      ))}
-    </div>
-  );
-}
+};
+export default ListWorkoutProgram;
 
 function SkeletonCard() {
   return (

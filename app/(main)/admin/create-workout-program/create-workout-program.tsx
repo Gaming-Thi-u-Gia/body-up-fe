@@ -18,15 +18,13 @@ import {
 import { useAuthStore } from "@/components/providers/auth-provider";
 import {
   fetchGetAllRecipeSelectForAdmin,
-  fetchPutWorkoutProgram,
-  fetchGetWorkoutProgramDetailById,
+  fetchPostWorkoutProgram,
 } from "@/utils/admin/fetch";
-import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export type EditProgramType = {
-  id: number;
+export type AddNewProgramType = {
   name: string;
   type: string;
   equipment: string;
@@ -84,14 +82,10 @@ type ExerciseError = {
   eveningRecipeError?: string;
 };
 
-const EditWorkoutProgram = () => {
-  const router = useRouter();
+const CreateWorkoutProgram = () => {
   const { sessionToken } = useAuthStore((store) => store);
-  const { programId } = useParams();
-  const workoutProgramIdNumber = Number(programId);
-
-  const [program, setProgram] = useState<EditProgramType>({
-    id: workoutProgramIdNumber,
+  const router = useRouter();
+  const [program, setProgram] = useState<AddNewProgramType>({
     name: "",
     type: "",
     equipment: "",
@@ -137,57 +131,6 @@ const EditWorkoutProgram = () => {
     }[]
   >([]);
 
-  const [initialDays, setInitialDays] = useState<number>(0);
-
-  useEffect(() => {
-    const getProgram = async () => {
-      try {
-        const data = await fetchGetWorkoutProgramDetailById(
-          workoutProgramIdNumber,
-          sessionToken!
-        );
-        setProgram(data);
-        setInitialDays(data.day);
-
-        const initialDayStates = Array.from({ length: data.day }, (_, i) => ({
-          dailyVideos:
-            data.dailyExercises[i]?.dailyVideos.length > 0
-              ? data.dailyExercises[i]?.dailyVideos
-              : [{ video: { id: 0, name: "" } }],
-          morningRecipes:
-            data.dailyExercises[i]?.dailyRecipes.filter(
-              (r: any) => r.part === "morning"
-            ).length > 0
-              ? data.dailyExercises[i]?.dailyRecipes.filter(
-                  (r: any) => r.part === "morning"
-                )
-              : [{ recipe: { id: 0, name: "" }, part: "morning" }],
-          afternoonRecipes:
-            data.dailyExercises[i]?.dailyRecipes.filter(
-              (r: any) => r.part === "afternoon"
-            ).length > 0
-              ? data.dailyExercises[i]?.dailyRecipes.filter(
-                  (r: any) => r.part === "afternoon"
-                )
-              : [{ recipe: { id: 0, name: "" }, part: "afternoon" }],
-          eveningRecipes:
-            data.dailyExercises[i]?.dailyRecipes.filter(
-              (r: any) => r.part === "evening"
-            ).length > 0
-              ? data.dailyExercises[i]?.dailyRecipes.filter(
-                  (r: any) => r.part === "evening"
-                )
-              : [{ recipe: { id: 0, name: "" }, part: "evening" }],
-        }));
-
-        setDayStates(initialDayStates);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getProgram();
-  }, [workoutProgramIdNumber, sessionToken]);
-
   const handleInputChange = (field: string, value: string | number) => {
     setProgram((prevProgram) => ({
       ...prevProgram,
@@ -207,9 +150,14 @@ const EditWorkoutProgram = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
+        const base64String = reader.result as string;
         setProgram((prevProgram) => ({
           ...prevProgram,
-          [field]: reader.result as string,
+          [field]: base64String,
+        }));
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [field]: "",
         }));
       };
       reader.readAsDataURL(file);
@@ -350,28 +298,14 @@ const EditWorkoutProgram = () => {
         return;
       }
 
-      if (program.day !== dayStates.length) {
-        const newDayStates = Array.from({ length: program.day }, (_, i) => ({
-          dailyVideos:
-            dayStates[i]?.dailyVideos.length > 0
-              ? dayStates[i].dailyVideos
-              : [{ video: { id: 0, name: "" } }],
-          morningRecipes:
-            dayStates[i]?.morningRecipes.length > 0
-              ? dayStates[i].morningRecipes
-              : [{ recipe: { id: 0, name: "" }, part: "morning" }],
-          afternoonRecipes:
-            dayStates[i]?.afternoonRecipes.length > 0
-              ? dayStates[i].afternoonRecipes
-              : [{ recipe: { id: 0, name: "" }, part: "afternoon" }],
-          eveningRecipes:
-            dayStates[i]?.eveningRecipes.length > 0
-              ? dayStates[i].eveningRecipes
-              : [{ recipe: { id: 0, name: "" }, part: "evening" }],
-        }));
-        setDayStates(newDayStates);
-      }
+      const newDayStates = Array.from({ length: program.day }, () => ({
+        dailyVideos: [{ video: { id: 0, name: "" } }],
+        morningRecipes: [{ recipe: { id: 0, name: "" }, part: "morning" }],
+        afternoonRecipes: [{ recipe: { id: 0, name: "" }, part: "afternoon" }],
+        eveningRecipes: [{ recipe: { id: 0, name: "" }, part: "evening" }],
+      }));
 
+      setDayStates(newDayStates);
       setCurrentStep(2);
     }
   };
@@ -590,56 +524,69 @@ const EditWorkoutProgram = () => {
       });
       return updatedExercise;
     });
-    const finalProgram = {
-      ...program,
+
+    setProgram((prevProgram) => ({
+      ...prevProgram,
       dailyExercises: validatedDailyExercises,
-    };
+    }));
+
     if (hasError) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         dailyExercises: "Please fix the errors before submitting.",
       }));
       return;
-    }
+    } else {
+      const finalProgram = {
+        ...program,
+        dailyExercises: validatedDailyExercises,
+      };
 
-    try {
-      await updateWorkoutProgram(finalProgram);
-    } catch (error) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        dailyExercises: "Failed to submit program",
-      }));
-      console.error(error);
+      try {
+        await postWorkoutProgram(finalProgram);
+        router.push("/admin/workout-program-management");
+      } catch (error) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          dailyExercises: "Failed to submit program",
+        }));
+        console.error(error);
+      }
     }
   };
 
-  const updateWorkoutProgram = async (finalProgram: EditProgramType) => {
+  const postWorkoutProgram = async (finalProgram: AddNewProgramType) => {
     try {
-      const response = await fetchPutWorkoutProgram(
-        sessionToken!,
-        finalProgram
+      const response = await fetchPostWorkoutProgram(
+        finalProgram,
+        sessionToken!
       );
-      toast.error(response, {
+      toast.success(response, {
         description: `${new Date().toLocaleString()}`,
         action: {
           label: "Close",
           onClick: () => console.log("Close"),
         },
       });
-      router.push("/admin/workout-program-management");
     } catch (error) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         dailyExercises: "Failed to submit program",
       }));
-      console.error(error);
+      toast.error("Fail To Add New Workout Program", {
+        description: `${new Date().toLocaleString()}`,
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
 
   const checkEmptyFields = (): boolean => {
     let hasError = false;
 
-    const requiredFields: (keyof EditProgramType)[] = [
+    const requiredFields: (keyof AddNewProgramType)[] = [
       "name",
       "type",
       "equipment",
@@ -709,25 +656,25 @@ const EditWorkoutProgram = () => {
 
   return (
     <div className="container mx-auto py-12">
+      <header className="flex items-center rounded-lg h-16 px-4 border-b shrink-0 md:px-6 bg-slate-700 text-white fixed top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-screen-2xl z-50">
+        <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+          <Link
+            href="#"
+            className="flex items-center gap-2 text-lg font-semibold md:text-base"
+            prefetch={false}
+          >
+            <span>Create Workout Program</span>
+          </Link>
+        </nav>
+        <div className="ml-auto">
+          <Link href="/admin" className="text-lg font-semibold">
+            Home
+          </Link>
+        </div>
+      </header>
       {currentStep === 1 && (
         <>
-          <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
-            <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-              <Link
-                href="#"
-                className="flex items-center gap-2 text-lg font-semibold md:text-base"
-                prefetch={false}
-              >
-                <span>Edit Workout Program</span>
-              </Link>
-            </nav>
-            <div className="ml-auto">
-              <Link href="/admin" className="text-lg font-semibold">
-                Home
-              </Link>
-            </div>
-          </header>
-          <form className="space-y-6" onSubmit={handleNextStep}>
+          <form className="space-y-6 mt-8" onSubmit={handleNextStep}>
             <div>
               <label htmlFor="name" className="block font-medium mb-2">
                 Program Name
@@ -759,6 +706,9 @@ const EditWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("type", e.target.value)
                 }
+                style={{
+                  color: program.type === "" ? "red" : "inherit",
+                }}
               />
               {errors.type && (
                 <p className="text-red-500">{errors.type.toString()}</p>
@@ -777,6 +727,9 @@ const EditWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("equipment", e.target.value)
                 }
+                style={{
+                  color: program.equipment === "" ? "red" : "inherit",
+                }}
               />
               {errors.equipment && (
                 <p className="text-red-500">{errors.equipment.toString()}</p>
@@ -794,6 +747,9 @@ const EditWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
                   handleInputChange("detail", e.target.value)
                 }
+                style={{
+                  color: program.detail === "" ? "red" : "inherit",
+                }}
               />
               {errors.detail && (
                 <p className="text-red-500">{errors.detail.toString()}</p>
@@ -812,6 +768,9 @@ const EditWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("day", parseInt(e.target.value))
                 }
+                style={{
+                  color: program.day === 0 ? "red" : "inherit",
+                }}
               />
               {errors.day && (
                 <p className="text-red-500">{errors.day.toString()}</p>
@@ -830,6 +789,9 @@ const EditWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("time", e.target.value)
                 }
+                style={{
+                  color: program.time === "" ? "red" : "inherit",
+                }}
               />
               {errors.time && (
                 <p className="text-red-500">{errors.time.toString()}</p>
@@ -848,6 +810,9 @@ const EditWorkoutProgram = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   handleInputChange("year", parseInt(e.target.value))
                 }
+                style={{
+                  color: program.year === 0 ? "red" : "inherit",
+                }}
               />
               {errors.year && (
                 <p className="text-red-500">{errors.year.toString()}</p>
@@ -938,18 +903,19 @@ const EditWorkoutProgram = () => {
                     className="bg-gray-100 rounded-md p-4 flex items-center"
                   >
                     <span className="font-medium">{topic.name}</span>
-                    <Button
-                      variant="default"
-                      size="icon"
-                      className="ml-auto"
-                      onClick={(e) => handleRemoveTopic(index, e)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+                    {program.programTopics.length > 1 && (
+                      <Button
+                        variant="default"
+                        size="icon"
+                        className="ml-auto"
+                        onClick={(e) => handleRemoveTopic(index, e)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
-
               {errors.programTopics && (
                 <p className="text-red-500">
                   {errors.programTopics.toString()}
@@ -1005,7 +971,7 @@ const EditWorkoutProgram = () => {
                             </span>
                             {program.workoutProgramCategories.filter(
                               (cat) => cat.type === category.type
-                            ) && (
+                            ).length > 1 && (
                               <Button
                                 variant="default"
                                 size="icon"
@@ -1039,25 +1005,9 @@ const EditWorkoutProgram = () => {
 
       {currentStep === 2 && (
         <>
-          <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-black text-white">
-            <nav className="flex-col hidden gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-              <Link
-                href="#"
-                className="flex items-center gap-2 text-lg font-semibold md:text-base"
-                prefetch={false}
-              >
-                <span>Select Video And Recipe</span>
-              </Link>
-            </nav>
-            <div className="ml-auto">
-              <Link
-                href="/admin/workout-program-management"
-                className="text-lg font-semibold"
-              >
-                Home
-              </Link>
-            </div>
-          </header>
+          <h1 className="text-3xl font-bold mb-8 mt-8">
+            Select Videos and Recipes
+          </h1>
           <form className="space-y-6" onSubmit={handleSubmit}>
             {dayStates.map((dayState, dayIndex) => (
               <div key={dayIndex} className="mb-8">
@@ -1127,6 +1077,12 @@ const EditWorkoutProgram = () => {
                       </Button>
                     )}
                   </div>
+                  {dayState.dailyVideos.length > 0 &&
+                    dayState.dailyVideos[0].video.id === 0 && (
+                      <p className="text-red-500 mt-2">
+                        {errors.dailyExercises.toString()}
+                      </p>
+                    )}
                 </div>
 
                 {["morning", "afternoon", "evening"].map((timeOfDay) => (
@@ -1197,6 +1153,11 @@ const EditWorkoutProgram = () => {
                             )}
                           </div>
                         ))}
+                      {errors[`${timeOfDay}RecipeError`] && (
+                        <p className="text-red-500 mt-2">
+                          {errors[`${timeOfDay}RecipeError`].toString()}
+                        </p>
+                      )}
                       {timeOfDay === "afternoon" &&
                         dayState.afternoonRecipes.map((recipe, recipeIndex) => (
                           <div key={recipeIndex} className="flex items-center">
@@ -1257,6 +1218,11 @@ const EditWorkoutProgram = () => {
                             )}
                           </div>
                         ))}
+                      {errors[`${timeOfDay}RecipeError`] && (
+                        <p className="text-red-500 mt-2">
+                          {errors[`${timeOfDay}RecipeError`].toString()}
+                        </p>
+                      )}
                       {timeOfDay === "evening" &&
                         dayState.eveningRecipes.map((recipe, recipeIndex) => (
                           <div key={recipeIndex} className="flex items-center">
@@ -1318,7 +1284,7 @@ const EditWorkoutProgram = () => {
                           </div>
                         ))}
                       {errors[`${timeOfDay}RecipeError`] && (
-                        <p className="text-red-500">
+                        <p className="text-red-500 mt-2">
                           {errors[`${timeOfDay}RecipeError`].toString()}
                         </p>
                       )}
@@ -1369,4 +1335,4 @@ const EditWorkoutProgram = () => {
   );
 };
 
-export default EditWorkoutProgram;
+export default CreateWorkoutProgram;

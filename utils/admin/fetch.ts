@@ -2,7 +2,7 @@ import { EditableRecipeType } from "@/app/(main)/admin/recipes-management/recipe
 import { AddNewRecipeType, AddNewVideoType } from "./type";
 import { VideoType } from "@/app/(main)/admin/workout-video-management/video-management";
 import { AddNewProgramType } from "@/app/(main)/admin/create-workout-program/add-workout-program";
-import { EditProgramType } from "@/app/(main)/admin/workout-program-management/edit-program/[programId]/edit-workout-program";
+import { EditProgramType } from "@/app/(main)/admin/workout-programs-management/edit-program/[programId]/edit-workout-program";
 import fetchVideos, {
   convertDuration,
   formatDate,
@@ -356,9 +356,6 @@ export const fetchGetVideos = async (
         },
       }
     );
-    console.log(
-      `${process.env.NEXT_PUBLIC_SERVER_PUBLIC_API_V1}/admin/list-video?pageNo=${pageNo}&pageSize=${pageSize}&name=${name}`
-    );
 
     const data = await response.json();
     return data;
@@ -490,7 +487,6 @@ export const fetchGetVideoDetailById = async (
       }
     );
     const dataFromDB = await response.json();
-    console.log("dataFromDB", dataFromDB);
     const extractedVideoId = dataFromDB.url;
     const apiKey = "AIzaSyC7RV-Yf4DiF8L4Xj4DprWjceASn5r-S6s";
     const videoResponse = await fetch(
@@ -511,11 +507,9 @@ export const fetchGetVideoDetailById = async (
     } else {
       console.log("The video IDs do not match.");
     }
-    console.log("dataFromDB", dataFromDB);
     return dataFromDB;
   } catch (error) {
     console.error(`Error while getting video details: ${error}`);
-    throw new Error(`Error while getting video details`);
   }
 };
 
@@ -671,7 +665,6 @@ export const fetchGetWorkoutProgramDetailById = async (
     for (const dailyExercise of data.dailyExercises) {
       for (const dailyVideo of dailyExercise.dailyVideos) {
         const videoId = dailyVideo.video.url;
-        console.log("videoId", videoId);
         const videoResponse = await fetch(
           `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${videoId}&key=${apiKey}`
         );
@@ -696,7 +689,6 @@ export const fetchGetWorkoutProgramDetailById = async (
         }
       }
     }
-    console.log(data);
     return data;
   } catch (error) {
     console.error(`Error while getting workout program detail: ${error}`);
