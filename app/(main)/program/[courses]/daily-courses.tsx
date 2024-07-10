@@ -5,12 +5,12 @@ import { fetchDailyExerciseData, fetchDailyRecipeExerciseData } from "@/utils/vi
 
 import { VideoDaily } from "./daily-video";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@radix-ui/react-accordion";
-import DailyExerciseSkeleton from "./skeleton-video";
 import fetchVideos from "@/utils/video/fetchDailyVideo";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { DailyCarousel } from "./daily-carusel-video";
+import CommentCourse from "./comment-courses";
 
 interface VideoItem {
     id: string;
@@ -200,6 +200,7 @@ const DailyCourses: React.FC<DailyCoursesProps> = ({ workoutProgramId }) => {
                     </Accordion>
                 </div>
             )}
+            <CommentCourse />
         </div>
     );
 };

@@ -90,6 +90,7 @@ const CategoryModelProgram = () => {
                 {programTopic.workoutPrograms.map((program) => (
                   <Link href={`/program/${program.id}`} key={program.id}>
                     <ProgramCard
+                      key={program.id}
                       id={program.id}
                       name={program.name}
                       type={program.type}
