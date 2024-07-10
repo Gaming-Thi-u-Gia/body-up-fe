@@ -230,12 +230,12 @@ const CreateBeforeAfterPost = () => {
                      </div>
                   </div>
                   {isOpenedFirst && (
-                     <div>
+                     <div className="w-full">
                         <h1 className="px-5 py-2 text-[20px] font-semibold ">
                            Create A New Post
                         </h1>
                         <div className="flex items-center justify-center px-8 py-5 w-[95%] bg-[#FAFAFA] mx-auto rounded-lg border border-[#E3E4EB]">
-                           <div className="space-y-2 w-[746px]">
+                           <div className="space-y-2 w-full">
                               <span className="text-[10px] pt-2 font-bold flex items-center">
                                  Title
                               </span>
@@ -256,12 +256,12 @@ const CreateBeforeAfterPost = () => {
                                     </FormItem>
                                  )}
                               ></FormField>
-                              <div className="flex items-center gap-4 w-full ">
+                              <div className="flex items-center gap-4 w-full justify-center">
                                  <div className="flex flex-col w-[50%] ">
                                     <span className="text-[10px] pt-2 font-bold flex items-center">
                                        Before
                                     </span>
-                                    <div className="relative cursor-pointer overflow-hidden rounded-lg h-[350px] w-[320px] bg-[#edf4fc] flex flex-col justify-center items-center gap-5 border-dashed border-2 border-blue-400">
+                                    <div className="relative cursor-pointer overflow-hidden rounded-lg min-h-[350px] max-w-[320px] bg-[#edf4fc] flex flex-col justify-center items-center gap-5 border-dashed border-2 border-blue-400">
                                        {preview ? (
                                           <div>
                                              <Image
@@ -315,7 +315,7 @@ const CreateBeforeAfterPost = () => {
                                     <span className="text-[10px] pt-2 font-bold flex items-center">
                                        After
                                     </span>
-                                    <div className="relative cursor-pointer overflow-hidden rounded-lg h-[350px] w-[320px] bg-[#edf4fc] flex flex-col justify-center items-center gap-5 border-dashed border-2 border-blue-400">
+                                    <div className="relative cursor-pointer overflow-hidden rounded-lg min-h-[350px] max-w-[320px] bg-[#edf4fc] flex flex-col justify-center items-center gap-5 border-dashed border-2 border-blue-400">
                                        {preview2 ? (
                                           <div>
                                              <Image
@@ -544,7 +544,7 @@ const CreateBeforeAfterPost = () => {
                   {isOpenedSecond && (
                      <div>
                         <div className="flex items-center justify-center px-8 py-5 w-[95%] bg-[#FAFAFA] mx-auto rounded-lg border border-[#E3E4EB]">
-                           <div className="space-y-2 w-[746px]">
+                           <div className="space-y-2 w-full">
                               <span className="text-[10px] pt-2 font-bold flex items-center">
                                  Description
                               </span>
