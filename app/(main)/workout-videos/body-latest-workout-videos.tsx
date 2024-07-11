@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import fetchVideos from "@/utils/video";
+
 import Modal from "./video";
 import SkeletonVideoCard from "./skeleton-video";
 import Skeleton from 'react-loading-skeleton';
@@ -19,6 +19,7 @@ type VideoItem = {
     duration: string;
     bookmarked: boolean;
     url: string;
+    name: string;
 };
 
 const BodyLatestWorkoutVideos = () => {
@@ -28,31 +29,15 @@ const BodyLatestWorkoutVideos = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            try {
-                const fetchedVideos = await fetchVideos();
-                const fetchedVideosTopic = await fetchLastTestVideo();
-                
-                if (fetchedVideosTopic && Array.isArray(fetchedVideosTopic)) {
-                    const videoDetails = fetchedVideosTopic.map((video) => {
-                        const details = fetchedVideos.find((v) => v.id === video.url);
-                        return details ? { ...video, ...details } : video;
-                    }).sort((a, b) => a.title.localeCompare(b.title));
-
-                    setVideos(videoDetails);
-                } else {
-                    console.error("Invalid or empty topics data");
-                    setVideos([]);
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                setVideos([]);
-            } finally {
-                setLoading(false);
-            }
+            const fetchedVideos = await fetchLastTestVideo();
+            setVideos(fetchedVideos);
+            setLoading(false);
         };
 
         fetchData();
     }, []);
+
+    console.log("videos", videos);
 
     const handleThumbnailClick = (id: string) => {
         setSelectedVideoId(id);
@@ -90,8 +75,8 @@ const BodyLatestWorkoutVideos = () => {
                 ) : (
                     videos.map((video, index) => (
                         <div
-                            key={video.id}
-                            onClick={() => handleThumbnailClick(video.id)}
+                            key={video.url}
+                            onClick={() => handleThumbnailClick(video.url)}
                             className={`relative bg-white border border-solid border-[#E9E9EF] rounded-lg cursor-pointer ${
                                 index === 0
                                     ? "flex w-[737px] h-[242.27px] px-4 pt-[24px] pb-[24px]"
@@ -104,7 +89,7 @@ const BodyLatestWorkoutVideos = () => {
                                         <Image
                                             layout="fill"
                                             className="rounded-t-lg object-cover rounded-2xl"
-                                            src={video.img}
+                                            src={video.img || "/default-image.png"}
                                             alt="Video image"
                                             style={{ objectFit: 'cover' }}
                                         />
@@ -116,7 +101,7 @@ const BodyLatestWorkoutVideos = () => {
                                     </div>
                                     <div className="flex-1 p-3 w-[40%]">
                                         <p className="text-[18px] font-medium leading-[150%] tracking-wide text-[#303033] line-clamp-2">
-                                            {video.title}
+                                            {video.name}
                                         </p>
                                         <div className="flex justify-between items-center font-medium text-sm text-[#868A93] mt-auto">
                                             <span className="truncate">
@@ -145,7 +130,7 @@ const BodyLatestWorkoutVideos = () => {
                                         <Image
                                             layout="fill"
                                             className="rounded-t-lg object-cover rounded-2xl"
-                                            src={video.img}
+                                            src={video.img || "/default-image.png"}
                                             alt="Video image"
                                             style={{ objectFit: 'cover' }}
                                         />
@@ -157,7 +142,7 @@ const BodyLatestWorkoutVideos = () => {
                                     </div>
                                     <div className="p-3">
                                         <p className="text-[16px] font-normal leading-[20px] text-[#303033] line-clamp-2">
-                                            {video.title}
+                                            {video.name}
                                         </p>
                                     </div>
                                     <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center font-medium text-sm text-[#868A93]">
