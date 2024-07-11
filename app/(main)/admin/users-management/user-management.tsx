@@ -202,6 +202,12 @@ const UserManagement = () => {
                 <div className="col-span-3">{selectedUser.id}</div>
               </div>
               <div className="grid items-center grid-cols-4 gap-4">
+                <Label htmlFor="userName" className="text-right">
+                  User Name
+                </Label>
+                <div className="col-span-3">{selectedUser.userName}</div>
+              </div>
+              <div className="grid items-center grid-cols-4 gap-4">
                 <Label htmlFor="name" className="text-right">
                   Name
                 </Label>
@@ -233,6 +239,20 @@ const UserManagement = () => {
                     Bio
                   </Label>
                   <div className="col-span-3">{selectedUser.bio}</div>
+                </div>
+              )}
+              {selectedUser.avatar && (
+                <div className="grid items-center grid-cols-4 gap-4">
+                  <Label htmlFor="avatar" className="text-right">
+                    Avatar
+                  </Label>
+                  <div className="col-span-3">
+                    <img
+                      src={selectedUser.avatar}
+                      alt="Avatar"
+                      className="w-20 h-20 rounded-full"
+                    />
+                  </div>
                 </div>
               )}
             </div>
