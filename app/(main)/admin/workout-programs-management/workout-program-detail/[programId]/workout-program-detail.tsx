@@ -142,6 +142,7 @@ const WorkoutProgramDetail = () => {
           workoutProgramIdNumber,
           sessionToken!
         );
+        data.dailyExercises.sort((a: any, b: any) => a.day - b.day);
         setProgram(data);
       } catch (error) {
         console.error(error);
