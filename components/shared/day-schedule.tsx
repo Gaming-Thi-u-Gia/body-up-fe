@@ -1,4 +1,5 @@
-"use client";
+'use client';
+import React, { useState, useEffect } from 'react';
 import {
     Calendar,
     CalendarCheck,
@@ -17,7 +18,6 @@ import {
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
 import { DailyCarousel, DailyExercise } from "./daily-carousel";
-import { useEffect, useState } from "react";
 import { VideoDailyCard } from "./video-daily-card";
 import { Button } from "../ui/button";
 import { useAuthStore } from "../providers/auth-provider";
@@ -41,6 +41,8 @@ import {
     AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { redirect, useRouter } from "next/navigation";
+import ReviewDialog from './review-program';
+
 type Props = {
     title: string;
     releaseDate: string;
@@ -53,7 +55,6 @@ type Props = {
     currDay: DailyExercise;
     setChallenge: any;
 };
-//TODO: fetch API
 
 export const DaySchedule = ({
     title,
@@ -77,11 +78,17 @@ export const DaySchedule = ({
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingDay, setIsLoadingDay] = useState(false);
     const [newCurrDay, setNewCurrDay] = useState<DailyExercise>(currDay);
-    //TODO: SET DATA WHEN CLICK ON SCHEDULE
+    const [isReviewOpen, setIsReviewOpen] = useState(false);
+
+    useEffect(() => {
+        console.log("isReviewOpen changed:", isReviewOpen);
+    }, [isReviewOpen]);
+
     const onClick = (index: number) => {
         if (isLoading) return;
         setDay("" + index);
     };
+
     const markFinish = async () => {
         setIsLoadingUI(true);
         const res = await markDailyChallenge(
@@ -90,11 +97,14 @@ export const DaySchedule = ({
         );
         await markFinishChallenge(sessionToken!, +challenge);
         if (res?.status === 200) {
+            setIsReviewOpen(true);
             toast.success("Challenge finished");
             setChallenge(null);
+            console.log('Opening review dialog');
         }
         setIsLoadingUI(false);
     };
+
     const markComplete = async () => {
         const res = await markDailyChallenge(
             sessionToken!,
@@ -103,7 +113,6 @@ export const DaySchedule = ({
         if (res?.status === 200) {
             toast.success("Day marked as complete");
             const nextDay = await getFirstUncompleted(sessionToken!);
-            // set status day to complete in all day
             const newAllDay = allDay.map((item) => {
                 if (item.dailyExercise.day === newCurrDay.dailyExercise.day) {
                     return {
@@ -118,6 +127,7 @@ export const DaySchedule = ({
             setNewCurrDay(nextDay!);
         }
     };
+
     useEffect(() => {
         const getDay = async () => {
             setIsLoadingDay(true);
@@ -130,6 +140,7 @@ export const DaySchedule = ({
         };
         getDay();
     }, [sessionToken, challenge]);
+
     useEffect(() => {
         const getVideoData = async () => {
             setIsLoading(true);
@@ -143,9 +154,11 @@ export const DaySchedule = ({
         };
         getVideoData();
     }, [day, sessionToken, challenge]);
+
     if (isLoadingUI) {
         return <LoadingSpinner />;
     }
+
     return (
         <div>
             <div className='flex justify-between items-center'>
@@ -329,6 +342,7 @@ export const DaySchedule = ({
                     </AccordionItem>
                 </Accordion>
             </div>
+            <ReviewDialog isOpen={isReviewOpen} onClose={() => setIsReviewOpen(false)} />
         </div>
     );
 };
