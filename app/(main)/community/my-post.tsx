@@ -196,7 +196,7 @@ const MyPost = () => {
       return null;
    }
    return (
-      <div className="w-[823px] mt-3">
+      <div className="w-full mt-3">
          {isLoading && posts.length === 0 ? (
             <div>
                <PostSkeleton />
