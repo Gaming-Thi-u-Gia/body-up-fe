@@ -9,13 +9,14 @@ import Modal from "./video";
 import { toast } from "sonner";
 
 type VideoItem = {
-    id: string;
+    id: number;
     title: string;
     img: string;
     views: string;
     date: string;
     duration: string;
     bookmarked: boolean;
+    name: string;
 }
 
 const VideoCard = ({ video }: { video: VideoItem }) => {
@@ -29,7 +30,7 @@ const VideoCard = ({ video }: { video: VideoItem }) => {
 
     const handleBookmarkClick = async () => {
         try {
-            const data = await fetchBookmarkVideo(user?.id!, video?.id!, sessionToken!);
+            const data = await fetchBookmarkVideo(video?.id!, sessionToken!);
             setBookmarkedVideos(data.bookmarked);
             if (data.bookmarked) {
                 toast.success('Video bookmarked successfully!');
@@ -68,7 +69,7 @@ const VideoCard = ({ video }: { video: VideoItem }) => {
                 </div>
                 <div className="p-3">
                     <p className="text-[16px] font-normal leading-[20px] text-[#303033] line-clamp-2">
-                        {video.title}
+                        {video.name}
                     </p>
                 </div>
                 <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center font-medium text-sm text-[#868A93]">

@@ -32,23 +32,8 @@ const FavoriteVideo = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true);
-            try {
-                const allVideos = await fetchVideos();
-                const bookmarkData = await fetchDataBookmarkVideoByUser(sessionToken!);
-                const bookmarkedUrls = bookmarkData.map((video: VideoItem) => video.url);
-
-                const bookmarkedVideos = allVideos
-                    .filter((video) => bookmarkedUrls.includes(video.id))
-                    .map((video) => ({
-                        ...video,
-                        bookmarked: true,
-                    }));
-
-                setVideos(bookmarkedVideos);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
+            const bookmarkData = await fetchDataBookmarkVideoByUser(sessionToken!);
+            setVideos(bookmarkData);
             setLoading(false);
         };
 
