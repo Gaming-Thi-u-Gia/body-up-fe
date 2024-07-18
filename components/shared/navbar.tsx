@@ -56,7 +56,6 @@ export const Navbar = () => {
       router.push("/");
     });
   };
-  console.log("chatsData:", chats);
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -125,6 +124,66 @@ export const Navbar = () => {
     }
     router.push("/inbox");
   };
+
+  if (pathname.includes("/admin")) {
+    return (
+      <div className="flex max-w-7xl justify-end items-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Image
+              src={user?.avatar || defaultProfile}
+              alt="Profile"
+              width={40}
+              height={40}
+              className="rounded-full cursor-pointer"
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <Link
+                  href={`/${currentUser?.username}`}
+                  className="w-full flex items-center"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link
+                  href="/settings/preferences "
+                  className="w-full flex items-center"
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuSub>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent></DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+            </DropdownMenuGroup>
+            <DropdownMenuItem
+              onClick={(e) => {
+                onClick(e);
+              }}
+            >
+              <span className="w-full flex items-center cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
+                Log out
+              </span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    );
+  }
 
   return (
     <nav className="bg-[#F7F7F7] border-b border-[#C4C4C4] fixed w-full z-50">

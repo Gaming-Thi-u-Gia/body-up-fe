@@ -18,6 +18,7 @@ export type UserState = {
   userDailyChallenges?: [];
   userProgressPhotos?: [];
   userNotifications?: [];
+  role?: string;
 };
 export type AuthState = {
   isLoggedIn: boolean;
