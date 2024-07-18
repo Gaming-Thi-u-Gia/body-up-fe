@@ -13,7 +13,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@radix-ui/react-accordion";
-import DailyExerciseSkeleton from "./skeleton-video";
 import fetchVideos from "@/utils/video/fetchDailyVideo";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -89,7 +88,6 @@ const DailyCourses: React.FC<DailyCoursesProps> = ({ workoutProgramId }) => {
           workoutProgramId,
           selectedDay
         );
-        console.log("Fetched Daily Recipe:", fetchedRecipe);
         setDailyRecipe(fetchedRecipe);
       }
       setLoading(false);
@@ -215,7 +213,7 @@ const DailyCourses: React.FC<DailyCoursesProps> = ({ workoutProgramId }) => {
           </Accordion>
         </div>
       )}
-      <CommentCourse />
+      
     </div>
   );
 };

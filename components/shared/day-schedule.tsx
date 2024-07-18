@@ -41,7 +41,7 @@ import {
     AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { redirect, useRouter } from "next/navigation";
-import ReviewDialog from './review-program';
+import { useFeedbackModel } from '@/stores/use-feedback';
 
 type Props = {
     title: string;
@@ -78,11 +78,8 @@ export const DaySchedule = ({
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingDay, setIsLoadingDay] = useState(false);
     const [newCurrDay, setNewCurrDay] = useState<DailyExercise>(currDay);
-    const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-    useEffect(() => {
-        console.log("isReviewOpen changed:", isReviewOpen);
-    }, [isReviewOpen]);
+    const {open, isOpen} = useFeedbackModel()
 
     const onClick = (index: number) => {
         if (isLoading) return;
@@ -96,11 +93,11 @@ export const DaySchedule = ({
             newCurrDay.dailyExercise.id
         );
         await markFinishChallenge(sessionToken!, +challenge);
+        console.log("challenge", challenge);
         if (res?.status === 200) {
-            setIsReviewOpen(true);
             toast.success("Challenge finished");
             setChallenge(null);
-            console.log('Opening review dialog');
+            open(+challenge)
         }
         setIsLoadingUI(false);
     };
@@ -341,8 +338,8 @@ export const DaySchedule = ({
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
+                
             </div>
-            <ReviewDialog isOpen={isReviewOpen} onClose={() => setIsReviewOpen(false)} />
         </div>
     );
 };
