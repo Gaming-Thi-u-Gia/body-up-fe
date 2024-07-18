@@ -106,11 +106,11 @@ const HeaderNavWorkoutPrograms: React.FC<HeaderNavWorkoutProgramsProps> = ({
         <div className="flex h-8 space-x-2">
           <div className="group relative">
             <Button
-              className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out"
+              className="group-hover:opacity-0 group-hover:invisible transition-opacity duration-500 ease-in-out search"
               variant="defaultOutline"
               size="default"
             >
-              <Image width={20} height={20} src="/search.svg" alt="Search" />{" "}
+              <Image width={20} height={20} src="/search.svg" alt="Search" />
               Search
             </Button>
             <input

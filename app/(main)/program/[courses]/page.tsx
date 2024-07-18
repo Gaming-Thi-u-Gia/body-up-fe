@@ -13,6 +13,7 @@ import SkeletonLoader from "./skeleton-daily";
 import { fetchJoinChallenge } from "@/utils/user";
 import { useAuthStore } from "@/components/providers/auth-provider";
 import ModalChallenge from "./access-join-challenge";
+import CommentCourse from "./comment-courses";
 
 interface Category {
     id: number;
@@ -31,7 +32,28 @@ interface WorkoutProgram {
     year: string;
     banner: string;
     releaseDate: string;
+    averageStar: number;
     workoutProgramCategories: Category[];
+    feedbackWorkouts: FeedBackWorkouts[];
+}
+
+interface FeedBackWorkouts {
+    id: number;
+    feedback: string;
+    createdAt: string;
+    ratingWorkout: RatingWorkout;
+    user: User;
+}
+
+interface RatingWorkout {
+    id: number;
+    star: number;
+}
+
+interface User {
+    id: number;
+    userName: string;
+    avatar: string;
 }
 
 const Page = () => {
@@ -40,7 +62,7 @@ const Page = () => {
     const [loading, setLoading] = useState(true);
     const [workoutProgramById, setWorkoutProgramById] = useState<WorkoutProgram | null>(null);
     const sessionToken = useAuthStore((store) => store.sessionToken);
-    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const pathName = usePathname();
     const workoutProgramId = pathName.split('/')[2];
@@ -62,7 +84,7 @@ const Page = () => {
     const joinWorkoutChallenge = async () => {
         const res = await fetchJoinChallenge(sessionToken!, Number(workoutProgramId));
         router.push("/my-fitness-journey");
-    }
+    };
 
     const joinChallenge = async () => {
         setIsModalOpen(true);
@@ -225,6 +247,7 @@ const Page = () => {
                     </div>
                     
                     <DailyCourses workoutProgramId={Number(workoutProgramId)}/>
+                    <CommentCourse averageStar={workoutProgramById?.averageStar || 0} feedbackWorkouts={workoutProgramById?.feedbackWorkouts || []} />
                 </div>
             </div>
         </div>

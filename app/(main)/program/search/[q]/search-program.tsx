@@ -70,7 +70,7 @@ const SearchProgram = ({ query }: SearchProgramProps) => {
         <div className="space-y-4">
             <div className="flex-1  bg-white py-2 my-3 flex justify-between items-center px-5 rounded-2xl">
                 <div>
-                    Showing <b>{totalSearchResult}</b> matching <b>Search Criteria</b>
+                    Showing <b id='total'>{totalSearchResult}</b> matching <b>Search Criteria</b>
                 </div>
                 <div>
                     <Link href="http://localhost:3000/program" className="text-red-500 cursor-pointer" onClick={clearSearch}>Clear</Link>

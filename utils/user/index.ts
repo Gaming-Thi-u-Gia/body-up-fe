@@ -476,3 +476,29 @@ export const fetchJoinChallenge = async (
         }
     );
 };
+
+export const createFeedback = async (sessionToken: string, workoutProgramId: number, feedback: string, star: number) => {
+    const res = await fetch(
+        `http://localhost:8080/api/v1/feedback?workoutProgramId=${workoutProgramId}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionToken}`,
+            },
+            body: JSON.stringify({
+                feedback,
+                ratingWorkout: {
+                    star,
+                },
+            }),
+        }
+    );
+
+    if (!res.ok) {
+        throw new Error('Failed to submit feedback');
+    }
+
+    return res.json();
+};
+

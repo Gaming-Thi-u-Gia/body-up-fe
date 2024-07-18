@@ -14,6 +14,8 @@ import { CardProgram } from "./card-program";
 import { DaySchedule } from "@/components/shared/day-schedule";
 import { useEffect, useState } from "react";
 import { getUncompletedChallenge } from "@/utils/user";
+import { useFeedbackModel } from "@/stores/use-feedback";
+import ReviewProgramModel from "@/components/modals/review-program-modal";
 type Props = {
     initAllChallenge: any;
     currDay: DailyExercise;
@@ -31,6 +33,7 @@ export const Challenge = ({ initAllChallenge, currDay, userCookie }: Props) => {
         };
         fetchChallenge();
     });
+    const {open, isOpen} = useFeedbackModel();
     return (
         <>
             {!challenge ? (
@@ -119,6 +122,7 @@ export const Challenge = ({ initAllChallenge, currDay, userCookie }: Props) => {
                     setChallenge={setChallenge}
                 />
             )}
+            {isOpen && <ReviewProgramModel />}
         </>
     );
 };

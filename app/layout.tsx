@@ -22,6 +22,7 @@ import { DeletePostModal } from "@/components/modals/delete-post-modal";
 import { SharePostModal } from "@/components/modals/share-modal";
 import { AddChatUser } from "@/components/modals/add-chat-user-modal";
 import { BlockUserModal } from "@/components/modals/block-user-modal";
+import ReviewProgramModel from "@/components/modals/review-program-modal";
 const font = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -63,6 +64,7 @@ export default async function RootLayout({
             <UploadPhotoModal />
             <DeletePhotoModal />
             <BmiModal />
+            <ReviewProgramModel />
             {children}
             <BmiCaculate />
           </main>
