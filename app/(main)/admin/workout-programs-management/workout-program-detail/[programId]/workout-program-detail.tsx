@@ -51,7 +51,7 @@ export type ProgramType = {
   year: number;
   img: string;
   banner: string;
-  createdAt: string;
+  releaseDate: string;
   programTopics: ProgramTopicType[];
   workoutProgramCategories: WorkoutProgramCategoryType[];
   dailyExercises: DailyExerciseType[];
@@ -286,8 +286,8 @@ const WorkoutProgramDetail = () => {
         <div>
           <label className="block font-medium text-lg mb-2">Created At:</label>
           <span className="text-base">
-            {program.createdAt
-              ? new Date(program.createdAt).toLocaleDateString()
+            {program.releaseDate
+              ? new Date(program.releaseDate).toLocaleDateString()
               : ""}
           </span>
         </div>

@@ -44,7 +44,7 @@ export const LoginForm = () => {
 
         const authResponse = await getAuth(response.payload.res.token);
         if (
-          authResponse?.payload.email !== "admin@gmail.com" &&
+          authResponse?.payload.role !== "ADMIN" &&
           authResponse?.status === 200
         ) {
           const res = await signInWithEmailAndPassword(
