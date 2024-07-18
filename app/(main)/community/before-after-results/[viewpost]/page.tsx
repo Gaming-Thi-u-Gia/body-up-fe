@@ -1,10 +1,20 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 import React, { useEffect, useState, useTransition } from "react";
+import defaultProfile from "/public/default-iProfile.png";
 import Image from "next/image";
 import message_icon from "/public/message-icon.svg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import before_after from "/public/before-after-icon.svg";
+import challenges_icon from "/public/challenges-icon.svg";
+import {
+   Sheet,
+   SheetContent,
+   SheetHeader,
+   SheetTitle,
+   SheetTrigger,
+} from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import back_Icon from "/public/back-icon.svg";
 import { usePathname } from "next/navigation";
@@ -40,6 +50,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CommentSchema } from "@/schemas";
 import { z } from "zod";
+import { SharePostModal } from "@/components/modals/share-modal";
+
 import moment from "moment";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSharePostModal } from "@/stores/use-share-model";
@@ -183,17 +195,17 @@ const BeforeAfterPost = () => {
    };
    if (isLoading)
       return (
-         <div className="w-full">
+         <div className="w-[823px] mt-[5%]">
             <BeforeAfterPostSkeleton />
          </div>
       );
 
    return (
       <Gallery>
-         <div className="full">
+         <div className="w-[823px] mt-[5%]">
             <Link
                href={`/community/${title}`}
-               className="flex gap-2 w-full items-center justify-start mb-4"
+               className="flex gap-2 items-center justify-start mb-4"
             >
                <Image src={back_Icon} width={24} height={24} alt="back" />
                <span className="text-[15px] text-black flex gap-2 ">
@@ -428,7 +440,7 @@ export default BeforeAfterPost;
 
 const BeforeAfterPostSkeleton = () => {
    return (
-      <div className="full animate-pulse">
+      <div className="w-[823px] mt-[5%] animate-pulse">
          <div className="flex items-center space-x-4">
             {/* Skeleton for back link */}
             <Skeleton className="h-6 w-6 rounded-full" />

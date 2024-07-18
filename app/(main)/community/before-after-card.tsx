@@ -97,12 +97,12 @@ const BeforAfterPost = () => {
    return (
       <>
          {isLoading && posts.length === 0 ? (
-            <div className="flex flex-col items-center gap-4 w-full">
-               <div className="w-full grid grid-cols-2 gap-4">
+            <div className="flex flex-col istems-center gap-4">
+               <div className="flex items-center justify-between gap-4">
                   <BeforeAfterPostSkeleton />
                   <BeforeAfterPostSkeleton />
                </div>
-               <div className="w-full grid grid-cols-2 gap-4">
+               <div className="flex items-center justify-between gap-4">
                   <BeforeAfterPostSkeleton />
                   <BeforeAfterPostSkeleton />
                </div>
@@ -113,8 +113,8 @@ const BeforAfterPost = () => {
                next={getPostsByCategory}
                hasMore={hasMorePosts}
                loader={
-                  <div className="flex flex-col istems-center gap-4 mt-4">
-                     <div className="w-full grid grid-cols-2 gap-4">
+                  <div className="flex flex-col istems-center gap-4">
+                     <div className="flex items-center justify-between gap-4">
                         <BeforeAfterPostSkeleton />
                         <BeforeAfterPostSkeleton />
                      </div>
@@ -196,7 +196,7 @@ export default BeforAfterPost;
 
 const BeforeAfterPostSkeleton = () => {
    return (
-      <div className="bg-white rounded-md px-2 py-3 space-y-4 w-full">
+      <div className="bg-white rounded-md px-2 py-3 space-y-4">
          {/* User details and new tag placeholder */}
          <div className="flex items-center justify-between ">
             <div className="flex gap-2 items-center">
