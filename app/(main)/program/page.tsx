@@ -1,5 +1,6 @@
 "use client";
-
+import { useAuthStore } from "@/components/providers/auth-provider";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
 import CatelogyModelProgram from "./catelogy-model-program";
@@ -40,6 +41,9 @@ interface WorkoutProgram {
 }
 
 const ProgramPage = () => {
+  const { user } = useAuthStore((store) => store);
+  const router = useRouter();
+  if (user?.role === "ADMIN") router.push("/admin");
   const [workoutPrograms, setWorkoutPrograms] = useState<WorkoutProgram[]>([]);
   const [topicIds, setTopicIds] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(true);

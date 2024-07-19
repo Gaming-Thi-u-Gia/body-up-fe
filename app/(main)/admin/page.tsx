@@ -6,12 +6,15 @@ import { useRouter } from "next/navigation";
 const page = () => {
   const { user } = useAuthStore((store) => store);
   const router = useRouter();
-  if (user?.role !== "ADMIN") router.push("/");
-  return (
-    <div>
-      <Dashboard />
-    </div>
-  );
+  if (user?.role === "ADMIN") {
+    return (
+      <div>
+        <Dashboard />
+      </div>
+    );
+  } else {
+    router.push("/");
+  }
 };
 
 export default page;

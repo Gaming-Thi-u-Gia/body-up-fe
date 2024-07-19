@@ -61,11 +61,7 @@ export const LoginForm = () => {
         }
         login(response.payload.res.token);
         updateProfile(authResponse?.payload);
-        if (user?.role === "ADMIN") {
-          router.push("/admin");
-        } else {
-          router.push("/program");
-        }
+        router.push("/program");
         toast.success("Login Successfuly!", {
           description: `${new Date().toLocaleString()}`,
           action: {
