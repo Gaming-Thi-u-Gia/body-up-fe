@@ -11,6 +11,7 @@ import UserInfo from "../../community/user-info";
 
 interface CommentCourseProps {
    averageStar: number;
+   //@ts-ignore
    feedbackWorkouts: FeedBackWorkouts[];
 }
 

@@ -54,7 +54,7 @@ const CategoryModelProgramById: React.FC<HeaderNavWorkoutProgramsProps> = ({onFi
         if (pathname) {
             const pathSegments = pathname.split("/");
             const lastSegment = pathSegments[pathSegments.length - 1] ?? "";
-    
+            //@ts-ignore
             if (!isNaN(lastSegment)) {
                 setQuery(lastSegment);
             }
@@ -84,6 +84,7 @@ const CategoryModelProgramById: React.FC<HeaderNavWorkoutProgramsProps> = ({onFi
         }
     }, [query]);
 
+    //@ts-ignore
     function formatDate(dateString) {
         const date = new Date(dateString);
         return date
