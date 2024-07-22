@@ -61,6 +61,7 @@ const VideoCategory = () => {
                         (searchVideo: VideoItem) => searchVideo.url === video.id
                     )
                 );
+                //@ts-ignore
                 setVideos(filteredVideos);
             } else {
                 setVideos([]);
@@ -108,6 +109,7 @@ const VideoCategory = () => {
                 </div>
                 <div className="grid grid-cols-5 gap-5 my-5">
                     {videos.map((video, index) => (
+                        //@ts-ignore
                         <VideoCard video={video} key={index} />
                     ))}
                 </div>

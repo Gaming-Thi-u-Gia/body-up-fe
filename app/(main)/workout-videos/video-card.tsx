@@ -59,6 +59,7 @@ const VideoCard = ({ video }: { video: VideoItem }) => {
                         className="rounded-t-lg object-cover rounded-2xl"
                         src={video.img || "/placeholder-image.png"}
                         alt={video.title || "Video thumbnail"}
+                        //@ts-ignore
                         onClick={() => handleThumbnailClick(video.id)}
                     />
                     <div className="absolute w-10 right-[10px] bottom-[10px] rounded-[4px] bg-[#303033]">

@@ -28,6 +28,7 @@ import {
 import { db } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const UserInfo = ({ user }: { user: UserReal }) => {
    const { currentUser } = useUserFirebaseStore((store) => store);
@@ -135,7 +136,7 @@ const UserInfo = ({ user }: { user: UserReal }) => {
                <div className="flex flex-col gap-2 mt-1">
                   <span className="text-sm">{user.email}</span>
 
-                  <div className="flex gap-1">
+                  {/* <div className="flex gap-1">
                      <Image
                         src={before_after}
                         width={18}
@@ -145,7 +146,7 @@ const UserInfo = ({ user }: { user: UserReal }) => {
                      <label htmlFor="" className="text-sm">
                         0 Challenges Completed
                      </label>
-                  </div>
+                  </div> */}
                   <div className="flex gap-1">
                      <Image
                         src={challenges_icon}
@@ -159,7 +160,9 @@ const UserInfo = ({ user }: { user: UserReal }) => {
                   </div>
                </div>
                <div className="flex gap-2 mt-4">
-                  <Button variant="primary">View Profile</Button>
+                  <Link href={`/${user.userName2}`}>
+                     <Button variant="primary">View Profile</Button>
+                  </Link>
                   <Button
                      variant="default"
                      className="bg-[#EFF0F4]"

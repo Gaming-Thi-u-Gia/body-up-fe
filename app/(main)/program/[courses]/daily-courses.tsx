@@ -43,7 +43,7 @@ interface Recipe {
   id: number;
   name: string;
   avgStar: number;
-  image: string;
+  img: string;
   url: string;
 }
 
@@ -71,6 +71,7 @@ const DailyCourses: React.FC<DailyCoursesProps> = ({ workoutProgramId }) => {
         const fetchedVideos = await fetchVideos(
           fetchDailyExerciseData(workoutProgramId, selectedDay)
         );
+        //@ts-ignore
         setDailyExercise(fetchedVideos);
       }
       setLoading(false);
@@ -143,6 +144,7 @@ const DailyCourses: React.FC<DailyCoursesProps> = ({ workoutProgramId }) => {
                       releaseDate={video.date}
                       duration={video.duration}
                       url={video.url}
+                      //@ts-ignore
                       category={video.category}
                     />
                   </div>

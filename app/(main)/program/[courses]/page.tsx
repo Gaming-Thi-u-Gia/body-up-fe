@@ -37,7 +37,7 @@ interface WorkoutProgram {
     feedbackWorkouts: FeedBackWorkouts[];
 }
 
-interface FeedBackWorkouts {
+export interface FeedBackWorkouts {
     id: number;
     feedback: string;
     createdAt: string;

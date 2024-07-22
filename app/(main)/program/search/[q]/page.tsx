@@ -18,7 +18,6 @@ const SearchPage = () => {
 
   return (
     <div className='w-full px-[140px] pb-[47px]'>
-      <HeaderNavWorkoutPrograms />
       <SearchProgram query={query} />
     </div>
   );
