@@ -2,7 +2,7 @@
 import { useAuthStore } from "@/components/providers/auth-provider";
 import { useRouter } from "next/navigation";
 import EditWorkoutProgram from "./edit-workout-program";
-const page = () => {
+const EditWorkoutProgramPage = () => {
   const { user } = useAuthStore((store) => store);
   const router = useRouter();
   if (user?.role === "ADMIN"){
@@ -15,4 +15,4 @@ const page = () => {
   }
 };
 
-export default page;
+export default EditWorkoutProgramPage;

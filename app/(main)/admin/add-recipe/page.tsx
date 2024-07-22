@@ -3,7 +3,7 @@ import { useAuthStore } from "@/components/providers/auth-provider";
 import { useRouter } from "next/navigation";
 import AddRecipe from "./add-recipe";
 
-const page = () => {
+const AddRecipePage = () => {
   const { user } = useAuthStore((store) => store);
   const router = useRouter();
   if (user?.role === "ADMIN"){
@@ -16,4 +16,4 @@ const page = () => {
   }
 };
 
-export default page;
+export default AddRecipePage;
