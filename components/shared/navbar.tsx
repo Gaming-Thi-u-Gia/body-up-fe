@@ -250,45 +250,49 @@ export const Navbar = () => {
                                        <DropdownMenuItem key={chat.chatId}>
                                           <Link
                                              href="#"
-                                             className={`flex
-                                              ${
-                                                 chat?.isSeen
-                                                    ? "bg-transparent"
-                                                    : "bg-[#4b7af0]"
-                                              } items-center w-full gap-3 rounded-md bg-muted/50 px-3 py-2 transition-colors hover:bg-muted`}
+                                             className={`flex ${
+                                                chat?.isSeen
+                                                   ? "bg-transparent"
+                                                   : "bg-[#4b7af0]"
+                                             } items-center w-full gap-3 rounded-md bg-muted/50 px-3 py-2 transition-colors hover:bg-muted`}
                                              prefetch={false}
                                              onClick={() => handleSelect(chat)}
                                           >
-                                             <Avatar className="h-8 w-8 border">
-                                                <Image
-                                                   src={
-                                                      chat.user.blocked?.includes(
-                                                         currentUser?.id!
-                                                      )
-                                                         ? defaultProfile
-                                                         : chat.user.avatar ??
-                                                           defaultProfile
-                                                   }
-                                                   alt="logo"
-                                                   width={32}
-                                                   height={32}
-                                                   className="cursor-pointer rounded-full"
-                                                />
-                                             </Avatar>
+                                             {chat.user && (
+                                                <Avatar className="h-8 w-8 border">
+                                                   <Image
+                                                      src={
+                                                         chat.user &&
+                                                         chat.user.blocked?.includes(
+                                                            currentUser?.id!
+                                                         )
+                                                            ? defaultProfile
+                                                            : chat.user
+                                                                 ?.avatar ??
+                                                              defaultProfile
+                                                      }
+                                                      alt="logo"
+                                                      width={32}
+                                                      height={32}
+                                                      className="cursor-pointer rounded-full"
+                                                   />
+                                                </Avatar>
+                                             )}
+
                                              <div className="flex-1 overflow-hidden">
                                                 <div className="font-medium truncate">
-                                                   {chat.user.blocked?.includes(
+                                                   {chat.user?.blocked?.includes(
                                                       currentUser?.id!
                                                    )
                                                       ? "User"
-                                                      : chat.user.username}
+                                                      : chat.user?.username}
                                                 </div>
                                                 <div
                                                    className={`${
                                                       chat.isSeen
                                                          ? "text-muted-foreground"
                                                          : "font-bold text-black"
-                                                   } text-sm  line-clamp-1 break-all`}
+                                                   } text-sm line-clamp-1 break-all`}
                                                 >
                                                    {chat.lastMessage}
                                                 </div>

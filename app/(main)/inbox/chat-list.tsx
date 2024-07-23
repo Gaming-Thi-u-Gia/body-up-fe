@@ -83,7 +83,7 @@ const ChatList = () => {
       }
    };
    const filteredChats = chats.filter((chat) =>
-      chat.user.username?.toLowerCase().includes(username.toLowerCase())
+      chat.user?.username?.toLowerCase().includes(username.toLowerCase())
    );
 
    const handleAIChatId = async (id: string) => {
@@ -155,7 +155,7 @@ const ChatList = () => {
                         src={
                            chat.user.blocked?.includes(currentUser?.id!)
                               ? defaultProfile
-                              : chat.user.avatar ?? ""
+                              : chat.user.avatar ?? defaultProfile
                         }
                         alt="logo"
                         width={32}
