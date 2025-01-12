@@ -37,7 +37,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const userCookie = cookies().get("sessionToken");
-  const googleCookie = cookies().get("googleToken");
   let res;
   if (userCookie) {
     res = await getAuth(userCookie.value);

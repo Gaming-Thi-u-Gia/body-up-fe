@@ -7,18 +7,35 @@
 }
 
 @keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
 }
 
 @keyframes blink-caret {
-    from, to { border-color: transparent; }
-    50% { border-color: black; }
+
+    from,
+    to {
+        border-color: transparent;
+    }
+
+    50% {
+        border-color: black;
+    }
 }
 
 @keyframes reset-typing {
-    0% { width: 100%; }
-    100% { width: 0; }
+    0% {
+        width: 100%;
+    }
+
+    100% {
+        width: 0;
+    }
 }
 
 .typing {
@@ -27,8 +44,9 @@
     white-space: nowrap;
     width: 0;
     animation: typing 1.5s steps(40, end) infinite alternate,
-               blink-caret .75s step-end infinite;
+        blink-caret .75s step-end infinite;
 }
+
 @layer base {
     :root {
         --background: 0 0% 100%;
@@ -97,6 +115,7 @@
     * {
         @apply border-border;
     }
+
     body {
         @apply bg-background text-foreground;
     }
@@ -108,8 +127,8 @@ body {
 }
 
 .loader {
-    border: 16px solid #f3f3f3; /* Light grey */
-    border-top: 16px solid #3498db; /* Blue */
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
     border-radius: 50%;
     width: 120px;
     height: 120px;
@@ -120,6 +139,7 @@ body {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }

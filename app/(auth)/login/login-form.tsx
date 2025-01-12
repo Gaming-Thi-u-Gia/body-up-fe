@@ -154,8 +154,8 @@ export const LoginForm = () => {
           </div>
           <Button
             type="submit"
-            variant="primary"
-            size="full"
+            variant="destructive"
+            size="icon"
             disabled={isPending}
           >
             Log in
@@ -169,8 +169,8 @@ export const LoginForm = () => {
           </div>
           <Button
             type="button"
-            variant="primaryOutline"
-            size="full"
+            variant="destructive"
+            size="icon"
             className="text-sm font-medium"
             disabled={isPending}
             onClick={() => signIn("google")}
